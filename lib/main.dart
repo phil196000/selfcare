@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:selfcare/Navigation/BottomNav.dart';
+import 'package:selfcare/Screens/Login.dart';
+import 'package:selfcare/Screens/Record.dart';
+import 'package:selfcare/Screens/Welcome.dart';
 
-import 'package:selfcare/Welcome.dart';
 
 void main() {
   runApp(MyApp());
@@ -28,7 +31,7 @@ class MyApp extends StatelessWidget {
         // closer together (more dense) than on mobile platforms.
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      home:Welcome() ,
+      home: Record(),
     );
   }
 }
