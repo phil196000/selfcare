@@ -1,12 +1,16 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:persistent_bottom_nav_bar/persistent-tab-view.dart';
 import 'package:selfcare/CustomisedWidgets/Background.dart';
 import 'package:selfcare/CustomisedWidgets/DarkRedText.dart';
 import 'package:selfcare/CustomisedWidgets/RecentCard.dart';
 import 'package:selfcare/CustomisedWidgets/RecordCard.dart';
 import 'package:selfcare/CustomisedWidgets/RedText.dart';
 import 'package:selfcare/CustomisedWidgets/WhiteText.dart';
+import 'package:selfcare/Screens/AllStatistics.dart';
 import 'package:selfcare/Theme/DefaultColors.dart';
+
+import 'Record.dart';
 
 class Home extends StatefulWidget {
   @override
@@ -39,7 +43,7 @@ class _HomeState extends State<Home> {
             ),
           )),
           ListView(
-            padding: EdgeInsets.only(left: 15,right: 15, top: 10,bottom: 100),
+            padding: EdgeInsets.only(left: 15, right: 15, top: 10, bottom: 100),
             children: [
               Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                 RedText(
@@ -79,7 +83,9 @@ class _HomeState extends State<Home> {
                 ],
               ),
               Container(
-                  margin: EdgeInsets.only(top: MediaQuery.of(context).size.height * 0.12, bottom: 10),
+                  margin: EdgeInsets.only(
+                      top: MediaQuery.of(context).size.height * 0.12,
+                      bottom: 10),
                   child: DarkRedText(
                     size: 13,
                     text: 'Check and record your readings',
@@ -89,30 +95,70 @@ class _HomeState extends State<Home> {
                 spacing: MediaQuery.of(context).size.width * 0.09,
                 runSpacing: MediaQuery.of(context).size.height * 0.05,
                 children: [
-                  RecordCard(
-                    title: 'Blood Glucose',
-                    poster: 'lib/Assets/sugar.png',
-                    onPressed: () {},
-                    background: defaultColors.darkRed,
-                  ),
-                  RecordCard(
-                    title: 'Blood Pressure',
-                    poster: 'lib/Assets/pressure.png',
-                    onPressed: () {},
-                    background: defaultColors.black,
-                  ),
-                  RecordCard(
-                    title: 'Body Weight',
-                    poster: 'lib/Assets/scale.png',
-                    onPressed: () {},
-                    background: defaultColors.primary,
-                  ),
-                  RecordCard(
-                    title: 'All Statistics',
-                    poster: 'lib/Assets/statistics.png',
-                    onPressed: () {},
-                    background: defaultColors.green,
-                  ),
+                  ...[
+                    {
+                      'title': 'Blood Glucose',
+                      'poster': 'lib/Assets/sugar.png',
+                      'background': defaultColors.darkRed
+                    },
+                    {
+                      'title': 'Blood Pressure',
+                      'poster': 'lib/Assets/pressure.png',
+                      'background': defaultColors.black
+                    },
+                    {
+                      'title': 'Body Weight',
+                      'poster': 'lib/Assets/scale.png',
+                      'background': defaultColors.primary
+                    },
+                    {
+                      'title': 'All Statistics',
+                      'poster': 'lib/Assets/statistics.png',
+                      'background': defaultColors.green
+                    }
+                  ]
+                      .map((e) => RecordCard(
+                            title: e['title'],
+                            poster: e['poster'],
+                            onPressed: () {
+                              pushNewScreen(context,
+                                  screen: e['title'] == 'All Statistics'
+                                      ? AllStatistics()
+                                      : Record(
+                                          title: e['title'],
+                                        ),
+                                  withNavBar: false);
+                            },
+                            background: e['background'],
+                          ))
+                      .toList(),
+                  // RecordCard(
+                  //   title: 'Blood Pressure',
+                  //   poster: 'lib/Assets/pressure.png',
+                  //   onPressed: () {
+                  //     pushNewScreen(context,
+                  //         screen: Record(), withNavBar: false);
+                  //   },
+                  //   background: defaultColors.black,
+                  // ),
+                  // RecordCard(
+                  //   title: 'Body Weight',
+                  //   poster: 'lib/Assets/scale.png',
+                  //   onPressed: () {
+                  //     pushNewScreen(context,
+                  //         screen: Record(), withNavBar: false);
+                  //   },
+                  //   background: defaultColors.primary,
+                  // ),
+                  // RecordCard(
+                  //   title: 'All Statistics',
+                  //   poster: 'lib/Assets/statistics.png',
+                  //   onPressed: () {
+                  //     pushNewScreen(context,
+                  //         screen: AllStatistics(), withNavBar: false);
+                  //   },
+                  //   background: defaultColors.green,
+                  // ),
                 ],
               )
             ],

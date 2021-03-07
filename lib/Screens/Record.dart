@@ -2,6 +2,7 @@ import 'dart:developer';
 
 import 'package:adobe_xd/pinned.dart';
 import 'package:flutter/material.dart';
+import 'package:persistent_bottom_nav_bar/persistent-tab-view.dart';
 import 'package:selfcare/CustomisedWidgets/Background.dart';
 import 'package:selfcare/CustomisedWidgets/DarkBlueText.dart';
 import 'package:selfcare/CustomisedWidgets/DarkRedText.dart';
@@ -9,10 +10,19 @@ import 'package:selfcare/CustomisedWidgets/Legend.dart';
 import 'package:selfcare/CustomisedWidgets/RecordScreenCard.dart';
 import 'package:selfcare/CustomisedWidgets/RedText.dart';
 import 'package:selfcare/CustomisedWidgets/WhiteText.dart';
+import 'package:selfcare/Navigation/BottomNav.dart';
+import 'package:selfcare/Screens/Record/BarChart.dart';
+import 'package:selfcare/Screens/Record/Calendar.dart';
+import 'package:selfcare/Screens/Record/DropDown.dart';
+import 'package:selfcare/Screens/Record/History.dart';
 import 'package:selfcare/Screens/Record/RecordSheet.dart';
 import 'package:selfcare/Theme/DefaultColors.dart';
 
 class Record extends StatefulWidget {
+  final String title;
+
+  const Record({Key key, this.title}) : super(key: key);
+
   @override
   _RecordState createState() => _RecordState();
 }
@@ -21,6 +31,8 @@ class _RecordState extends State<Record> {
   DefaultColors defaultColors = DefaultColors();
   PageController pageController = PageController();
   int page = 0;
+  bool choice = true;
+  String dropdownValue = 'One';
 
   void changePage(int pageValue) {
     pageController.animateToPage(pageValue,
@@ -31,6 +43,26 @@ class _RecordState extends State<Record> {
   }
 
   @override
+  void initState() {
+    super.initState();
+    pageController.addListener(() {
+      // log(pageController.page.toString());
+      if (pageController.page == 0.0 || pageController.page == 1.0) {
+        this.setState(() {
+          page = pageController.page.toInt();
+        });
+        log(pageController.page.toString());
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    pageController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
@@ -38,7 +70,6 @@ class _RecordState extends State<Record> {
           // overflow: Overflow.visible,
           children: [
             Background(),
-
             Flex(
               direction: Axis.vertical,
               children: [
@@ -60,8 +91,12 @@ class _RecordState extends State<Record> {
                             IconButton(
                                 icon: Icon(Icons.chevron_left),
                                 iconSize: 40,
-                                onPressed: () {}),
-                            DarkRedText(text: 'BLOOD GLUCOSE')
+                                onPressed: () {
+                                  Navigator.pop(context);
+                                  // pushNewScreen(context,
+                                  //     screen: Main(), withNavBar: true);
+                                }),
+                            DarkRedText(text: widget.title.toUpperCase())
                           ],
                         ),
                         page == 0
@@ -92,25 +127,114 @@ class _RecordState extends State<Record> {
                               size: 13,
                               text: 'Pick a time to view record',
                             ),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                RecordScreenCard(
-                                  title: 'Pre Meal',
-                                  value: '329',
-                                  unit: "mg/dl",
-                                  background: defaultColors.darkRed,
-                                  poster: 'lib/Assets/emptybowl.png',
+                            Container(
+                              decoration: BoxDecoration(
+                                  color: defaultColors.white,
+                                  border: Border.all(
+                                    width: 1,
+                                    color: defaultColors.darkblue,
+                                  ),
+                                  borderRadius: BorderRadius.circular(5),
+                                  boxShadow: [
+                                    BoxShadow(
+                                        color: defaultColors.shadowColorGrey,
+                                        offset: Offset(0, 5),
+                                        blurRadius: 10)
+                                  ]),
+                              margin: EdgeInsets.only(bottom: 25),
+                              padding: EdgeInsets.symmetric(horizontal: 10),
+                              child: DropdownButton<String>(
+                                value: dropdownValue,
+
+                                icon: Icon(Icons.keyboard_arrow_down_outlined),
+                                iconSize: 24,
+                                elevation: 16,
+                                isExpanded: true,
+
+                                hint: Text('Select a text'),
+                                style: TextStyle(color: Colors.deepPurple),
+                                // selectedItemBuilder: ,
+                                underline: Container(
+                                  height: 0,
+                                  color: Colors.deepPurpleAccent,
                                 ),
-                                RecordScreenCard(
-                                  title: 'Pre Meal',
-                                  value: '329',
-                                  unit: "mg/dl",
-                                  background: defaultColors.darkblue,
-                                  poster: 'lib/Assets/fullbowl.png',
-                                )
-                              ],
+                                onChanged: (String newValue) {
+                                  setState(() {
+                                    dropdownValue = newValue;
+                                  });
+                                },
+                                items: <String>[
+                                  'One',
+                                  'Two',
+                                  'Free',
+                                  'Four'
+                                ].map<DropdownMenuItem<String>>((String value) {
+                                  return DropdownMenuItem<String>(
+                                    value: value,
+                                    child: Text(
+                                      value,
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                        color: defaultColors.darkblue,
+                                      ),
+                                    ),
+                                  );
+                                }).toList(),
+                              ),
                             ),
+                            Visibility(
+                              visible: widget.title != 'Body Weight',
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  RecordScreenCard(
+                                    textColor: defaultColors.white,
+                                    title: widget.title == 'Blood Glucose'
+                                        ? 'Pre Meal'
+                                        : 'Systolic',
+                                    value: '329',
+                                    unit: widget.title == 'Blood Glucose'
+                                        ? "mg/dl"
+                                        : 'mm/hg',
+                                    background: widget.title == 'Blood Glucose'
+                                        ? defaultColors.darkRed
+                                        : defaultColors.black,
+                                    poster: widget.title == 'Blood Glucose'
+                                        ? 'lib/Assets/emptybowl.png'
+                                        : '',
+                                  ),
+                                  RecordScreenCard(
+                                    textColor: widget.title == 'Blood Glucose'
+                                        ? defaultColors.white
+                                        : defaultColors.black,
+                                    title: widget.title == 'Blood Glucose'
+                                        ? 'Pre Meal'
+                                        : 'Diastolic',
+                                    value: '329',
+                                    unit: widget.title == 'Blood Glucose'
+                                        ? "mg/dl"
+                                        : 'mm/hg',
+                                    background: widget.title == 'Blood Glucose'
+                                        ? defaultColors.darkblue
+                                        : defaultColors.white,
+                                    poster: widget.title == 'Blood Glucose'
+                                        ? 'lib/Assets/fullbowl.png'
+                                        : '',
+                                  )
+                                ],
+                              ),
+                            ),
+                            Padding(
+                                padding: widget.title != 'Body Weight'
+                                    ? EdgeInsets.only(
+                                        top:
+                                            MediaQuery.of(context).size.height *
+                                                0.05)
+                                    : EdgeInsets.only(
+                                        top:
+                                            MediaQuery.of(context).size.height *
+                                                0.002)),
                             Row(
                               children: [
                                 Container(
@@ -124,7 +248,11 @@ class _RecordState extends State<Record> {
                                       ),
                                       Container(
                                         child: WhiteText(
-                                          text: 'mg/dl',
+                                          text: widget.title == 'Blood Glucose'
+                                              ? "mg/dl"
+                                              : widget.title == 'Bood Pressure'
+                                                  ? 'mm/hg'
+                                                  : 'kg',
                                           size: 12,
                                         ),
                                       ),
@@ -146,7 +274,8 @@ class _RecordState extends State<Record> {
                                   alignment: Alignment.centerRight,
                                   padding: EdgeInsets.symmetric(
                                       vertical: 22, horizontal: 19),
-                                  margin: EdgeInsets.only(right: 30),
+                                  margin:
+                                      EdgeInsets.only(right: 30, bottom: 15),
                                 ),
                                 Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -167,41 +296,64 @@ class _RecordState extends State<Record> {
                                 )
                               ],
                               mainAxisAlignment: MainAxisAlignment.center,
-                            )
+                            ),
+                            Row(
+                              children: [
+                                ChoiceChip(
+                                  backgroundColor: Colors.transparent,
+                                  selectedColor: defaultColors.lightdarkRed,
+                                  shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(25),
+                                      side: BorderSide(
+                                          color: defaultColors.darkRed)),
+                                  labelStyle:
+                                      TextStyle(color: defaultColors.darkRed),
+                                  selected: choice,
+                                  onSelected: (bool selected) {
+                                    this.setState(() {
+                                      choice = selected;
+                                    });
+                                  },
+                                  label: Text('Calendar'),
+                                  padding: EdgeInsets.symmetric(horizontal: 10),
+                                ),
+                                SizedBox(
+                                  width: 25,
+                                ),
+                                ChoiceChip(
+                                  selected: !choice,
+                                  shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(25),
+                                      side: BorderSide(
+                                          color: defaultColors.darkRed)),
+                                  labelStyle:
+                                      TextStyle(color: defaultColors.darkRed),
+                                  backgroundColor: defaultColors.white,
+                                  selectedColor: defaultColors.lightdarkRed,
+                                  onSelected: (bool selected) {
+                                    this.setState(() {
+                                      choice = !selected;
+                                    });
+                                  },
+                                  label: Text('Graph'),
+                                  padding: EdgeInsets.symmetric(horizontal: 10),
+                                )
+                              ],
+                            ),
+                            choice
+                                ? Container(child: Calendar())
+                                : Container(
+                                    height: MediaQuery.of(context).size.height *
+                                        0.3,
+                                    child: SimpleBarChart(
+                                      animate: true,
+                                    ),
+                                  )
                           ],
                           padding: EdgeInsets.only(
                               bottom: 100, top: 10, left: 15, right: 15),
                         ),
-                        ListView(
-                          padding: EdgeInsets.only(
-                              top: 10, left: 15, right: 15, bottom: 100),
-                          children: [
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Container(
-                                  child: WhiteText(
-                                    text: '11 February 2021',
-                                    size: 10,
-                                  ),
-                                  alignment: Alignment.center,
-                                  padding: EdgeInsets.symmetric(
-                                      horizontal: 8, vertical: 7),
-                                  decoration: BoxDecoration(
-                                      color: defaultColors.darkRed,
-                                      borderRadius: BorderRadius.circular(5),
-                                      boxShadow: [
-                                        BoxShadow(
-                                            color:
-                                                defaultColors.shadowColorGrey,
-                                            offset: Offset(0, 5),
-                                            blurRadius: 10)
-                                      ]),
-                                )
-                              ],
-                            )
-                          ],
-                        )
+                        History(record: widget.title,)
                       ],
                     ),
                   ),
@@ -261,7 +413,7 @@ class _RecordState extends State<Record> {
                           borderRadius: BorderRadius.only(
                               topLeft: Radius.circular(50),
                               topRight: Radius.circular(50))),
-                      enableDrag: false,
+                      enableDrag: true,
                       isScrollControlled: true,
                       builder: (BuildContext context) {
                         return RecordSheet();
@@ -314,4 +466,13 @@ class _RecordState extends State<Record> {
       ),
     );
   }
+}
+
+/// Sample ordinal data type.
+
+class OrdinalSales {
+  final String year;
+  final int sales;
+
+  OrdinalSales(this.year, this.sales);
 }

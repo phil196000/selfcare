@@ -6,9 +6,14 @@ class PrimaryButton extends StatelessWidget {
   final String text;
   final Function onPressed;
   final double horizontalPadding;
+  final double verticalPadding;
 
   PrimaryButton(
-      {Key key, this.text, this.onPressed, this.horizontalPadding = 15})
+      {Key key,
+      this.text,
+      this.onPressed,
+      this.horizontalPadding = 15,
+      this.verticalPadding = 15})
       : super(key: key);
 
   @override
@@ -21,7 +26,7 @@ class PrimaryButton extends StatelessWidget {
       ),
       child: Container(
         padding: EdgeInsets.symmetric(
-            vertical: 15, horizontal: this.horizontalPadding),
+            vertical: verticalPadding, horizontal: this.horizontalPadding),
         decoration: BoxDecoration(
             color: defaultColors.primary,
             borderRadius: BorderRadius.circular(5),

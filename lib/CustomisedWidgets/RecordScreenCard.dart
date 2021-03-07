@@ -10,6 +10,7 @@ class RecordScreenCard extends StatelessWidget {
   final Color background;
   final String poster;
   final String title;
+  final Color textColor;
 
   RecordScreenCard(
       {Key key,
@@ -17,29 +18,40 @@ class RecordScreenCard extends StatelessWidget {
       @required this.unit,
       this.background = Colors.red,
       this.poster = '',
-      this.title})
+      this.title,
+      this.textColor = Colors.white})
       : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: EdgeInsets.only(top: 10, bottom: 10, right: 12, left: 5),
+      padding: EdgeInsets.only(top: 10, bottom: 10, right: 12, left: 10),
       decoration: BoxDecoration(
+          boxShadow: [
+            BoxShadow(
+                color: defaultColors.shadowColorGrey,
+                blurRadius: 10,
+                offset: Offset(0, 5))
+          ],
           color: this.background,
           borderRadius: BorderRadius.circular(10),
-          border: Border.all(width: 2, color: defaultColors.white)),
+          border: Border.all(width: 2, color: textColor)),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // this.poster,
           this.poster.length > 0
-              ? Container(child: Image.asset(this.poster),margin: EdgeInsets.only(right: 5),)
+              ? Container(
+                  child: Image.asset(this.poster),
+                  margin: EdgeInsets.only(right: 5),
+                )
               : Container(),
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Container(
                 child: WhiteText(
+                  color: textColor,
                   text: this.title,
                   weight: FontWeight.normal,
                 ),
@@ -48,6 +60,7 @@ class RecordScreenCard extends StatelessWidget {
                 children: [
                   Container(
                     child: WhiteText(
+                      color: textColor,
                       text: this.value,
                       size: 30,
                     ),
@@ -59,6 +72,7 @@ class RecordScreenCard extends StatelessWidget {
                         // left: 20,
                         ),
                     child: WhiteText(
+                      color: textColor,
                       text: this.unit,
                       size: 11,
                     ),

@@ -6,6 +6,7 @@ import 'package:selfcare/CustomisedWidgets/DarkRedText.dart';
 import 'package:selfcare/CustomisedWidgets/DefaultInput.dart';
 import 'package:selfcare/CustomisedWidgets/PrimaryButton.dart';
 import 'package:selfcare/CustomisedWidgets/TextButton.dart';
+import 'package:selfcare/Navigation/BottomNav.dart';
 import 'package:selfcare/Theme/DefaultColors.dart';
 
 class Login extends StatefulWidget {
@@ -81,13 +82,20 @@ class _LoginState extends State<Login> {
                               child: PrimaryButton(
                                 horizontalPadding: 50,
                                 text: 'Login',
-                                onPressed: () {},
+                                onPressed: () {
+                                  Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => Main(),
+                                      ));
+                                },
                               ),
                             )
                           ],
                         ),
                       )),
-                  Visibility(visible:!isKeyboardVisible,child: Spacer(flex: 2))
+                  Visibility(
+                      visible: !isKeyboardVisible, child: Spacer(flex: 2))
                 ],
               )
             ],

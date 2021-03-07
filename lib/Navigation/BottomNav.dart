@@ -122,11 +122,9 @@ class _MainState extends State<Main> {
         controller: _controller,
         screens: _buildScreens(),
         items: _navBarsItems(),
-
         confineInSafeArea: true,
         backgroundColor: Colors.white,
         handleAndroidBackButtonPress: true,
-
         resizeToAvoidBottomInset: true,
         stateManagement: true,
         hideNavigationBarWhenKeyboardShows: true,
@@ -152,6 +150,7 @@ class _MainState extends State<Main> {
         //   );
         //   return false;
         // },
+
         padding: NavBarPadding.all(0),
         decoration: NavBarDecoration(
             boxShadow: [
@@ -176,11 +175,7 @@ class _MainState extends State<Main> {
         customWidget: CustomNavBarWidget(
           items: _navBarsItems(),
           selectedIndex: selected,
-          onItemSelected: (val) {
-            this.setState(() {
-              selected = val;
-            });
-          },
+          onItemSelected: changeToBottomTab,
         ),
         navBarStyle:
             NavBarStyle.custom, // Choose the nav bar style with this property

@@ -1,6 +1,8 @@
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
+import 'package:persistent_bottom_nav_bar/persistent-tab-view.dart';
 import 'package:selfcare/CustomisedWidgets/PrimaryButton.dart';
+import 'package:selfcare/Screens/Login.dart';
 import 'package:selfcare/Theme/DefaultColors.dart';
 
 final List<dynamic> imgList = [
@@ -124,7 +126,14 @@ class _WelcomeState extends State<Welcome> {
                             ],
                           ),
                           PrimaryButton(
-                            onPressed: () {},
+                            onPressed: () {
+                              // pushNewScreen(context, screen: Login(),pageTransitionAnimation: );
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => Login(),
+                                  ));
+                            },
                             text: 'Get Started',
                           )
                         ],
