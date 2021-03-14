@@ -2,16 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:selfcare/Theme/DefaultColors.dart';
 
 class PrimaryButton extends StatelessWidget {
-  DefaultColors defaultColors = DefaultColors();
+  final DefaultColors defaultColors = DefaultColors();
   final String text;
-  final Function onPressed;
+  final Function? onPressed;
   final double horizontalPadding;
   final double verticalPadding;
 
   PrimaryButton(
-      {Key key,
-      this.text,
-      this.onPressed,
+      {Key? key,
+      required this.text,
+      required this.onPressed,
       this.horizontalPadding = 15,
       this.verticalPadding = 15})
       : super(key: key);
@@ -19,7 +19,7 @@ class PrimaryButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return RaisedButton(
-      onPressed: this.onPressed,
+      onPressed: ()=>this.onPressed!(),
       padding: EdgeInsets.all(0),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(5),

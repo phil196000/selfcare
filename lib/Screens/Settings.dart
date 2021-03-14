@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:selfcare/CustomisedWidgets/Background.dart';
 import 'package:selfcare/CustomisedWidgets/DarkRedText.dart';
+import 'package:selfcare/Data/SettingCardModels.dart';
 import 'package:selfcare/Screens/Settings/SettingCard.dart';
 import 'package:selfcare/Theme/DefaultColors.dart';
 
@@ -59,18 +60,21 @@ class _SettingsState extends State<Settings> {
                   'avatar': Icons.file_copy,
                   'color': defaultColors.cyan
                 },
-              {
-              'title': 'Contact Us',
-              'avatar': Icons.contact_phone_sharp,
-              'color': defaultColors.grey
-              }
-              ].map((e) => Container(
-                  margin: EdgeInsets.only(bottom: 18),
-                  child: SettingCard(
-                    title: e['title'],
-                    avatar: e['avatar'],
-                    color: e['color'],
-                  )))
+                {
+                  'title': 'Contact Us',
+                  'avatar': Icons.contact_phone_sharp,
+                  'color': defaultColors.grey
+                }
+              ].map((e) {
+                SettingCardModel settingCardModel = SettingCardModel.fromJson(e);
+                return Container(
+                    margin: EdgeInsets.only(bottom: 18),
+                    child: SettingCard(
+                      title: settingCardModel.title,
+                      avatar: settingCardModel.avatar,
+                      color: settingCardModel.color,
+                    ));
+              })
             ],
           ),
         ],

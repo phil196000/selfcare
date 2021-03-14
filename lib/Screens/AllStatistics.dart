@@ -165,9 +165,9 @@ class _AllStatisticsState extends State<AllStatistics> {
                             height: 0,
                             color: Colors.deepPurpleAccent,
                           ),
-                          onChanged: (String newValue) {
+                          onChanged: (String? newValue) {
                             setState(() {
-                              dropdownValue = newValue;
+                              dropdownValue = newValue!;
                             });
                           },
                           items: <String>['One', 'Two', 'Free', 'Four']

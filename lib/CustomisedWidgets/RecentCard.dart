@@ -8,12 +8,12 @@ class RecentCard extends StatelessWidget {
   final String value;
   final String unit;
   final Color background;
-  final Image poster;
+  final Image? poster;
 
   RecentCard(
-      {Key key,
-      @required this.value,
-      @required this.unit,
+      {Key? key,
+      required this.value,
+      required this.unit,
       this.background = Colors.red, this.poster})
       : super(key: key);
 

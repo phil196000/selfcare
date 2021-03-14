@@ -13,12 +13,12 @@ class RecordScreenCard extends StatelessWidget {
   final Color textColor;
 
   RecordScreenCard(
-      {Key key,
-      @required this.value,
-      @required this.unit,
+      {Key? key,
+      required this.value,
+      required this.unit,
       this.background = Colors.red,
       this.poster = '',
-      this.title,
+      required this.title,
       this.textColor = Colors.white})
       : super(key: key);
 

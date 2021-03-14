@@ -7,7 +7,7 @@ import 'package:selfcare/Theme/DefaultColors.dart';
 class History extends StatefulWidget {
   final String record;
 
-  const History({Key key, this.record}) : super(key: key);
+  const History({required this.record});
 
   @override
   _HistoryState createState() => _HistoryState();
@@ -44,6 +44,8 @@ class _HistoryState extends State<History> {
           ],
         ),
         HistoryCard1(
+          delete: () => null,
+          key: Key('value'),
           showAvatars: widget.record == 'Blood Glucose' ? true : false,
           title: widget.record == 'Blood Glucose'
               ? ['Pre\nMeal', 'Post\nMeal']

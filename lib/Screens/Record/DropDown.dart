@@ -17,7 +17,7 @@ class DropDown extends StatelessWidget {
         dropdownBuilder: (context, selectedItem, itemAsString) {
           return Container(
             child: Row(
-              children: [Text(selectedItem ?? 'Select a time')],
+              children: [Text(selectedItem )],
             ),
           );
         },
@@ -28,32 +28,7 @@ class DropDown extends StatelessWidget {
         onChanged: (value) {},
         popupItemDisabled: (String s) => s.startsWith('I'),
         selectedItem: "",
-        onBeforeChange: (a, b) {
-          // AlertDialog alert = AlertDialog(
-          //   title: Text("Are you sure..."),
-          //   content: Text("...you want to clear the selection"),
-          //   actions: [
-          //     FlatButton(
-          //       child: Text("OK"),
-          //       onPressed: () {
-          //         Navigator.of(context).pop(true);
-          //       },
-          //     ),
-          //     FlatButton(
-          //       child: Text("NOT OK"),
-          //       onPressed: () {
-          //         Navigator.of(context).pop(false);
-          //       },
-          //     ),
-          //   ],
-          // );
-
-          // return showDialog(
-          //     context: context,
-          //     builder: (BuildContext context) {
-          //       return alert;
-          //     });
-        },
+    //     dar
       ),
     );
   }

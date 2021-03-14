@@ -6,8 +6,8 @@ class SettingCard extends StatelessWidget {
   final Color color;
   final IconData avatar;
 
-  const SettingCard({Key key, this.title, this.color, this.avatar})
-      : super(key: key);
+  const SettingCard({ required this.title, required this.color, required this.avatar})
+      ;
 
   @override
   Widget build(BuildContext context) {

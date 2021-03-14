@@ -1,19 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:selfcare/CustomisedWidgets/DarkRedText.dart';
 import 'package:selfcare/Theme/DefaultColors.dart';
 
 class AddRecordForm extends StatelessWidget {
   final DefaultColors defaultColors = DefaultColors();
   final String title;
-  final TextEditingController textEditingController;
-  final Function minusOnPressed;
-  final Function addOnPressed;
+  final TextEditingController? textEditingController;
+  final Function? minusOnPressed;
+  final Function? addOnPressed;
 
   AddRecordForm(
-      {Key key,
-      @required this.title,
+      {required Key key,
+      required this.title,
       this.textEditingController,
-      this.minusOnPressed,
+       this.minusOnPressed,
       this.addOnPressed})
       : super(key: key);
 
@@ -50,7 +51,7 @@ class AddRecordForm extends StatelessWidget {
                     color: defaultColors.white,
                     elevation: 6,
                     // minWidth: 38,
-                    onPressed: this.minusOnPressed,
+                    onPressed: () => minusOnPressed!(),
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(5)),
                     child: Icon(Icons.remove))),
@@ -58,7 +59,11 @@ class AddRecordForm extends StatelessWidget {
               margin: EdgeInsets.only(top: 5),
               width: MediaQuery.of(context).size.width * 0.15,
               child: TextField(
-                controller: textEditingController,
+                inputFormatters:[
+                  LengthLimitingTextInputFormatter(3),
+                ],
+                // maxLength: 3,
+                controller: this.textEditingController,
                 // controller: this.controller,
                 // obscureText: this.obscureText,
                 keyboardType: TextInputType.number,
@@ -102,7 +107,7 @@ class AddRecordForm extends StatelessWidget {
                     color: defaultColors.white,
                     elevation: 6,
                     // minWidth: 38,
-                    onPressed: addOnPressed,
+                    onPressed: () => addOnPressed!(),
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(5)),
                     child: Icon(Icons.add))),

@@ -5,7 +5,7 @@ class DarkGreenText extends StatelessWidget {
   final String text;
   final FontWeight weight;
   final double size;
-  const DarkGreenText({Key key, @required this.text, this.weight=FontWeight.bold, this.size =18}) : super(key: key);
+  const DarkGreenText({Key? key, required this.text, this.weight=FontWeight.bold, this.size =18}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {

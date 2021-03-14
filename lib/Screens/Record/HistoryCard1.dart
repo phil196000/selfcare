@@ -12,12 +12,12 @@ class HistoryCard1 extends StatelessWidget {
   final bool showAvatars;
 
   HistoryCard1(
-      {Key key,
-      this.title,
-      this.values,
-      this.unit,
-      this.time,
-      this.delete,
+      {required Key key,
+      required this.title,
+      required this.values,
+      required this.unit,
+      required this.time,
+      required this.delete,
       this.showAvatars = true})
       : super(key: key);
 

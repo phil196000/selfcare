@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "452085232901",
+    "project_id": "selfcare-43f41",
+    "storage_bucket": "selfcare-43f41.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:452085232901:android:04a0db4e405d2e1346336c",
+        "android_client_info": {
+          "package_name": "com.phil.selfcare"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "452085232901-ap0uksmhee5roqvjkt7elo9mtb4ueoqb.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAitRHkkPx8uzqB1wlHzFdBvL9-gA3WFdg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "452085232901-ap0uksmhee5roqvjkt7elo9mtb4ueoqb.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -9,11 +9,11 @@ class RecordCard extends StatelessWidget {
   final String poster;
   DefaultColors defaultColors = DefaultColors();
 
-   RecordCard({Key key, this.onPressed, this.background,@required this.title, this.poster}) : super(key: key);
+   RecordCard({Key? key,  required this.onPressed, required this.background,required this.title, required this.poster}) : super(key: key);
   @override
   Widget build(BuildContext context) {
     return  RaisedButton(
-      onPressed: this.onPressed,
+      onPressed:()=> this.onPressed(),
       shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(10)),
       padding: EdgeInsets.zero,

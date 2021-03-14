@@ -6,8 +6,8 @@ class RedText extends StatelessWidget {
   final FontWeight weight;
 
   const RedText(
-      {Key key,
-      @required this.text,
+      {Key? key,
+       this.text='',
       this.size = 16,
       this.weight = FontWeight.bold})
       : super(key: key);

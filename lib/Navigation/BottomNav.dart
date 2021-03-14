@@ -17,18 +17,18 @@ class Main extends StatefulWidget {
 
 class _MainState extends State<Main> {
   DefaultColors defaultColors = DefaultColors();
-  PersistentTabController _controller;
-  bool _hideNavBar;
+  PersistentTabController? _controller;
+  bool? _hideNavBar;
   int selected = 0;
 
   @override
   void initState() {
     super.initState();
     _controller = PersistentTabController(initialIndex: 0);
-    _controller.addListener(() {
-      print(_controller.index);
+    _controller!.addListener(() {
+      print(_controller!.index);
       this.setState(() {
-        selected = _controller.index;
+        selected = _controller!.index;
       });
     });
     _hideNavBar = false;
@@ -38,7 +38,7 @@ class _MainState extends State<Main> {
     this.setState(() {
       selected = tab;
     });
-    _controller.jumpToTab(tab);
+    _controller!.jumpToTab(tab);
     // print(tab.toString());
     // print('object');
   }
@@ -63,44 +63,44 @@ class _MainState extends State<Main> {
             color: selected == 0 ? defaultColors.white : defaultColors.primary,
           ),
           title: ("Home"),
-          activeContentColor: defaultColors.white,
+          activeColorAlternate: defaultColors.white,
           activeColor: defaultColors.primary,
           inactiveColor: defaultColors.primary,
           contentPadding: 0,
-          titleStyle: TextStyle(fontWeight: FontWeight.bold)),
+          textStyle: TextStyle(fontWeight: FontWeight.bold)),
       PersistentBottomNavBarItem(
           icon: Icon(
             Icons.chat_sharp,
             color: selected == 1 ? defaultColors.white : defaultColors.primary,
           ),
           title: ("Chat"),
-          activeContentColor: defaultColors.white,
+          activeColorAlternate: defaultColors.white,
           activeColor: defaultColors.primary,
           inactiveColor: defaultColors.primary,
           contentPadding: 0,
-          titleStyle: TextStyle(fontWeight: FontWeight.bold)),
+          textStyle: TextStyle(fontWeight: FontWeight.bold)),
       PersistentBottomNavBarItem(
           icon: Icon(
             CupertinoIcons.news_solid,
             color: selected == 2 ? defaultColors.white : defaultColors.primary,
           ),
           title: ("Blog"),
-          activeContentColor: defaultColors.white,
+          activeColorAlternate: defaultColors.white,
           activeColor: defaultColors.primary,
           inactiveColor: defaultColors.primary,
           contentPadding: 0,
-          titleStyle: TextStyle(fontWeight: FontWeight.bold)),
+          textStyle: TextStyle(fontWeight: FontWeight.bold)),
       PersistentBottomNavBarItem(
           icon: Icon(
             Icons.settings,
             color: selected == 3 ? defaultColors.white : defaultColors.primary,
           ),
           title: ("Settings"),
-          activeContentColor: defaultColors.white,
+          activeColorAlternate: defaultColors.white,
           activeColor: defaultColors.primary,
           inactiveColor: defaultColors.primary,
           contentPadding: 0,
-          titleStyle: TextStyle(fontWeight: FontWeight.bold)),
+          textStyle: TextStyle(fontWeight: FontWeight.bold)),
     ];
   }
 
@@ -119,6 +119,7 @@ class _MainState extends State<Main> {
       //   ),
       // ),
       body: PersistentTabView(
+        context,
         controller: _controller,
         screens: _buildScreens(),
         items: _navBarsItems(),
@@ -172,13 +173,15 @@ class _MainState extends State<Main> {
           curve: Curves.ease,
           duration: Duration(milliseconds: 200),
         ),
-        customWidget: CustomNavBarWidget(
-          items: _navBarsItems(),
-          selectedIndex: selected,
-          onItemSelected: changeToBottomTab,
-        ),
+// selectedTabScreenContext: ,
+        // customWidget: CustomNavBarWidget(
+        //   items: _navBarsItems(),
+        //   selectedIndex: selected,
+        //   onItemSelected: changeToBottomTab,
+        //   key: Key('value'),
+        // ),
         navBarStyle:
-            NavBarStyle.custom, // Choose the nav bar style with this property
+            NavBarStyle.simple, // Choose the nav bar style with this property
       ),
     );
   }
@@ -190,10 +193,10 @@ class CustomNavBarWidget extends StatelessWidget {
   final ValueChanged<int> onItemSelected;
 
   CustomNavBarWidget({
-    Key key,
-    this.selectedIndex,
-    @required this.items,
-    this.onItemSelected,
+    required Key key,
+    required this.selectedIndex,
+    required this.items,
+    required this.onItemSelected,
   });
 
   DefaultColors defaultColors = DefaultColors();

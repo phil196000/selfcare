@@ -9,8 +9,8 @@ class WhiteText extends StatelessWidget {
   final Color color;
 
   const WhiteText(
-      {Key key,
-      @required this.text,
+      {Key? key,
+      required this.text,
       this.size = 16,
       this.weight = FontWeight.bold,
       this.color = Colors.white})

@@ -1,15 +1,19 @@
 /// Bar chart example
 // EXCLUDE_FROM_GALLERY_DOCS_START
 import 'dart:math';
+
 // EXCLUDE_FROM_GALLERY_DOCS_END
 import 'package:charts_flutter/flutter.dart' as charts;
 import 'package:flutter/material.dart';
 
 class SimpleBarChart extends StatelessWidget {
-  final List<charts.Series> seriesList;
+  final List<charts.Series>? seriesList;
   final bool animate;
 
-  SimpleBarChart( {this.animate,this.seriesList,});
+  SimpleBarChart({
+    required this.animate,
+    this.seriesList,
+  });
 
   /// Creates a [BarChart] with sample data and no transition.
   // factory SimpleBarChart.withSampleData() {
@@ -49,6 +53,7 @@ class SimpleBarChart extends StatelessWidget {
       )
     ];
   }
+
   // EXCLUDE_FROM_GALLERY_DOCS_END
 
   @override
@@ -60,7 +65,7 @@ class SimpleBarChart extends StatelessWidget {
   }
 
   /// Create one series with sample hard coded data.
-  static List<charts.Series<OrdinalSales, String>> _createSampleData() {
+  List<charts.Series<OrdinalSales, String>> _createSampleData() {
     final data = [
       new OrdinalSales('2014', 5),
       new OrdinalSales('2015', 25),

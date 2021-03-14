@@ -1,4 +1,7 @@
+import 'dart:developer';
+
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:persistent_bottom_nav_bar/persistent-tab-view.dart';
 import 'package:selfcare/CustomisedWidgets/PrimaryButton.dart';
@@ -28,6 +31,13 @@ class Welcome extends StatefulWidget {
 
 class _WelcomeState extends State<Welcome> {
   int _current = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    FirebaseFirestore.instance.settings =
+        Settings(cacheSizeBytes: Settings.CACHE_SIZE_UNLIMITED);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -127,7 +137,7 @@ class _WelcomeState extends State<Welcome> {
                           ),
                           PrimaryButton(
                             onPressed: () {
-                              // pushNewScreen(context, screen: Login(),pageTransitionAnimation: );
+                              log('i work'); // pushNewScreen(context, screen: Login(),pageTransitionAnimation: );
                               Navigator.push(
                                   context,
                                   MaterialPageRoute(
