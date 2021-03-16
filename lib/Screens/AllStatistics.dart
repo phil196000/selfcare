@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:persistent_bottom_nav_bar/persistent-tab-view.dart';
@@ -5,6 +7,8 @@ import 'package:redux/redux.dart';
 import 'package:selfcare/CustomisedWidgets/Background.dart';
 import 'package:selfcare/CustomisedWidgets/DarkGreenText.dart';
 import 'package:selfcare/CustomisedWidgets/DarkRedText.dart';
+import 'package:selfcare/Data/BloodPressure.dart';
+import 'package:selfcare/Data/bloodglucosepost.dart';
 import 'package:selfcare/Navigation/BottomNav.dart';
 import 'package:selfcare/Screens/AllStats/Chart.dart';
 import 'package:selfcare/Theme/DefaultColors.dart';
@@ -19,101 +23,291 @@ class AllStatistics extends StatefulWidget {
 
 class _AllStatisticsState extends State<AllStatistics> {
   DefaultColors defaultColors = DefaultColors();
-  String dropdownValue = 'One';
-  List<charts.Series<TimeSeriesSales, DateTime>> _createSampleData() {
-    final myDesktopData = [
-      new TimeSeriesSales(timeCurrent: new DateTime(2017, 9, 19), sales: 5),
-      new TimeSeriesSales(timeCurrent: new DateTime(2017, 9, 26), sales: 25),
-      new TimeSeriesSales(timeCurrent: new DateTime(2017, 10, 3), sales: 100),
-      new TimeSeriesSales(timeCurrent: new DateTime(2017, 10, 10), sales: 75),
-    ];
+  String dropdownValue = 'All Records';
+  bool choiceGlucose = true;
+  bool choicePressure = true;
+  bool choiceWeight = true;
+  bool showFilterChips = true;
+  bool statChoice = false;
+  String singleChoice = 'Glucose';
 
-    final myTabletData = [
-      new TimeSeriesSales(timeCurrent: new DateTime(2017, 9, 19), sales: 10),
-      new TimeSeriesSales(timeCurrent: new DateTime(2017, 9, 26), sales: 50),
-      new TimeSeriesSales(timeCurrent: new DateTime(2017, 10, 3), sales: 200),
-      new TimeSeriesSales(timeCurrent: new DateTime(2017, 10, 10), sales: 150),
-    ];
+  List<charts.Series<TimeSeriesModel, DateTime>> _allStats(
+      {List glucose = const [],
+      List pressure = const [],
+      List weight = const []}) {
+    //Multiples
+    List<TimeSeriesModel> glucoseForStat = [];
+    List<TimeSeriesModel> pressureForStat = [];
+    List<TimeSeriesModel> weightForStat = [];
 
-    // Example of a series with two range annotations. A regular point shape
-    // will be drawn at the current domain value, and a range shape will be
-    // drawn between the previous and target domain values.
-    //
-    // Note that these series do not contain any measure values. They are
-    // positioned automatically in rows.
-    final myAnnotationData1 = [
-      new TimeSeriesSales(
-        timeCurrent: new DateTime(2017, 9, 24),
-        timePrevious: new DateTime(2017, 9, 19),
-        timeTarget: new DateTime(2017, 9, 24),
-      ),
-      new TimeSeriesSales(
-        timeCurrent: new DateTime(2017, 9, 29),
-        timePrevious: new DateTime(2017, 9, 29),
-        timeTarget: new DateTime(2017, 10, 4),
-      ),
-    ];
+    //Singles
+    List<TimeSeriesModel> glucoseForStatSinglePreMeal = [];
+    List<TimeSeriesModel> glucoseForStatSinglePostMeal = [];
+    List<TimeSeriesModel> glucoseForStatSingle = [];
+    List<TimeSeriesModel> pressureForStatSingle = [];
+    List<TimeSeriesModel> pressureForStatSingleSystolic = [];
+    List<TimeSeriesModel> pressureForStatSingleDiastolic = [];
 
-    // Example of a series with one range annotation and two single point
-    // annotations. Omitting the previous and target domain values causes that
-    // datum to be drawn as a single point.
-    final myAnnotationData2 = [
-      new TimeSeriesSales(
-        timeCurrent: new DateTime(2017, 9, 25),
-        timePrevious: new DateTime(2017, 9, 21),
-        timeTarget: new DateTime(2017, 9, 25),
-      ),
-      new TimeSeriesSales(timeCurrent: new DateTime(2017, 9, 31)),
-      new TimeSeriesSales(timeCurrent: new DateTime(2017, 10, 5)),
-    ];
+    List<TimeSeriesModel> weightForStatSingle = [];
 
-    return [
-      new charts.Series<TimeSeriesSales, DateTime>(
-        id: 'Desktop',
-        colorFn: (_, __) => charts.MaterialPalette.blue.shadeDefault,
-        domainFn: (TimeSeriesSales sales, _) => sales.timeCurrent,
-        measureFn: (TimeSeriesSales sales, _) => sales.sales,
-        data: myDesktopData,
-      ),
-      new charts.Series<TimeSeriesSales, DateTime>(
-        id: 'Tablet',
-        colorFn: (_, __) => charts.MaterialPalette.green.shadeDefault,
-        domainFn: (TimeSeriesSales sales, _) => sales.timeCurrent,
-        measureFn: (TimeSeriesSales sales, _) => sales.sales,
-        data: myTabletData,
-      ),
-      new charts.Series<TimeSeriesSales, DateTime>(
-        id: 'Annotation Series 1',
-        colorFn: (_, __) => charts.MaterialPalette.gray.shadeDefault,
-        domainFn: (TimeSeriesSales sales, _) => sales.timeCurrent,
-        domainLowerBoundFn: (TimeSeriesSales row, _) => row.timePrevious,
-        domainUpperBoundFn: (TimeSeriesSales row, _) => row.timeTarget,
-        // No measure values are needed for symbol annotations.
-        measureFn: (_, __) => null,
-        data: myAnnotationData1,
-      )
-      // // Configure our custom symbol annotation renderer for this series.
-      //   ..setAttribute(charts.rendererIdKey, 'customSymbolAnnotation')
-      // // Optional radius for the annotation shape. If not specified, this will
-      // // default to the same radius as the points.
-      //   ..setAttribute(charts.boundsLineRadiusPxKey, 3.5),
-      // new charts.Series<TimeSeriesSales, DateTime>(
-      //   id: 'Annotation Series 2',
-      //   colorFn: (_, __) => charts.MaterialPalette.red.shadeDefault,
-      //   domainFn: (TimeSeriesSales sales, _) => sales.timeCurrent,
-      //   domainLowerBoundFn: (TimeSeriesSales row, _) => row.timePrevious,
-      //   domainUpperBoundFn: (TimeSeriesSales row, _) => row.timeTarget,
-      //   // No measure values are needed for symbol annotations.
-      //   measureFn: (_, __) => null,
-      //   data: myAnnotationData2,
-      // )
-      // // Configure our custom symbol annotation renderer for this series.
-      //   ..setAttribute(charts.rendererIdKey, 'customSymbolAnnotation')
-      // // Optional radius for the annotation shape. If not specified, this will
-      // // default to the same radius as the points.
-      //   ..setAttribute(charts.boundsLineRadiusPxKey, 3.5),
-    ];
+    glucose.forEach((element) {
+      MainGlucoseModelwithID mainGlucoseModelwithID =
+          MainGlucoseModelwithID.fromJson(element);
+      MainBloodGlucoseModel mainBloodGlucoseModel =
+          MainBloodGlucoseModel.fromJson(mainGlucoseModelwithID.data);
+      mainBloodGlucoseModel.readings!.forEach((element) {
+        BloodGlucoseModel bloodGlucoseModel =
+            BloodGlucoseModel.fromJson(element);
+
+        if (dropdownValue == '30 days') {
+          DateTime end = DateTime.now();
+          DateTime start = DateTime.fromMillisecondsSinceEpoch(
+              end.millisecondsSinceEpoch - (30 * 24 * 60 * 60 * 1000));
+          DateTime itemDate = DateTime.fromMillisecondsSinceEpoch(
+              mainBloodGlucoseModel.date_for_timestamp_millis!);
+          if (itemDate.millisecondsSinceEpoch <= end.millisecondsSinceEpoch &&
+              itemDate.millisecondsSinceEpoch >= start.millisecondsSinceEpoch) {
+            if (!statChoice) {
+              if (choiceGlucose) {
+                glucoseForStat.add(new TimeSeriesModel(
+                    timeCurrent: DateTime.fromMillisecondsSinceEpoch(
+                        bloodGlucoseModel.created_at),
+                    value: ((bloodGlucoseModel.post_meal +
+                                bloodGlucoseModel.post_meal) /
+                            2)
+                        .floor()));
+              }
+            } else {
+              if (singleChoice == 'Glucose') {
+                glucoseForStatSinglePreMeal.add(new TimeSeriesModel(
+                    timeCurrent: DateTime.fromMillisecondsSinceEpoch(
+                        bloodGlucoseModel.created_at),
+                    value: bloodGlucoseModel.pre_meal));
+                glucoseForStatSinglePostMeal.add(new TimeSeriesModel(
+                    timeCurrent: DateTime.fromMillisecondsSinceEpoch(
+                        bloodGlucoseModel.created_at),
+                    value: bloodGlucoseModel.post_meal));
+              }
+            }
+          }
+        } else if (dropdownValue == '7 days') {
+          DateTime end = DateTime.now();
+          DateTime start = DateTime.fromMillisecondsSinceEpoch(
+              end.millisecondsSinceEpoch - (7 * 24 * 60 * 60 * 1000));
+          DateTime itemDate = DateTime.fromMillisecondsSinceEpoch(
+              mainBloodGlucoseModel.date_for_timestamp_millis!);
+          if (itemDate.millisecondsSinceEpoch <= end.millisecondsSinceEpoch &&
+              itemDate.millisecondsSinceEpoch >= start.millisecondsSinceEpoch) {
+            if (!statChoice) {
+              if (choiceGlucose) {
+                glucoseForStat.add(new TimeSeriesModel(
+                    timeCurrent: DateTime.fromMillisecondsSinceEpoch(
+                        bloodGlucoseModel.created_at),
+                    value: ((bloodGlucoseModel.post_meal +
+                                bloodGlucoseModel.post_meal) /
+                            2)
+                        .floor()));
+              }
+            } else {
+              if (singleChoice == 'Glucose') {
+                glucoseForStatSinglePreMeal.add(new TimeSeriesModel(
+                    timeCurrent: DateTime.fromMillisecondsSinceEpoch(
+                        bloodGlucoseModel.created_at),
+                    value: bloodGlucoseModel.pre_meal));
+                glucoseForStatSinglePostMeal.add(new TimeSeriesModel(
+                    timeCurrent: DateTime.fromMillisecondsSinceEpoch(
+                        bloodGlucoseModel.created_at),
+                    value: bloodGlucoseModel.post_meal));
+              }
+            }
+          }
+        } else {
+          if (!statChoice) {
+            if (choiceGlucose) {
+              glucoseForStat.add(new TimeSeriesModel(
+                  timeCurrent: DateTime.fromMillisecondsSinceEpoch(
+                      bloodGlucoseModel.created_at),
+                  value: ((bloodGlucoseModel.post_meal +
+                              bloodGlucoseModel.post_meal) /
+                          2)
+                      .floor()));
+            }
+          } else {
+            if (singleChoice == 'Glucose') {
+              glucoseForStatSinglePreMeal.add(new TimeSeriesModel(
+                  timeCurrent: DateTime.fromMillisecondsSinceEpoch(
+                      bloodGlucoseModel.created_at),
+                  value: bloodGlucoseModel.pre_meal));
+              glucoseForStatSinglePostMeal.add(new TimeSeriesModel(
+                  timeCurrent: DateTime.fromMillisecondsSinceEpoch(
+                      bloodGlucoseModel.created_at),
+                  value: bloodGlucoseModel.post_meal));
+            }
+          }
+        }
+      });
+    });
+
+    pressure.forEach((element) {
+      MainPressureModelwithID mainPressureModelwithID =
+          MainPressureModelwithID.fromJson(element);
+      MainBloodPressureModel mainBloodPressureModel =
+          MainBloodPressureModel.fromJson(mainPressureModelwithID.data);
+      mainBloodPressureModel.readings!.forEach((element) {
+        BloodPressureModel bloodPressureModel =
+            BloodPressureModel.fromJson(element);
+
+        if (dropdownValue == '30 days') {
+          DateTime end = DateTime.now();
+          DateTime start = DateTime.fromMillisecondsSinceEpoch(
+              end.millisecondsSinceEpoch - (30 * 24 * 60 * 60 * 1000));
+          DateTime itemDate = DateTime.fromMillisecondsSinceEpoch(
+              mainBloodPressureModel.date_for_timestamp_millis!);
+          // log(itemDate.toIso8601String());
+          if (itemDate.millisecondsSinceEpoch <= end.millisecondsSinceEpoch &&
+              itemDate.millisecondsSinceEpoch >= start.millisecondsSinceEpoch) {
+            if (!statChoice) {
+              if (choicePressure) {
+                pressureForStat.add(new TimeSeriesModel(
+                    timeCurrent: DateTime.fromMillisecondsSinceEpoch(
+                        bloodPressureModel.created_at),
+                    value: ((bloodPressureModel.systolic +
+                                bloodPressureModel.diastolic) /
+                            2)
+                        .floor()));
+              }
+            } else {
+              if (singleChoice == 'Pressure') {
+                pressureForStatSingleSystolic.add(new TimeSeriesModel(
+                    timeCurrent: DateTime.fromMillisecondsSinceEpoch(
+                        bloodPressureModel.created_at),
+                    value: bloodPressureModel.systolic));
+                pressureForStatSingleDiastolic.add(new TimeSeriesModel(
+                    timeCurrent: DateTime.fromMillisecondsSinceEpoch(
+                        bloodPressureModel.created_at),
+                    value: bloodPressureModel.diastolic));
+              }
+            }
+          }
+        } else if (dropdownValue == '7 days') {
+          DateTime end = DateTime.now();
+          DateTime start = DateTime.fromMillisecondsSinceEpoch(
+              end.millisecondsSinceEpoch - (7 * 24 * 60 * 60 * 1000));
+          DateTime itemDate = DateTime.fromMillisecondsSinceEpoch(
+              mainBloodPressureModel.date_for_timestamp_millis!);
+          log(itemDate.toIso8601String());
+          if (itemDate.millisecondsSinceEpoch <= end.millisecondsSinceEpoch &&
+              itemDate.millisecondsSinceEpoch >= start.millisecondsSinceEpoch) {
+            if (!statChoice) {
+              if (choicePressure) {
+                pressureForStat.add(new TimeSeriesModel(
+                    timeCurrent: DateTime.fromMillisecondsSinceEpoch(
+                        bloodPressureModel.created_at),
+                    value: ((bloodPressureModel.systolic +
+                                bloodPressureModel.diastolic) /
+                            2)
+                        .floor()));
+              }
+            } else {
+              if (singleChoice == 'Pressure') {
+                pressureForStatSingleSystolic.add(new TimeSeriesModel(
+                    timeCurrent: DateTime.fromMillisecondsSinceEpoch(
+                        bloodPressureModel.created_at),
+                    value: bloodPressureModel.systolic));
+                pressureForStatSingleDiastolic.add(new TimeSeriesModel(
+                    timeCurrent: DateTime.fromMillisecondsSinceEpoch(
+                        bloodPressureModel.created_at),
+                    value: bloodPressureModel.diastolic));
+              }
+            }
+          }
+        } else {
+          if (!statChoice) {
+            if (choicePressure) {
+              pressureForStat.add(new TimeSeriesModel(
+                  timeCurrent: DateTime.fromMillisecondsSinceEpoch(
+                      bloodPressureModel.created_at),
+                  value: ((bloodPressureModel.systolic +
+                              bloodPressureModel.diastolic) /
+                          2)
+                      .floor()));
+            }
+          } else {
+            if (singleChoice == 'Pressure') {
+              pressureForStatSingleSystolic.add(new TimeSeriesModel(
+                  timeCurrent: DateTime.fromMillisecondsSinceEpoch(
+                      bloodPressureModel.created_at),
+                  value: bloodPressureModel.systolic));
+              pressureForStatSingleDiastolic.add(new TimeSeriesModel(
+                  timeCurrent: DateTime.fromMillisecondsSinceEpoch(
+                      bloodPressureModel.created_at),
+                  value: bloodPressureModel.diastolic));
+            }
+          }
+        }
+      });
+    });
+
+    return statChoice
+        ? singleChoice == 'Pressure'
+            ? [
+                new charts.Series<TimeSeriesModel, DateTime>(
+                  id: 'Pressure Single Systolic',
+                  displayName: 'Pressure',
+                  colorFn: (_, __) => charts.Color.fromHex(code: '#000000'),
+                  domainFn: (TimeSeriesModel sales, _) => sales.timeCurrent,
+                  measureFn: (TimeSeriesModel sales, _) => sales.value,
+                  data: pressureForStatSingleSystolic,
+                ),
+                new charts.Series<TimeSeriesModel, DateTime>(
+                  id: 'Pressure Single Diastolic',
+                  displayName: 'Pressure',
+                  colorFn: (_, __) => charts.Color.fromHex(code: '#139932'),
+                  domainFn: (TimeSeriesModel sales, _) => sales.timeCurrent,
+                  measureFn: (TimeSeriesModel sales, _) => sales.value,
+                  data: pressureForStatSingleDiastolic,
+                )
+              ]
+            : singleChoice == 'Glucose'
+                ? [
+                    new charts.Series<TimeSeriesModel, DateTime>(
+                      id: 'Glucose Single PreMeal',
+                      displayName: 'Glucose',
+                      colorFn: (_, __) => charts.Color.fromHex(code: '#530505'),
+                      domainFn: (TimeSeriesModel sales, _) => sales.timeCurrent,
+                      measureFn: (TimeSeriesModel sales, _) => sales.value,
+                      data: glucoseForStatSinglePreMeal,
+                    ),
+                    new charts.Series<TimeSeriesModel, DateTime>(
+                      id: 'Glucose Single PostMeal',
+                      displayName: 'Glucose',
+                      colorFn: (_, __) => charts.Color.fromHex(code: '#1B0973'),
+                      domainFn: (TimeSeriesModel sales, _) => sales.timeCurrent,
+                      measureFn: (TimeSeriesModel sales, _) => sales.value,
+                      data: glucoseForStatSinglePostMeal,
+                    )
+                  ]
+                : []
+        : [
+            new charts.Series<TimeSeriesModel, DateTime>(
+              id: 'Glucose',
+              displayName: 'Glucose',
+              colorFn: (_, __) => charts.Color.fromHex(code: '#530505'),
+              domainFn: (TimeSeriesModel sales, _) => sales.timeCurrent,
+              measureFn: (TimeSeriesModel sales, _) => sales.value,
+              data: glucoseForStat,
+            ),
+            new charts.Series<TimeSeriesModel, DateTime>(
+              id: 'Pressure',
+              displayName: 'Pressure',
+              colorFn: (_, __) => charts.Color.fromHex(code: '#000000'),
+              domainFn: (TimeSeriesModel sales, _) => sales.timeCurrent,
+              measureFn: (TimeSeriesModel sales, _) => sales.value,
+              data: pressureForStat,
+            ),
+          ];
   }
+
   @override
   Widget build(BuildContext context) {
     return StoreConnector(
@@ -170,70 +364,214 @@ class _AllStatisticsState extends State<AllStatistics> {
                     ),
                     Expanded(
                       child: ListView(
-                        padding: EdgeInsets.only(top: 13, left: 10, right: 10),
+                        padding: EdgeInsets.only(top: 0, left: 10, right: 10),
                         children: [
-                          DarkGreenText(
-                            text: 'Choose one or more to filter',
-                            size: 13,
+                          TextButton(
+                              onPressed: () {
+                                setState(() {
+                                  showFilterChips = !showFilterChips;
+                                });
+                              },
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  ConstrainedBox(
+                                    constraints: BoxConstraints(
+                                        maxWidth:
+                                            MediaQuery.of(context).size.width *
+                                                0.7),
+                                    child: DarkGreenText(
+                                      text: 'Press to show filter options',
+                                      size: 13,
+                                    ),
+                                  ),
+                                  Container(
+                                    child: Icon(showFilterChips
+                                        ? Icons.arrow_drop_up
+                                        : Icons.arrow_drop_down),
+                                  )
+                                ],
+                              )),
+                          Visibility(
+                            visible: showFilterChips,
+                            child: Wrap(
+                              spacing: 5,
+                              children: [
+                                ChoiceChip(
+                                  backgroundColor: Colors.transparent,
+                                  selectedColor: defaultColors.lightdarkRed,
+                                  shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(25),
+                                      side: BorderSide(
+                                          color: defaultColors.darkRed)),
+                                  labelStyle:
+                                      TextStyle(color: defaultColors.darkRed),
+                                  selected: statChoice,
+                                  onSelected: (bool selected) {
+                                    this.setState(() {
+                                      statChoice = true;
+                                    });
+                                  },
+                                  label: Text('Single'),
+                                  padding: EdgeInsets.symmetric(horizontal: 5),
+                                ),
+                                ChoiceChip(
+                                  backgroundColor: Colors.transparent,
+                                  selectedColor: defaultColors.lightdarkRed,
+                                  shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(25),
+                                      side: BorderSide(
+                                          color: defaultColors.darkRed)),
+                                  labelStyle:
+                                      TextStyle(color: defaultColors.darkRed),
+                                  selected: !statChoice,
+                                  onSelected: (bool selected) {
+                                    this.setState(() {
+                                      statChoice = false;
+                                    });
+                                  },
+                                  label: Text('Multiple'),
+                                  padding: EdgeInsets.symmetric(horizontal: 5),
+                                ),
+                              ],
+                            ),
                           ),
-                          Wrap(
-                            spacing: 5,
-                            children: [
-                              FilterChip(
-                                backgroundColor: Colors.transparent,
-                                selectedColor: defaultColors.lightdarkRed,
-                                shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(25),
-                                    side: BorderSide(
-                                        color: defaultColors.darkRed)),
-                                labelStyle:
-                                    TextStyle(color: defaultColors.darkRed),
-                                selected: false,
-                                onSelected: (bool selected) {
-                                  // this.setState(() {
-                                  //   choice = selected;
-                                  // });
-                                },
-                                label: Text('Blood Glucose'),
-                                padding: EdgeInsets.symmetric(horizontal: 5),
-                              ),
-                              FilterChip(
-                                backgroundColor: Colors.transparent,
-                                selectedColor: defaultColors.lightdarkRed,
-                                shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(25),
-                                    side: BorderSide(
-                                        color: defaultColors.darkRed)),
-                                labelStyle:
-                                    TextStyle(color: defaultColors.darkRed),
-                                selected: false,
-                                onSelected: (bool selected) {
-                                  // this.setState(() {
-                                  //   choice = selected;
-                                  // });
-                                },
-                                label: Text('Blood Pressure'),
-                                padding: EdgeInsets.symmetric(horizontal: 5),
-                              ),
-                              FilterChip(
-                                backgroundColor: Colors.transparent,
-                                selectedColor: defaultColors.lightdarkRed,
-                                shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(25),
-                                    side: BorderSide(
-                                        color: defaultColors.darkRed)),
-                                labelStyle:
-                                    TextStyle(color: defaultColors.darkRed),
-                                selected: false,
-                                onSelected: (bool selected) {
-                                  // this.setState(() {
-                                  //   choice = selected;
-                                  // });
-                                },
-                                label: Text('Body Weight'),
-                                padding: EdgeInsets.symmetric(horizontal: 5),
-                              )
-                            ],
+                          Visibility(
+                              visible: showFilterChips,
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  DarkGreenText(
+                                    text: 'Choose one or more to filter',
+                                    size: 13,
+                                  ),
+                                ],
+                              )),
+                          Visibility(
+                            visible: showFilterChips && statChoice,
+                            child: Wrap(
+                              spacing: 5,
+                              children: [
+                                ChoiceChip(
+                                  backgroundColor: Colors.transparent,
+                                  selectedColor: defaultColors.lightdarkRed,
+                                  shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(25),
+                                      side: BorderSide(
+                                          color: defaultColors.darkRed)),
+                                  labelStyle:
+                                      TextStyle(color: defaultColors.darkRed),
+                                  selected: singleChoice == 'Glucose',
+                                  onSelected: (bool selected) {
+                                    this.setState(() {
+                                      singleChoice = 'Glucose';
+                                    });
+                                  },
+                                  label: Text('Glucose'),
+                                  padding: EdgeInsets.symmetric(horizontal: 5),
+                                ),
+                                ChoiceChip(
+                                  backgroundColor: Colors.transparent,
+                                  selectedColor: defaultColors.lightdarkRed,
+                                  shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(25),
+                                      side: BorderSide(
+                                          color: defaultColors.darkRed)),
+                                  labelStyle:
+                                      TextStyle(color: defaultColors.darkRed),
+                                  selected: singleChoice == 'Pressure',
+                                  onSelected: (bool selected) {
+                                    this.setState(() {
+                                      singleChoice = 'Pressure';
+                                    });
+                                  },
+                                  label: Text('Pressure'),
+                                  padding: EdgeInsets.symmetric(horizontal: 5),
+                                ),
+                                ChoiceChip(
+                                  backgroundColor: Colors.transparent,
+                                  selectedColor: defaultColors.lightdarkRed,
+                                  shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(25),
+                                      side: BorderSide(
+                                          color: defaultColors.darkRed)),
+                                  labelStyle:
+                                      TextStyle(color: defaultColors.darkRed),
+                                  selected: singleChoice == 'Weight',
+                                  onSelected: (bool selected) {
+                                    this.setState(() {
+                                      singleChoice = 'Weight';
+                                    });
+                                  },
+                                  label: Text('Weight'),
+                                  padding: EdgeInsets.symmetric(horizontal: 5),
+                                )
+                              ],
+                            ),
+                          ),
+                          Visibility(
+                            visible: showFilterChips && !statChoice,
+                            child: Wrap(
+                              spacing: 5,
+                              children: [
+                                FilterChip(
+                                  backgroundColor: Colors.transparent,
+                                  selectedColor: defaultColors.lightdarkRed,
+                                  shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(25),
+                                      side: BorderSide(
+                                          color: defaultColors.darkRed)),
+                                  labelStyle:
+                                      TextStyle(color: defaultColors.darkRed),
+                                  selected: choiceGlucose,
+                                  onSelected: (bool selected) {
+                                    this.setState(() {
+                                      choiceGlucose = selected;
+                                    });
+                                  },
+                                  label: Text('Glucose'),
+                                  padding: EdgeInsets.symmetric(horizontal: 5),
+                                ),
+                                FilterChip(
+                                  backgroundColor: Colors.transparent,
+                                  selectedColor: defaultColors.lightdarkRed,
+                                  shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(25),
+                                      side: BorderSide(
+                                          color: defaultColors.darkRed)),
+                                  labelStyle:
+                                      TextStyle(color: defaultColors.darkRed),
+                                  selected: choicePressure,
+                                  onSelected: (bool selected) {
+                                    this.setState(() {
+                                      choicePressure = selected;
+                                    });
+                                  },
+                                  label: Text('Pressure'),
+                                  padding: EdgeInsets.symmetric(horizontal: 5),
+                                ),
+                                FilterChip(
+                                  backgroundColor: Colors.transparent,
+                                  selectedColor: defaultColors.lightdarkRed,
+                                  shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(25),
+                                      side: BorderSide(
+                                          color: defaultColors.darkRed)),
+                                  labelStyle:
+                                      TextStyle(color: defaultColors.darkRed),
+                                  selected: choiceWeight,
+                                  onSelected: (bool selected) {
+                                    this.setState(() {
+                                      choiceWeight = selected;
+                                    });
+                                  },
+                                  label: Text('Weight'),
+                                  padding: EdgeInsets.symmetric(horizontal: 5),
+                                )
+                              ],
+                            ),
                           ),
                           Padding(padding: EdgeInsets.only(top: 10)),
                           DarkGreenText(
@@ -277,10 +615,9 @@ class _AllStatisticsState extends State<AllStatistics> {
                                 });
                               },
                               items: <String>[
-                                'One',
-                                'Two',
-                                'Free',
-                                'Four'
+                                '7 days',
+                                '30 days',
+                                'All Records',
                               ].map<DropdownMenuItem<String>>((String value) {
                                 return DropdownMenuItem<String>(
                                   value: value,
@@ -297,8 +634,9 @@ class _AllStatisticsState extends State<AllStatistics> {
                           ),
                           Container(
                             height: MediaQuery.of(context).size.height * 0.6,
-                            child: TimeSeriesSymbolAnnotationChart
-                                .withSampleData(),
+                            child: TimeSeriesSymbolAnnotationChart(_allStats(
+                                glucose: state.bloodglucose!,
+                                pressure: state.bloodpressure!)),
                           )
                         ],
                       ),
@@ -315,6 +653,7 @@ class _AllStatisticsState extends State<AllStatistics> {
     );
   }
 }
+
 class TimeSeriesModel {
   final DateTime? timeCurrent;
   final DateTime? timePrevious;

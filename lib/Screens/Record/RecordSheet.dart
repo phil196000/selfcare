@@ -164,7 +164,9 @@ class _RecordSheetState extends State<RecordSheet> {
                               Container(
                                 margin: EdgeInsets.only(bottom: 15),
                                 alignment: Alignment.center,
-                                child: RedText(text: 'RECORD BLOOD GLUCOSE'),
+                                child: RedText(
+                                    text:
+                                        'RECORD ${widget.screen.toUpperCase()}'),
                               ),
                               Column(
                                 mainAxisAlignment:
@@ -253,35 +255,67 @@ class _RecordSheetState extends State<RecordSheet> {
                                   ),
                                 ],
                               ),
-                              AddRecordForm(
-                                avatar: widget.screen == "Blood Glucose",
-                                key: Key('PreMealAddRecord1'),
-                                title: widget.screen == "Blood Glucose"
-                                    ? 'Pre Meal'
-                                    : 'Systolic',
-                                minusOnPressed: () =>
-                                    widget.onPreMealMinusPressed!(),
-                                addOnPressed: () =>
-                                    widget.onPreMealAddPressed!(),
-                                textEditingController: widget.preMeal,
-                              ),
-                              Padding(padding: EdgeInsets.only(top: 20)),
-                              AddRecordForm(
-                                avatar: widget.screen == "Blood Glucose",
-                                title: widget.screen == "Blood Glucose"
-                                    ? 'Post Meal'
-                                    : 'Diastolic',
-                                minusOnPressed: () =>
-                                    widget.onPostMealMinusPressed!(),
-                                addOnPressed: () =>
-                                    widget.onPostMealAddPressed!(),
-                                textEditingController: widget.postMeal,
-                                key: Key('PreMealAddRecord2'),
-                              ),
-                              Padding(
-                                  padding: EdgeInsets.only(
-                                      top: MediaQuery.of(context).size.height *
-                                          0.08)),
+                              Visibility(
+                                  child: Column(
+                                children: [
+                                  AddRecordForm(
+                                    avatar: false,
+                                    title: 'Body Weight',
+                                    minusOnPressed: () =>
+                                        widget.onPostMealMinusPressed!(),
+                                    addOnPressed: () =>
+                                        widget.onPostMealAddPressed!(),
+                                    textEditingController: widget.postMeal,
+                                    key: Key('PreMealAddRecord2'),
+                                  ),
+                                  Padding(
+                                      padding: EdgeInsets.only(
+                                          top: MediaQuery.of(context)
+                                                  .size
+                                                  .height *
+                                              0.08)),
+                                ],
+                              )),
+                              Visibility(
+                                  visible: widget.screen != 'Body Weight',
+                                  child: Column(
+                                    children: [
+                                      AddRecordForm(
+                                        avatar:
+                                            widget.screen == "Blood Glucose",
+                                        key: Key('PreMealAddRecord1'),
+                                        title: widget.screen == "Blood Glucose"
+                                            ? 'Pre Meal'
+                                            : 'Systolic',
+                                        minusOnPressed: () =>
+                                            widget.onPreMealMinusPressed!(),
+                                        addOnPressed: () =>
+                                            widget.onPreMealAddPressed!(),
+                                        textEditingController: widget.preMeal,
+                                      ),
+                                      Padding(
+                                          padding: EdgeInsets.only(top: 20)),
+                                      AddRecordForm(
+                                        avatar:
+                                            widget.screen == "Blood Glucose",
+                                        title: widget.screen == "Blood Glucose"
+                                            ? 'Post Meal'
+                                            : 'Diastolic',
+                                        minusOnPressed: () =>
+                                            widget.onPostMealMinusPressed!(),
+                                        addOnPressed: () =>
+                                            widget.onPostMealAddPressed!(),
+                                        textEditingController: widget.postMeal,
+                                        key: Key('PreMealAddRecord2'),
+                                      ),
+                                      Padding(
+                                          padding: EdgeInsets.only(
+                                              top: MediaQuery.of(context)
+                                                      .size
+                                                      .height *
+                                                  0.08)),
+                                    ],
+                                  )),
                               Row(
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
@@ -314,6 +348,86 @@ class _RecordSheetState extends State<RecordSheet> {
                                           int.parse(widget.preMeal.text);
                                       int postMealVal =
                                           int.parse(widget.postMeal.text);
+                                      if (widget.screen == 'Body Weight') {
+                                        if (preMealVal > 0 && postMealVal > 0) {
+                                          CollectionReference bodyWeight =
+                                          FirebaseFirestore.instance
+                                              .collection('users')
+                                              .doc(state.userModel!.user_id)
+                                              .collection('bodyweight');
+                                          // log('user id has to ran here',name: users.path);
+                                          bodyWeight
+                                              .where('date_for',
+                                              isEqualTo:
+                                              '${dateTime!.day}-${dateTime!.month}-${dateTime!.year}')
+                                              .get()
+                                              .then((QuerySnapshot snapshot) {
+                                            if (snapshot.docs.isEmpty) {
+                                              bodyWeight.add({
+                                                'readings': [
+                                                  {
+
+                                                    'weight': int.parse(
+                                                        widget.postMeal.text),
+                                                    'created_at': dateTime!
+                                                        .millisecondsSinceEpoch,
+                                                    'is_deleted': false,
+                                                  }
+                                                ],
+                                                'is_deleted': false,
+                                                'date_for_timestamp_millis':
+                                                dateTime!
+                                                    .millisecondsSinceEpoch,
+                                                'date_for':
+                                                '${dateTime!.day}-${dateTime!.month}-${dateTime!.year}',
+                                              }).then((value) => getIt
+                                                  .get<Store<AppState>>()
+                                                  .dispatch(
+                                                  GetGlucoseAction()));
+                                              getIt
+                                                  .get<Store<AppState>>()
+                                                  .dispatch(GetGlucoseAction());
+                                              getIt
+                                                  .get<Store<AppState>>()
+                                                  .dispatch(SelectedDateAction(
+                                                  screen: widget.screen,
+                                                  selected: dateTime!));
+                                            } else {
+                                              bodyWeight
+                                                  .doc(snapshot.docs[0].id)
+                                                  .update({
+                                                'readings':
+                                                FieldValue.arrayUnion([
+                                                  {
+                                                    'is_deleted': false,
+
+                                                    'weight': int.parse(
+                                                        widget.postMeal.text),
+                                                    'created_at': dateTime!
+                                                        .millisecondsSinceEpoch,
+                                                  }
+                                                ]),
+                                              }).then((value) => getIt
+                                                  .get<Store<AppState>>()
+                                                  .dispatch(
+                                                  GetGlucoseAction()));
+                                              getIt
+                                                  .get<Store<AppState>>()
+                                                  .dispatch(GetGlucoseAction());
+                                              getIt
+                                                  .get<Store<AppState>>()
+                                                  .dispatch(SelectedDateAction(
+                                                  screen: widget.screen,
+                                                  selected: dateTime!));
+                                            }
+                                            widget.preMeal.text = '0';
+                                            widget.postMeal.text = '0';
+                                            Navigator.pop(context);
+                                          });
+                                        } else {
+                                          _showMyDialog();
+                                        }
+                                      }
                                       if (widget.screen == 'Blood Glucose') {
                                         if (preMealVal > 0 && postMealVal > 0) {
                                           CollectionReference bloodglucose =
