@@ -41,13 +41,14 @@ class HistoryCard1 extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               DarkRedText(
-                text: '11:50 AM',
+                text: time,
                 size: 14,
               ),
               IconButton(
                   padding: EdgeInsets.zero,
+                  color: defaultColors.primary,
                   icon: Icon(Icons.delete_forever),
-                  onPressed: () => null)
+                  onPressed: () => delete())
             ],
           ),
           Row(

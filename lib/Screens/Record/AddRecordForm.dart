@@ -9,13 +9,15 @@ class AddRecordForm extends StatelessWidget {
   final TextEditingController? textEditingController;
   final Function? minusOnPressed;
   final Function? addOnPressed;
+  final bool avatar;
 
   AddRecordForm(
       {required Key key,
       required this.title,
       this.textEditingController,
-       this.minusOnPressed,
-      this.addOnPressed})
+      this.minusOnPressed,
+      this.addOnPressed,
+      this.avatar = false})
       : super(key: key);
 
   @override
@@ -24,15 +26,18 @@ class AddRecordForm extends StatelessWidget {
       Container(
         child: Row(
           children: [
-            Container(
-              padding: EdgeInsets.all(5),
-              margin: EdgeInsets.only(right: 10),
-              decoration: BoxDecoration(
-                  color: defaultColors.darkRed,
-                  borderRadius: BorderRadius.circular(5)),
-              child: title == 'Pre Meal'
-                  ? Image.asset('lib/Assets/emptybowl.png')
-                  : Image.asset('lib/Assets/fullbowl.png'),
+            Visibility(
+              visible: this.avatar,
+              child: Container(
+                padding: EdgeInsets.all(5),
+                margin: EdgeInsets.only(right: 10),
+                decoration: BoxDecoration(
+                    color: defaultColors.darkRed,
+                    borderRadius: BorderRadius.circular(5)),
+                child: title == 'Pre Meal'
+                    ? Image.asset('lib/Assets/emptybowl.png')
+                    : Image.asset('lib/Assets/fullbowl.png'),
+              ),
             ),
             DarkRedText(text: this.title)
           ],
@@ -59,7 +64,7 @@ class AddRecordForm extends StatelessWidget {
               margin: EdgeInsets.only(top: 5),
               width: MediaQuery.of(context).size.width * 0.15,
               child: TextField(
-                inputFormatters:[
+                inputFormatters: [
                   LengthLimitingTextInputFormatter(3),
                 ],
                 // maxLength: 3,

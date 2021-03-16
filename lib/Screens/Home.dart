@@ -67,9 +67,9 @@ class _HomeState extends State<Home> {
                       size: 13,
                       text: 'Your recent recording',
                     )),
-                state.bodyweight.length == 0 &&
-                        state.bodyweight.length == 0 &&
-                        state.bodyweight.length == 0
+                state.bodyweight!.length == 0 &&
+                        state.bodyweight!.length == 0 &&
+                        state.bodyweight!.length == 0
                     ? RedText(
                         text: 'No records availble',
                       )

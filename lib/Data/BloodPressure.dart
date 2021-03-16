@@ -1,44 +1,44 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-class BloodGlucoseModel {
-  final int pre_meal;
-  final int post_meal;
+class BloodPressureModel {
+  final int systolic;
+  final int diastolic;
   final int created_at;
   final bool is_deleted;
 
-  BloodGlucoseModel(
-      {required this.pre_meal,
-      required this.post_meal,
+  BloodPressureModel(
+      {this.systolic = 0,
+      this.diastolic = 0,
       this.is_deleted = false,
-      required this.created_at});
+      this.created_at = 0});
 
-  BloodGlucoseModel.fromJson(Map<String, dynamic> json)
-      : pre_meal = json['pre_meal'],
+  BloodPressureModel.fromJson(Map<String, dynamic> json)
+      : systolic = json['systolic'],
         is_deleted = json['is_deleted'],
-        post_meal = json['post_meal'],
+        diastolic = json['diastolic'],
         created_at = json['created_at'];
 
   Map<String, dynamic> toJson() => {
-        'pre_meal': pre_meal,
-        'post_meal': post_meal,
+        'systolic': systolic,
+        'diastolic': diastolic,
         'created_at': created_at,
         'is_deleted': is_deleted
       };
 }
 
-class MainBloodGlucoseModel {
+class MainBloodPressureModel {
   final String? date_for;
   final int? date_for_timestamp_millis;
   final List? readings;
   final bool is_deleted;
 
-  MainBloodGlucoseModel(
+  MainBloodPressureModel(
       {this.date_for,
       this.date_for_timestamp_millis,
       this.readings,
       this.is_deleted = false});
 
-  MainBloodGlucoseModel.fromJson(Map<String, dynamic> json)
+  MainBloodPressureModel.fromJson(Map<String, dynamic> json)
       : date_for = json['date_for'],
         date_for_timestamp_millis = json['date_for_timestamp_millis'],
         is_deleted = json['is_deleted'],
@@ -52,13 +52,13 @@ class MainBloodGlucoseModel {
       };
 }
 
-class MainGlucoseModelwithID {
+class MainPressureModelwithID {
   final DocumentReference? id;
   final dynamic data;
 
-  MainGlucoseModelwithID({this.id, this.data});
+  MainPressureModelwithID({this.id, this.data});
 
-  MainGlucoseModelwithID.fromJson(Map<String, dynamic> json)
+  MainPressureModelwithID.fromJson(Map<String, dynamic> json)
       : id = json['id'],
         data = json['data'];
 

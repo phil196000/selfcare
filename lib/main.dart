@@ -3,7 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:get_it/get_it.dart';
 import 'package:redux/redux.dart';
+import 'package:selfcare/Data/BloodPressure.dart';
 import 'package:selfcare/Data/UserModel.dart';
+import 'package:selfcare/Data/bloodglucosepost.dart';
 import 'package:selfcare/Navigation/BottomNav.dart';
 import 'package:selfcare/Screens/AllStatistics.dart';
 import 'package:selfcare/Screens/Login.dart';
@@ -23,18 +25,19 @@ GetIt getIt = GetIt.instance;
 void main() {
   final store = new Store(
     appStateReducer,
-    middleware: [fetchUser],
+    middleware: [fetchUser, setDate, fetchPressure],
     initialState: new AppState(
-      bloodglucose: [],
-      bloodpressure: [],
-      bodyweight: [],
-      userModel: UserModel(),
-      userModelFetch: false,
-      selectedDate: DateTime.now()
-
-    ),
+        selectTimeValuesPressure: BloodPressureModel(),
+        selectTimeValues: BloodGlucoseModel(),
+        selectedDateTimes: <String>[],
+        bloodglucose: [],
+        bloodpressure: [],
+        bodyweight: [],
+        userModel: UserModel(),
+        userModelFetch: false,
+        selectedDate: DateTime.now()),
   );
-  getIt.registerSingleton<Store>(store, signalsReady: true);
+  getIt.registerSingleton<Store<AppState>>(store, signalsReady: true);
   WidgetsFlutterBinding.ensureInitialized();
   runApp(MyApp(
     store: store,

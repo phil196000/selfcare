@@ -1,31 +1,33 @@
 import 'dart:developer';
 
-import 'package:adobe_xd/pinned.dart';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
-import 'package:persistent_bottom_nav_bar/persistent-tab-view.dart';
+
 import 'package:redux/redux.dart';
 import 'package:selfcare/CustomisedWidgets/Background.dart';
-import 'package:selfcare/CustomisedWidgets/DarkBlueText.dart';
+
+import 'package:selfcare/CustomisedWidgets/DarkGreenText.dart';
 import 'package:selfcare/CustomisedWidgets/DarkRedText.dart';
 import 'package:selfcare/CustomisedWidgets/Legend.dart';
 import 'package:selfcare/CustomisedWidgets/RecordScreenCard.dart';
 import 'package:selfcare/CustomisedWidgets/RedText.dart';
 import 'package:selfcare/CustomisedWidgets/WhiteText.dart';
-import 'package:selfcare/Navigation/BottomNav.dart';
+import 'package:selfcare/Data/BloodPressure.dart';
+import 'package:selfcare/Data/bloodglucosepost.dart';
 import 'package:selfcare/Screens/Record/BarChart.dart';
 import 'package:selfcare/Screens/Record/Calendar.dart';
-import 'package:selfcare/Screens/Record/DropDown.dart';
 import 'package:selfcare/Screens/Record/History.dart';
 import 'package:selfcare/Screens/Record/RecordSheet.dart';
 import 'package:selfcare/Theme/DefaultColors.dart';
 import 'package:selfcare/main.dart';
 import 'package:selfcare/redux/Actions/GetGlucoseAction.dart';
+import 'package:selfcare/redux/Actions/GetPressureAction.dart';
 import 'package:selfcare/redux/AppState.dart';
 import 'package:flutter_calendar_carousel/classes/event.dart';
-import 'package:flutter_calendar_carousel/classes/event_list.dart';
 import 'package:intl/intl.dart' show DateFormat;
+import 'package:charts_flutter/flutter.dart' as charts;
 
 class Record extends StatefulWidget {
   final String title;
@@ -41,7 +43,8 @@ class _RecordState extends State<Record> {
   PageController pageController = PageController();
   int page = 0;
   bool choice = true;
-  String dropdownValue = 'One';
+  String? dropdownValue;
+
   TextEditingController preMeal = TextEditingController(text: '0');
 
   TextEditingController postMeal = TextEditingController(text: '0');
@@ -60,6 +63,9 @@ class _RecordState extends State<Record> {
   @override
   void initState() {
     super.initState();
+    getIt.get<Store<AppState>>().dispatch(GetGlucoseAction());
+    getIt.get<Store<AppState>>().dispatch(GetPressureAction());
+
     pageController.addListener(() {
       // log(pageController.page.toString());
       if (pageController.page == 0.0 || pageController.page == 1.0) {
@@ -95,47 +101,230 @@ class _RecordState extends State<Record> {
     return mo[m];
   }
 
+  String firstCard({BloodGlucoseModel? bloodGlucoseModel,
+    BloodPressureModel? bloodPressureModel}) {
+    if (widget.title == 'Blood Glucose') {
+      return bloodGlucoseModel!.pre_meal.toString();
+    }
+    return bloodPressureModel!.systolic.toString();
+  }
+
+  String secondCard({BloodGlucoseModel? bloodGlucoseModel,
+    BloodPressureModel? bloodPressureModel}) {
+    if (widget.title == 'Blood Glucose') {
+      return bloodGlucoseModel!.post_meal.toString();
+    }
+    return bloodPressureModel!.diastolic.toString();
+  }
+
+  String averageCard({required BloodGlucoseModel bloodGlucoseModel,
+    required BloodPressureModel bloodPressureModel}) {
+    if (widget.title == 'Blood Glucose' &&
+        bloodGlucoseModel.post_meal != null) {
+      return ((bloodGlucoseModel.pre_meal + bloodGlucoseModel.post_meal) / 2)
+          .floor()
+          .toString();
+    } else if (widget.title == 'Blood Pressure') {
+      return ((bloodPressureModel.systolic + bloodPressureModel.diastolic) / 2)
+          .floor()
+          .toString();
+    }
+    return '';
+  }
+
+  List<charts.Series<GraphModel, String>> graphList(
+      BloodGlucoseModel bloodGlucoseModel) {
+    final data = [
+      new GraphModel('Pre Meal', bloodGlucoseModel.pre_meal),
+      new GraphModel('Post Meal', bloodGlucoseModel.post_meal)
+    ];
+
+    return [
+      new charts.Series<GraphModel, String>(
+        id: 'Glocuse',
+        colorFn: (GraphModel datum, index) {
+          return datum.title == 'Pre Meal'
+              ? charts.Color.fromHex(code: '#530505')
+              : charts.Color.fromHex(code: '#1B0973');
+        },
+        domainFn: (GraphModel graphmodel, _) => graphmodel.title,
+        measureFn: (GraphModel graphmodel, _) => graphmodel.value,
+        data: data,
+      )
+    ];
+  }
+
+  Future<void> _deleteAll(
+      {required String user_id, required String collection}) async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false, // user must tap button!
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [Text('DELETE ALL')],
+          ),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[
+                RedText(
+                    text: 'You are about to delete ALL ITEMS in your history'),
+                Container(
+                  margin: EdgeInsets.only(top: 15),
+                  child: DarkRedText(
+                    text: 'Do you want to proceed to Delete?',
+                    weight: FontWeight.normal,
+                    size: 14,
+                  ),
+                )
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: RedText(
+                text: 'NO',
+              ),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: DarkGreenText(
+                text: 'YES',
+              ),
+              onPressed: () {
+                CollectionReference ref = FirebaseFirestore.instance
+                    .collection('users')
+                    .doc(user_id)
+                    .collection(collection);
+                ref.get().then((QuerySnapshot snapshot) {
+                  snapshot.docs.forEach((element) {
+                    MainGlucoseModelwithID mainbloodGlucoseModelwithID =
+                    MainGlucoseModelwithID(
+                        data: element.data(), id: element.reference);
+                    mainbloodGlucoseModelwithID.id!.delete().then((value) {
+                      getIt.get<Store<AppState>>().dispatch(
+                          GetPressureAction());
+                      getIt
+                          .get<Store<AppState>>()
+                          .dispatch(GetGlucoseAction());
+                    });
+                    if (snapshot.size == snapshot.docs.indexOf(element)) {
+                      log('i ran');
+                      getIt.get<Store<AppState>>().dispatch(GetGlucoseAction());
+                      getIt.get<Store<AppState>>().dispatch(
+                          GetPressureAction());
+                    }
+                  });
+                });
+                getIt.get<Store<AppState>>().dispatch(GetGlucoseAction());
+                getIt.get<Store<AppState>>().dispatch(GetPressureAction());
+                Navigator.pop(context);
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> _showMyDialog() async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false, // user must tap button!
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [Text('Alert')],
+          ),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[
+                RedText(text: 'Pre Meal Or Post Meal values cannot be zero'),
+                Container(
+                  margin: EdgeInsets.only(top: 15),
+                  child: DarkRedText(
+                    text: 'Press OK to make changes and save again',
+                    weight: FontWeight.normal,
+                    size: 14,
+                  ),
+                )
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: Text('OK'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return StoreConnector(
       builder: (context, AppState state) {
         DateTime selectedDate = state.selectedDate!;
+
         return Scaffold(
           appBar: AppBar(
             title: DarkRedText(text: widget.title.toUpperCase()),
             backgroundColor: defaultColors.white,
             leading: Builder(
-              builder: (context) => IconButton(
-                  icon: Icon(Icons.chevron_left),
-                  color: defaultColors.darkRed,
-                  iconSize: 40,
-                  onPressed: () {
-                    Navigator.pop(context);
-                    // pushNewScreen(context,
-                    //     screen: Main(), withNavBar: true);
-                  }),
+              builder: (context) =>
+                  IconButton(
+                      icon: Icon(Icons.chevron_left),
+                      color: defaultColors.darkRed,
+                      iconSize: 40,
+                      onPressed: () {
+                        Navigator.pop(context);
+                        // pushNewScreen(context,
+                        //     screen: Main(), withNavBar: true);
+                      }),
             ),
             actions: <Widget>[
               page == 0
                   ? IconButton(
-                      icon: Icon(Icons.help),
-                      onPressed: () {},
-                      color: defaultColors.darkRed,
-                    )
+                icon: Icon(Icons.help),
+                onPressed: () {},
+                color: defaultColors.darkRed,
+              )
                   : Row(
-                      children: [
-                        IconButton(
-                          icon: Icon(Icons.tune),
-                          onPressed: () {},
-                          color: defaultColors.darkRed,
-                        ),
-                        IconButton(
-                          icon: Icon(Icons.delete_forever),
-                          onPressed: () {},
-                          color: defaultColors.darkRed,
-                        ),
-                      ],
-                    ),
+                children: [
+                  // IconButton(
+                  //   icon: Icon(Icons.tune),
+                  //   onPressed: () {},
+                  //   color: defaultColors.darkRed,
+                  // ),
+                  IconButton(
+                    icon: Icon(Icons.delete_forever),
+                    onPressed: (widget.title == 'Blood Glucose' &&
+                        state.bloodglucose!.length > 0)
+                        ? () {
+                      _deleteAll(
+                          user_id: state.userModel!.user_id,
+                          collection: 'bloodglucose');
+                    }
+                        : (widget.title == 'Blood Pressure' &&
+                        state.bloodpressure!.length > 0)
+                        ? () {
+                      _deleteAll(
+                          user_id: state.userModel!.user_id,
+                          collection: 'bloodpressure');
+                    }
+                        : null,
+                    color: defaultColors.primary,
+                  ),
+                ],
+              ),
             ],
           ),
           body: SafeArea(
@@ -168,7 +357,7 @@ class _RecordState extends State<Record> {
                                       boxShadow: [
                                         BoxShadow(
                                             color:
-                                                defaultColors.shadowColorGrey,
+                                            defaultColors.shadowColorGrey,
                                             offset: Offset(0, 5),
                                             blurRadius: 10)
                                       ]),
@@ -191,69 +380,78 @@ class _RecordState extends State<Record> {
                                       color: Colors.deepPurpleAccent,
                                     ),
                                     onChanged: (String? newValue) {
+                                      getIt.get<Store<AppState>>().dispatch(
+                                          SelectTimeValuesAction(
+                                              screen: widget.title,
+                                              selected: newValue));
                                       setState(() {
                                         dropdownValue = newValue!;
                                       });
                                     },
-                                    items: <String>[
-                                      'One',
-                                      'Two',
-                                      'Free',
-                                      'Four'
-                                    ].map<DropdownMenuItem<String>>(
-                                        (String value) {
-                                      return DropdownMenuItem<String>(
-                                        value: value,
-                                        child: Text(
-                                          value,
-                                          textAlign: TextAlign.center,
-                                          style: TextStyle(
-                                            color: defaultColors.darkblue,
-                                          ),
-                                        ),
-                                      );
-                                    }).toList(),
+                                    items: state.selectedDateTimes!
+                                        .map<DropdownMenuItem<String>>(
+                                            (String value) {
+                                          return DropdownMenuItem<String>(
+                                            value: value,
+                                            child: Text(
+                                              value,
+                                              textAlign: TextAlign.center,
+                                              style: TextStyle(
+                                                color: defaultColors.darkblue,
+                                              ),
+                                            ),
+                                          );
+                                        }).toList(),
                                   ),
                                 ),
                                 Visibility(
-                                  visible: widget.title != 'Body Weight',
+                                  visible: widget.title != 'Body Weight' &&
+                                      dropdownValue != null,
                                   child: Row(
                                     mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
+                                    MainAxisAlignment.spaceBetween,
                                     children: [
                                       RecordScreenCard(
                                         textColor: defaultColors.white,
                                         title: widget.title == 'Blood Glucose'
                                             ? 'Pre Meal'
                                             : 'Systolic',
-                                        value: '329',
+                                        value: firstCard(
+                                            bloodGlucoseModel:
+                                            state.selectTimeValues!,
+                                            bloodPressureModel:
+                                            state.selectTimeValuesPressure),
                                         unit: widget.title == 'Blood Glucose'
                                             ? "mg/dl"
                                             : 'mm/hg',
                                         background:
-                                            widget.title == 'Blood Glucose'
-                                                ? defaultColors.darkRed
-                                                : defaultColors.black,
+                                        widget.title == 'Blood Glucose'
+                                            ? defaultColors.darkRed
+                                            : defaultColors.black,
                                         poster: widget.title == 'Blood Glucose'
                                             ? 'lib/Assets/emptybowl.png'
                                             : '',
                                       ),
                                       RecordScreenCard(
                                         textColor:
-                                            widget.title == 'Blood Glucose'
-                                                ? defaultColors.white
-                                                : defaultColors.black,
+                                        widget.title == 'Blood Glucose'
+                                            ? defaultColors.white
+                                            : defaultColors.black,
                                         title: widget.title == 'Blood Glucose'
-                                            ? 'Pre Meal'
+                                            ? 'Post Meal'
                                             : 'Diastolic',
-                                        value: '329',
+                                        value: secondCard(
+                                            bloodPressureModel:
+                                            state.selectTimeValuesPressure,
+                                            bloodGlucoseModel:
+                                            state.selectTimeValues!),
                                         unit: widget.title == 'Blood Glucose'
                                             ? "mg/dl"
                                             : 'mm/hg',
                                         background:
-                                            widget.title == 'Blood Glucose'
-                                                ? defaultColors.darkblue
-                                                : defaultColors.white,
+                                        widget.title == 'Blood Glucose'
+                                            ? defaultColors.darkblue
+                                            : defaultColors.white,
                                         poster: widget.title == 'Blood Glucose'
                                             ? 'lib/Assets/fullbowl.png'
                                             : '',
@@ -264,82 +462,91 @@ class _RecordState extends State<Record> {
                                 Padding(
                                     padding: widget.title != 'Body Weight'
                                         ? EdgeInsets.only(
-                                            top: MediaQuery.of(context)
-                                                    .size
-                                                    .height *
-                                                0.05)
+                                        top: MediaQuery
+                                            .of(context)
+                                            .size
+                                            .height *
+                                            0.05)
                                         : EdgeInsets.only(
-                                            top: MediaQuery.of(context)
-                                                    .size
-                                                    .height *
-                                                0.002)),
-                                Row(
-                                  children: [
-                                    Container(
-                                      child: Column(
-                                        children: [
-                                          Container(
-                                            child: WhiteText(
-                                              text: '329',
-                                              size: 37,
+                                        top: MediaQuery
+                                            .of(context)
+                                            .size
+                                            .height *
+                                            0.002)),
+                                Visibility(
+                                  visible: dropdownValue != null,
+                                  child: Row(
+                                    children: [
+                                      Container(
+                                        child: Column(
+                                          children: [
+                                            Container(
+                                              child: WhiteText(
+                                                text: averageCard(
+                                                    bloodGlucoseModel:
+                                                    state.selectTimeValues!,
+                                                    bloodPressureModel: state
+                                                        .selectTimeValuesPressure!),
+                                                size: 37,
+                                              ),
                                             ),
-                                          ),
-                                          Container(
-                                            child: WhiteText(
-                                              text: widget.title ==
-                                                      'Blood Glucose'
-                                                  ? "mg/dl"
-                                                  : widget.title ==
-                                                          'Bood Pressure'
-                                                      ? 'mm/hg'
-                                                      : 'kg',
-                                              size: 12,
+                                            Container(
+                                              child: WhiteText(
+                                                text: widget.title ==
+                                                    'Blood Glucose'
+                                                    ? "mg/dl"
+                                                    : widget.title ==
+                                                    'Bood Pressure'
+                                                    ? 'mm/hg'
+                                                    : 'kg',
+                                                size: 12,
+                                              ),
                                             ),
-                                          ),
-                                        ],
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.end,
-                                      ),
-                                      decoration: BoxDecoration(
-                                          color: defaultColors.primary,
-                                          border: Border.all(
-                                              width: 2,
-                                              color: defaultColors.white),
-                                          boxShadow: [
-                                            BoxShadow(
-                                                color: defaultColors
-                                                    .shadowColorGrey,
-                                                offset: Offset(0, 5),
-                                                blurRadius: 10)
                                           ],
-                                          borderRadius:
-                                              BorderRadius.circular(100)),
-                                      alignment: Alignment.centerRight,
-                                      padding: EdgeInsets.symmetric(
-                                          vertical: 22, horizontal: 19),
-                                      margin: EdgeInsets.only(
-                                          right: 30, bottom: 15),
-                                    ),
-                                    Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Legend(
-                                          text: 'High',
-                                          color: defaultColors.primary,
+                                          crossAxisAlignment:
+                                          CrossAxisAlignment.end,
                                         ),
-                                        Legend(
-                                          text: 'Normal',
-                                          color: defaultColors.green,
-                                        ),
-                                        Legend(
-                                          text: 'Low',
-                                          color: Colors.yellow,
-                                        )
-                                      ],
-                                    )
-                                  ],
-                                  mainAxisAlignment: MainAxisAlignment.center,
+                                        decoration: BoxDecoration(
+                                            color: defaultColors.primary,
+                                            border: Border.all(
+                                                width: 2,
+                                                color: defaultColors.white),
+                                            boxShadow: [
+                                              BoxShadow(
+                                                  color: defaultColors
+                                                      .shadowColorGrey,
+                                                  offset: Offset(0, 5),
+                                                  blurRadius: 10)
+                                            ],
+                                            borderRadius:
+                                            BorderRadius.circular(100)),
+                                        alignment: Alignment.centerRight,
+                                        padding: EdgeInsets.symmetric(
+                                            vertical: 22, horizontal: 19),
+                                        margin: EdgeInsets.only(
+                                            right: 30, bottom: 15),
+                                      ),
+                                      Column(
+                                        crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                        children: [
+                                          Legend(
+                                            text: 'High',
+                                            color: defaultColors.primary,
+                                          ),
+                                          Legend(
+                                            text: 'Normal',
+                                            color: defaultColors.green,
+                                          ),
+                                          Legend(
+                                            text: 'Low',
+                                            color: Colors.yellow,
+                                          )
+                                        ],
+                                      )
+                                    ],
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                  ),
                                 ),
                                 Row(
                                   children: [
@@ -348,7 +555,7 @@ class _RecordState extends State<Record> {
                                       selectedColor: defaultColors.lightdarkRed,
                                       shape: RoundedRectangleBorder(
                                           borderRadius:
-                                              BorderRadius.circular(25),
+                                          BorderRadius.circular(25),
                                           side: BorderSide(
                                               color: defaultColors.darkRed)),
                                       labelStyle: TextStyle(
@@ -361,7 +568,7 @@ class _RecordState extends State<Record> {
                                       },
                                       label: Text('Calendar'),
                                       padding:
-                                          EdgeInsets.symmetric(horizontal: 10),
+                                      EdgeInsets.symmetric(horizontal: 10),
                                     ),
                                     SizedBox(
                                       width: 25,
@@ -370,7 +577,7 @@ class _RecordState extends State<Record> {
                                       selected: !choice,
                                       shape: RoundedRectangleBorder(
                                           borderRadius:
-                                              BorderRadius.circular(25),
+                                          BorderRadius.circular(25),
                                           side: BorderSide(
                                               color: defaultColors.darkRed)),
                                       labelStyle: TextStyle(
@@ -384,41 +591,58 @@ class _RecordState extends State<Record> {
                                       },
                                       label: Text('Graph'),
                                       padding:
-                                          EdgeInsets.symmetric(horizontal: 10),
+                                      EdgeInsets.symmetric(horizontal: 10),
                                     )
                                   ],
                                 ),
                                 choice
                                     ? Container(
-                                        child: Calendar(
-                                        onDayPressed: (DateTime date,
-                                            List<Event> events) {
-                                          getIt.get<Store>().dispatch(
-                                              SelectedDateAction(
-                                                  selected: date));
-                                        },
-                                        selectedDate: selectedDate,
-                                      ))
+                                    child: Calendar(
+                                      onDayPressed: (DateTime date,
+                                          List<Event> events) {
+                                        setState(() {
+                                          dropdownValue = null;
+                                        });
+                                        getIt.get<Store<AppState>>().dispatch(
+                                            SelectedDateAction(
+                                                screen: widget.title,
+                                                selected: date));
+                                      },
+                                      selectedDate: selectedDate,
+                                      screen: widget.title,
+                                    ))
+                                    : dropdownValue == null
+                                    ? RedText(
+                                  text: 'No data avaible to be shown',
+                                )
                                     : (widget.title == 'Blood Glucose' &&
-                                                state.bloodglucose.length ==
-                                                    0) ||
-                                            (widget.title == 'Blood Pressure' &&
-                                                state.bloodpressure.length ==
-                                                    0) ||
-                                            (widget.title == 'Body Weight' &&
-                                                state.bodyweight.length == 0)
-                                        ? RedText(
-                                            text: 'No data avaible to be shown',
-                                          )
-                                        : Container(
-                                            height: MediaQuery.of(context)
-                                                    .size
-                                                    .height *
-                                                0.3,
-                                            child: SimpleBarChart(
-                                              animate: true,
-                                            ),
-                                          )
+                                    state.bloodglucose!
+                                        .length ==
+                                        0) ||
+                                    (widget.title ==
+                                        'Blood Pressure' &&
+                                        state.bloodpressure!
+                                            .length ==
+                                            0) ||
+                                    (widget.title ==
+                                        'Body Weight' &&
+                                        state.bodyweight!.length ==
+                                            0)
+                                    ? RedText(
+                                  text:
+                                  'No data avaible to be shown',
+                                )
+                                    : Container(
+                                  height: MediaQuery
+                                      .of(context)
+                                      .size
+                                      .height *
+                                      0.3,
+                                  child: SimpleBarChart(
+                                      animate: true,
+                                      seriesList: graphList(state
+                                          .selectTimeValues!)),
+                                )
                               ],
                               padding: EdgeInsets.only(
                                   bottom: 100, top: 10, left: 15, right: 15),
@@ -435,7 +659,10 @@ class _RecordState extends State<Record> {
                       flex: 1,
                       child: Container(
                         // height: MediaQuery.of(context).size.height * 0.07,
-                        width: MediaQuery.of(context).size.width,
+                        width: MediaQuery
+                            .of(context)
+                            .size
+                            .width,
                         decoration: BoxDecoration(
                             color: defaultColors.white,
                             boxShadow: [
@@ -490,30 +717,7 @@ class _RecordState extends State<Record> {
                           isScrollControlled: true,
                           builder: (BuildContext context) {
                             return RecordSheet(
-                              onSavePressed: () {
-                                // log(state.userModel!.user_id.toString());
-                                CollectionReference users = FirebaseFirestore
-                                    .instance
-                                    .collection('users')
-                                    .doc(state.userModel!.user_id)
-                                    .collection('bloodglucose');
-                                // log('user id has to ran here',name: users.path);
-
-                                users.add({
-                                  'readings': [
-                                    {
-                                      'pre_meal': int.parse(preMeal.text),
-                                      'post_meal': int.parse(postMeal.text),
-                                      'created_at':
-                                          DateTime.now().millisecondsSinceEpoch,
-                                    }
-                                  ],
-                                  'date_for_timestamp_millis': state
-                                      .selectedDate!.millisecondsSinceEpoch,
-                                  'date_for':
-                                      '${state.selectedDate!.day}-${state.selectedDate!.month}-${state.selectedDate!.year}',
-                                }).then((value) => log('done'));
-                              },
+                              screen: widget.title,
                               postMeal: postMeal,
                               preMeal: preMeal,
                               onPreMealMinusPressed: () {
@@ -553,8 +757,11 @@ class _RecordState extends State<Record> {
                                     context: context,
                                     initialTime: TimeOfDay.now());
                                 log(timeofday!.hour.toString());
-                                getIt.get<Store>().dispatch(SelectedDateAction(
-                                        selected: DateTime(
+                                getIt
+                                    .get<Store<AppState>>()
+                                    .dispatch(SelectedDateAction(
+                                    screen: widget.title,
+                                    selected: DateTime(
                                       state.selectedDate!.year,
                                       state.selectedDate!.month,
                                       state.selectedDate!.day,
@@ -563,16 +770,25 @@ class _RecordState extends State<Record> {
                                     )));
                               },
                               datePressed: () async {
+                                print('i am running');
+                                log(state.selectedDate!.day.toString());
                                 DateTime? datetime = await showDatePicker(
                                     context: context,
                                     initialDate: state.selectedDate!,
-                                    firstDate: DateTime(DateTime.now().year),
+                                    firstDate: DateTime(DateTime
+                                        .now()
+                                        .year),
                                     lastDate: DateTime(
-                                      DateTime.now().year + 1,
+                                      DateTime
+                                          .now()
+                                          .year + 1,
                                     ));
                                 log(datetime!.year.toString());
-                                getIt.get<Store>().dispatch(
-                                    SelectedDateAction(selected: datetime));
+
+                                getIt.get<Store<AppState>>().dispatch(
+                                    SelectedDateAction(
+                                        selected: datetime,
+                                        screen: widget.title));
                               },
                             );
                           });
@@ -583,7 +799,7 @@ class _RecordState extends State<Record> {
                     ),
                     child: Container(
                       padding:
-                          EdgeInsets.symmetric(vertical: 10, horizontal: 21),
+                      EdgeInsets.symmetric(vertical: 10, horizontal: 21),
                       decoration: BoxDecoration(
                           color: defaultColors.primary,
                           borderRadius: BorderRadius.circular(25),
@@ -618,7 +834,10 @@ class _RecordState extends State<Record> {
                     ),
                   ),
                   right: 10,
-                  bottom: MediaQuery.of(context).size.height * 0.07 + 7,
+                  bottom: MediaQuery
+                      .of(context)
+                      .size
+                      .height * 0.07 + 7,
                 ),
               ],
             ),
@@ -632,9 +851,27 @@ class _RecordState extends State<Record> {
 
 /// Sample ordinal data type.
 
-class OrdinalSales {
-  final String year;
-  final int sales;
+class GraphModel {
+  final String? title;
+  final int? value;
 
-  OrdinalSales(this.year, this.sales);
+  GraphModel(this.title, this.value);
+}
+
+String monthSelectedString(int m) {
+  List<String> mo = [
+    'January',
+    'February',
+    'March',
+    'April',
+    'May',
+    'June',
+    'July',
+    'August',
+    'September',
+    'October',
+    'November',
+    'December'
+  ];
+  return mo[m];
 }

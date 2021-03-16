@@ -80,7 +80,7 @@ class _LoginState extends State<Login> {
           loading = false;
         });
         _loginCredentialsSave().then((value) {
-          getIt.get<Store>().dispatch(GetUserAction(email: _email.text));
+          getIt.get<Store<AppState>>().dispatch(GetUserAction(email: _email.text));
           Timer(
               Duration(seconds: 3),
               () => Navigator.push(
@@ -133,7 +133,7 @@ class _LoginState extends State<Login> {
                             flex: 4, child: Image.asset('lib/Assets/logo.png')),
                       ),
                       Expanded(
-                          flex: 6,
+                          flex: 9,
                           child: Container(
                             margin: EdgeInsets.symmetric(
                                 horizontal: 11, vertical: 10),
@@ -148,8 +148,8 @@ class _LoginState extends State<Login> {
                                       color: defaultColors.shadowColorGrey,
                                       blurRadius: 10)
                                 ]),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
+                            child: ListView(
+                             padding: EdgeInsets.only(bottom: 20),
                               children: [
                                 DarkRedText(
                                   text: 'Login to enjoy our services',

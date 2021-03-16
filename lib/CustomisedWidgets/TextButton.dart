@@ -9,8 +9,7 @@ class ButtonText extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return FlatButton(
-      padding: EdgeInsets.all(0),
+    return TextButton(
         onPressed: ()=>this.onPressed,
         child: RedText(
           text: this.text,
