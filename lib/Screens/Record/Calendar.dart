@@ -7,6 +7,7 @@ import 'package:flutter_calendar_carousel/flutter_calendar_carousel.dart'
     show CalendarCarousel;
 import 'package:redux/redux.dart';
 import 'package:selfcare/Data/BloodPressure.dart';
+import 'package:selfcare/Data/BodyWeight.dart';
 import 'package:selfcare/Data/bloodglucosepost.dart';
 import 'package:selfcare/redux/AppState.dart';
 
@@ -70,16 +71,16 @@ class Calendar extends StatelessWidget {
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: state.bloodglucose!.map((e) {
                               MainGlucoseModelwithID
-                              initMainGlucoseModelwithID =
-                              MainGlucoseModelwithID.fromJson(e);
+                                  initMainGlucoseModelwithID =
+                                  MainGlucoseModelwithID.fromJson(e);
 
                               MainBloodGlucoseModel mainBloodGlucoseModel =
-                              MainBloodGlucoseModel.fromJson(
-                                  initMainGlucoseModelwithID.data);
+                                  MainBloodGlucoseModel.fromJson(
+                                      initMainGlucoseModelwithID.data);
                               String dayDateString =
                                   '${day.day}-${day.month}-${day.year}';
                               if (mainBloodGlucoseModel.date_for ==
-                                  dayDateString &&
+                                      dayDateString &&
                                   mainBloodGlucoseModel.readings!.length > 0 &&
                                   !mainBloodGlucoseModel.is_deleted) {
                                 return Container(
@@ -109,6 +110,32 @@ class Calendar extends StatelessWidget {
                                       dayDateString &&
                                   mainBloodPressureModel.readings!.length > 0 &&
                                   !mainBloodPressureModel.is_deleted) {
+                                return Container(
+                                  width: 3,
+                                  height: 3,
+                                  color: Colors.black,
+                                );
+                              }
+                              return Container();
+                            }).toList(),
+                          )),
+                      Visibility(
+                          visible: screen == 'Body Weight',
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: state.bodyweight!.map((e) {
+                              MainWeightModelwithID initMainWeightModelwithID =
+                                  MainWeightModelwithID.fromJson(e);
+
+                              MainBodyWeightModel mainBodyWeightModel =
+                                  MainBodyWeightModel.fromJson(
+                                      initMainWeightModelwithID.data);
+                              String dayDateString =
+                                  '${day.day}-${day.month}-${day.year}';
+                              if (mainBodyWeightModel.date_for ==
+                                      dayDateString &&
+                                  mainBodyWeightModel.readings!.length > 0 &&
+                                  !mainBodyWeightModel.is_deleted) {
                                 return Container(
                                   width: 3,
                                   height: 3,

@@ -7,10 +7,12 @@ import 'package:selfcare/CustomisedWidgets/DarkRedText.dart';
 import 'package:selfcare/CustomisedWidgets/RedText.dart';
 import 'package:selfcare/CustomisedWidgets/WhiteText.dart';
 import 'package:selfcare/Data/BloodPressure.dart';
+import 'package:selfcare/Data/BodyWeight.dart';
 import 'package:selfcare/Data/bloodglucosepost.dart';
 import 'package:selfcare/Screens/Record.dart';
 import 'package:selfcare/Screens/Record/HistoryCard1.dart';
 import 'package:selfcare/Theme/DefaultColors.dart';
+import 'package:selfcare/redux/Actions/GetBodyWeightAction.dart';
 import 'package:selfcare/redux/Actions/GetGlucoseAction.dart';
 import 'package:selfcare/redux/Actions/GetPressureAction.dart';
 import 'package:selfcare/redux/AppState.dart';
@@ -32,7 +34,8 @@ class _HistoryState extends State<History> {
   Future<void> _singleDelete(
       {MainGlucoseModelwithID? modelwithID,
       dynamic e,
-      MainPressureModelwithID? pressureModelwithID}) async {
+      MainPressureModelwithID? pressureModelwithID,
+      MainWeightModelwithID? weightModelwithID}) async {
     return showDialog<void>(
       context: context,
       barrierDismissible: false, // user must tap button!
@@ -73,7 +76,9 @@ class _HistoryState extends State<History> {
               onPressed: () {
                 DocumentReference itemRef = (widget.record == 'Blood Glucose'
                     ? modelwithID!.id!
-                    : pressureModelwithID!.id)!;
+                    : widget.record == 'Blood Pressure'
+                        ? pressureModelwithID!.id
+                        : weightModelwithID!.id)!;
                 itemRef.update({
                   'readings': FieldValue.arrayRemove([e])
                 }).then((value) => widget.record == 'Blood Glucose'
@@ -81,21 +86,16 @@ class _HistoryState extends State<History> {
                     : getIt
                         .get<Store<AppState>>()
                         .dispatch(GetPressureAction()));
-                // itemRef.update({
-                //   'readings': FieldValue.arrayUnion([
-                //     {
-                //       'pre_meal': bloodGlucoseModel.pre_meal,
-                //       'post_meal': bloodGlucoseModel.post_meal,
-                //       'created_at': bloodGlucoseModel.created_at,
-                //       'is_deleted': !bloodGlucoseModel.is_deleted,
-                //     }
-                //   ])
-                // }).then((value) => null);
+
                 widget.record == 'Blood Glucose'
                     ? getIt.get<Store<AppState>>().dispatch(GetGlucoseAction())
-                    : getIt
-                        .get<Store<AppState>>()
-                        .dispatch(GetPressureAction());
+                    : widget.record == 'Blood Pressure'
+                        ? getIt
+                            .get<Store<AppState>>()
+                            .dispatch(GetPressureAction())
+                        : getIt
+                            .get<Store<AppState>>()
+                            .dispatch(GetWeightAction());
                 Navigator.pop(context);
               },
             ),
@@ -300,8 +300,10 @@ class _HistoryState extends State<History> {
                                             ? 'mg/dl'
                                             : 'mm/hg',
                                         values: [
-                                          bloodpressureModel.systolic.toString(),
-                                          bloodpressureModel.diastolic.toString()
+                                          bloodpressureModel.systolic
+                                              .toString(),
+                                          bloodpressureModel.diastolic
+                                              .toString()
                                         ],
                                       ));
                                 })
@@ -310,7 +312,117 @@ class _HistoryState extends State<History> {
                       }).toList(),
                     ],
                   )
-                : Container();
+                : widget.record == 'Body Weight'
+                    ? ListView(
+                        padding: EdgeInsets.only(
+                            top: 10, left: 15, right: 15, bottom: 100),
+                        children: [
+                          Visibility(
+                              visible: state.bodyweight!.length == 0,
+                              child: RedText(
+                                text: 'No records yet, add your first reading',
+                              )),
+                          ...state.bodyweight!.map((e) {
+                            MainWeightModelwithID initMainWeightModelwithID =
+                                MainWeightModelwithID.fromJson(e);
+
+                            MainBodyWeightModel mainBodyWeightModel =
+                                MainBodyWeightModel.fromJson(
+                                    initMainWeightModelwithID.data);
+                            DateTime dateTime =
+                                DateTime.fromMillisecondsSinceEpoch(
+                                    mainBodyWeightModel
+                                        .date_for_timestamp_millis!);
+                            return Visibility(
+                                visible: !mainBodyWeightModel.is_deleted,
+                                child: Flex(
+                                  direction: Axis.vertical,
+                                  children: [
+                                    Visibility(
+                                        visible: mainBodyWeightModel
+                                                    .readings!.length >
+                                                0 &&
+                                            !mainBodyWeightModel.is_deleted,
+                                        child: Row(
+                                          key: Key(
+                                              '${mainBodyWeightModel.date_for_timestamp_millis}'),
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          children: [
+                                            Container(
+                                              margin: EdgeInsets.only(top: 5),
+                                              child: WhiteText(
+                                                text:
+                                                    '${dateTime.day} ${monthSelectedString(dateTime.month - 1)} ${dateTime.year}',
+                                                size: 10,
+                                              ),
+                                              alignment: Alignment.center,
+                                              padding: EdgeInsets.symmetric(
+                                                  horizontal: 8, vertical: 7),
+                                              decoration: BoxDecoration(
+                                                  color: defaultColors.darkRed,
+                                                  borderRadius:
+                                                      BorderRadius.circular(5),
+                                                  boxShadow: [
+                                                    BoxShadow(
+                                                        color: defaultColors
+                                                            .shadowColorGrey,
+                                                        offset: Offset(0, 5),
+                                                        blurRadius: 10)
+                                                  ]),
+                                            )
+                                          ],
+                                        )),
+                                    ...mainBodyWeightModel.readings!.map((e) {
+                                      BodyWeightModel bodyWeighteModel =
+                                          BodyWeightModel.fromJson(e);
+                                      TimeOfDay timeOfDay =
+                                          TimeOfDay.fromDateTime(DateTime
+                                              .fromMillisecondsSinceEpoch(
+                                                  bodyWeighteModel.created_at));
+
+                                      return Visibility(
+                                          visible: !bodyWeighteModel.is_deleted,
+                                          child: HistoryCard1(
+                                            delete: () {
+                                              _singleDelete(
+                                                  e: e,
+                                                  weightModelwithID:
+                                                      initMainWeightModelwithID);
+                                              // log(initMainGlucoseModelwithID.id.toString());
+                                            },
+                                            key: Key(bodyWeighteModel.created_at
+                                                .toString()),
+                                            showAvatars:
+                                                widget.record == 'Blood Glucose'
+                                                    ? true
+                                                    : false,
+                                            title: widget.record ==
+                                                    'Blood Glucose'
+                                                ? ['Pre\nMeal', 'Post\nMeal']
+                                                : ['Systolic', 'Diastolic'],
+                                            time:
+                                                '${timeOfDay.hour == 0 ? '12' : timeOfDay.hour > 12 ? timeOfDay.hour - 12 : timeOfDay.hour}:${timeOfDay.minute < 10 ? '0${timeOfDay.minute}' : timeOfDay.minute} ${timeOfDay.hour > 11 ? 'PM' : 'AM'}',
+                                            unit:
+                                                widget.record == 'Blood Glucose'
+                                                    ? 'mg/dl'
+                                                    : widget.record ==
+                                                            'Blood Pressure'
+                                                        ? 'mm/hg'
+                                                        : 'kg',
+                                            values: [
+                                              bodyWeighteModel.weight
+                                                  .toString(),
+                                              bodyWeighteModel.weight.toString()
+                                            ],
+                                          ));
+                                    })
+                                  ],
+                                ));
+                          }).toList(),
+                        ],
+                      )
+                    : Container();
       },
       converter: (Store<AppState> store) => store.state,
     );

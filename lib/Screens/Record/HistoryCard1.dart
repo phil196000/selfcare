@@ -51,90 +51,120 @@ class HistoryCard1 extends StatelessWidget {
                   onPressed: () => delete())
             ],
           ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Column(
-                children: [
-                  Container(
-                    child: Row(
+          Visibility(
+            visible: unit == 'kg',
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Container(
+                  child: DarkRedText(
+                    text: 'Weight',
+                    size: 14,
+                  ),
+                ),
+                Row(
+                  children: [
+                    DarkRedText(
+                      text: values[0],
+                      size: 20,
+                    ),
+                    DarkRedText(
+                      text: unit,
+                      size: 11,
+                      weight: FontWeight.normal,
+                    ),
+                  ],
+                )
+              ],
+            ),
+          ),
+          Visibility(
+            visible: unit != 'kg',
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Column(
+                  children: [
+                    Container(
+                      child: Row(
+                        children: [
+                          Visibility(
+                            visible: showAvatars,
+                            child: Container(
+                                padding: EdgeInsets.all(5),
+                                margin: EdgeInsets.only(right: 10),
+                                decoration: BoxDecoration(
+                                    color: defaultColors.darkRed,
+                                    borderRadius: BorderRadius.circular(5)),
+                                child: title[0] == 'Pre\nMeal'
+                                    ? Image.asset('lib/Assets/emptybowl.png')
+                                    : Image.asset('lib/Assets/fullbowl.png')),
+                          ),
+                          DarkRedText(
+                            text: title[0],
+                            size: 14,
+                          )
+                        ],
+                      ),
+                    ),
+                    Padding(padding: EdgeInsets.only(top: 10)),
+                    Row(
                       children: [
-                        Visibility(
-                          visible: showAvatars,
-                          child: Container(
-                              padding: EdgeInsets.all(5),
-                              margin: EdgeInsets.only(right: 10),
-                              decoration: BoxDecoration(
-                                  color: defaultColors.darkRed,
-                                  borderRadius: BorderRadius.circular(5)),
-                              child: title[0] == 'Pre\nMeal'
-                                  ? Image.asset('lib/Assets/emptybowl.png')
-                                  : Image.asset('lib/Assets/fullbowl.png')),
+                        DarkRedText(
+                          text: values[0],
+                          size: 24,
                         ),
                         DarkRedText(
-                          text: title[0],
-                          size: 14,
+                          text: unit,
+                          size: 11,
+                          weight: FontWeight.normal,
                         )
                       ],
-                    ),
-                  ),
-                  Padding(padding: EdgeInsets.only(top: 10)),
-                  Row(
-                    children: [
-                      DarkRedText(
-                        text: values[0],
-                        size: 24,
+                    )
+                  ],
+                ),
+                Column(
+                  children: [
+                    Container(
+                      child: Row(
+                        children: [
+                          Visibility(
+                            visible: showAvatars,
+                            child: Container(
+                                padding: EdgeInsets.all(5),
+                                margin: EdgeInsets.only(right: 10),
+                                decoration: BoxDecoration(
+                                    color: defaultColors.darkRed,
+                                    borderRadius: BorderRadius.circular(5)),
+                                child: title[1] == 'Post\nMeal'
+                                    ? Image.asset('lib/Assets/emptybowl.png')
+                                    : Image.asset('lib/Assets/fullbowl.png')),
+                          ),
+                          DarkRedText(
+                            text: title[1],
+                            size: 14,
+                          )
+                        ],
                       ),
-                      DarkRedText(
-                        text: unit,
-                        size: 11,
-                        weight: FontWeight.normal,
-                      )
-                    ],
-                  )
-                ],
-              ),
-              Column(
-                children: [
-                  Container(
-                    child: Row(
+                    ),
+                    Padding(padding: EdgeInsets.only(top: 10)),
+                    Row(
                       children: [
-                        Visibility(
-                          visible: showAvatars,
-                          child: Container(
-                              padding: EdgeInsets.all(5),
-                              margin: EdgeInsets.only(right: 10),
-                              decoration: BoxDecoration(
-                                  color: defaultColors.darkRed,
-                                  borderRadius: BorderRadius.circular(5)),
-                              child: title[1] == 'Post\nMeal'
-                                  ? Image.asset('lib/Assets/emptybowl.png')
-                                  : Image.asset('lib/Assets/fullbowl.png')),
+                        DarkRedText(
+                          text: values[1],
+                          size: 24,
                         ),
                         DarkRedText(
-                          text: title[1],
-                          size: 14,
+                          text: unit,
+                          size: 11,
+                          weight: FontWeight.normal,
                         )
                       ],
-                    ),
-                  ),
-                  Padding(padding: EdgeInsets.only(top: 10)),
-                  Row(
-                    children: [
-                      DarkRedText(
-                        text: values[1],
-                        size: 24,
-                      ),
-                      DarkRedText(
-                        text: unit,
-                        size: 11,
-                        weight: FontWeight.normal,
-                      )
-                    ],
-                  )
-                ],
-              ),
-            ],
+                    )
+                  ],
+                ),
+              ],
+            ),
           )
         ],
       ),

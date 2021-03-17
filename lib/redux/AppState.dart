@@ -1,4 +1,5 @@
 import 'package:selfcare/Data/BloodPressure.dart';
+import 'package:selfcare/Data/BodyWeight.dart';
 import 'package:selfcare/Data/UserModel.dart';
 import 'package:selfcare/Data/bloodglucosepost.dart';
 
@@ -13,8 +14,11 @@ class AppState {
   final MainBloodGlucoseModel? selectedBloodGlucoseByDate;
   final BloodGlucoseModel? selectTimeValues;
   final BloodPressureModel? selectTimeValuesPressure;
+  final BodyWeightModel? selectTimeValuesWeight;
+
 
   AppState({
+    this.selectTimeValuesWeight,
     this.selectTimeValuesPressure,
     this.selectTimeValues,
     this.selectedDateTimes = const <String>[],

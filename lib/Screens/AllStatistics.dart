@@ -7,10 +7,13 @@ import 'package:redux/redux.dart';
 import 'package:selfcare/CustomisedWidgets/Background.dart';
 import 'package:selfcare/CustomisedWidgets/DarkGreenText.dart';
 import 'package:selfcare/CustomisedWidgets/DarkRedText.dart';
+import 'package:selfcare/CustomisedWidgets/WhiteText.dart';
 import 'package:selfcare/Data/BloodPressure.dart';
+import 'package:selfcare/Data/BodyWeight.dart';
 import 'package:selfcare/Data/bloodglucosepost.dart';
 import 'package:selfcare/Navigation/BottomNav.dart';
 import 'package:selfcare/Screens/AllStats/Chart.dart';
+import 'package:selfcare/Screens/Record.dart';
 import 'package:selfcare/Theme/DefaultColors.dart';
 import 'package:selfcare/redux/AppState.dart';
 import 'package:charts_flutter/flutter.dart' as charts;
@@ -30,6 +33,40 @@ class _AllStatisticsState extends State<AllStatistics> {
   bool showFilterChips = true;
   bool statChoice = false;
   String singleChoice = 'Glucose';
+  List<Widget> selectedPoint = [];
+
+//Chart Selection
+  DateTime? _time;
+  late Map<String, num> _measures;
+
+  _onSelectionChanged(charts.SelectionModel model) {
+    final selectedDatum = model.selectedDatum;
+
+    DateTime? time;
+    final measures = <String, num>{};
+    List<Widget> pointsSelected = [];
+    // We get the model that updated with a list of [SeriesDatum] which is
+    // simply a pair of series & datum.
+    //
+    // Walk the selection updating the measures map, storing off the sales and
+    // series name for each selection point.
+    if (selectedDatum.isNotEmpty) {
+      time = selectedDatum.first.datum.timeCurrent;
+      selectedDatum.forEach((charts.SeriesDatum datumPair) {
+        measures[datumPair.series.displayName] = datumPair.datum.value;
+        log(datumPair.datum.value.toString(), name: 'value');
+      });
+    }
+    measures.forEach((String series, num value) {
+      pointsSelected.add(WhiteText(text: '$series: $value'));
+    });
+    // Request a build.
+    setState(() {
+      _time = time!;
+      _measures = measures;
+      selectedPoint = pointsSelected;
+    });
+  }
 
   List<charts.Series<TimeSeriesModel, DateTime>> _allStats(
       {List glucose = const [],
@@ -49,6 +86,48 @@ class _AllStatisticsState extends State<AllStatistics> {
     List<TimeSeriesModel> pressureForStatSingleDiastolic = [];
 
     List<TimeSeriesModel> weightForStatSingle = [];
+    log(weight.length.toString());
+    weight.forEach((element) {
+      MainWeightModelwithID mainWeightModelwithID =
+          MainWeightModelwithID.fromJson(element);
+      MainBodyWeightModel mainBodyWeightModel =
+          MainBodyWeightModel.fromJson(mainWeightModelwithID.data);
+      mainBodyWeightModel.readings!.forEach((element) {
+        BodyWeightModel bodyWeightModel = BodyWeightModel.fromJson(element);
+        if (dropdownValue == '30 days') {
+          DateTime end = DateTime.now();
+          DateTime start = DateTime.fromMillisecondsSinceEpoch(
+              end.millisecondsSinceEpoch - (30 * 24 * 60 * 60 * 1000));
+          DateTime itemDate = DateTime.fromMillisecondsSinceEpoch(
+              mainBodyWeightModel.date_for_timestamp_millis!);
+          if (itemDate.millisecondsSinceEpoch <= end.millisecondsSinceEpoch &&
+              itemDate.millisecondsSinceEpoch >= start.millisecondsSinceEpoch) {
+            weightForStat.add(new TimeSeriesModel(
+                timeCurrent: DateTime.fromMillisecondsSinceEpoch(
+                    bodyWeightModel.created_at),
+                value: bodyWeightModel.weight));
+          }
+        } else if (dropdownValue == '7 days') {
+          DateTime end = DateTime.now();
+          DateTime start = DateTime.fromMillisecondsSinceEpoch(
+              end.millisecondsSinceEpoch - (30 * 24 * 60 * 60 * 1000));
+          DateTime itemDate = DateTime.fromMillisecondsSinceEpoch(
+              mainBodyWeightModel.date_for_timestamp_millis!);
+          if (itemDate.millisecondsSinceEpoch <= end.millisecondsSinceEpoch &&
+              itemDate.millisecondsSinceEpoch >= start.millisecondsSinceEpoch) {
+            weightForStat.add(new TimeSeriesModel(
+                timeCurrent: DateTime.fromMillisecondsSinceEpoch(
+                    bodyWeightModel.created_at),
+                value: bodyWeightModel.weight));
+          }
+        } else {
+          weightForStat.add(new TimeSeriesModel(
+              timeCurrent: DateTime.fromMillisecondsSinceEpoch(
+                  bodyWeightModel.created_at),
+              value: bodyWeightModel.weight));
+        }
+      });
+    });
 
     glucose.forEach((element) {
       MainGlucoseModelwithID mainGlucoseModelwithID =
@@ -253,7 +332,7 @@ class _AllStatisticsState extends State<AllStatistics> {
             ? [
                 new charts.Series<TimeSeriesModel, DateTime>(
                   id: 'Pressure Single Systolic',
-                  displayName: 'Pressure',
+                  displayName: 'Systolic',
                   colorFn: (_, __) => charts.Color.fromHex(code: '#000000'),
                   domainFn: (TimeSeriesModel sales, _) => sales.timeCurrent,
                   measureFn: (TimeSeriesModel sales, _) => sales.value,
@@ -261,7 +340,7 @@ class _AllStatisticsState extends State<AllStatistics> {
                 ),
                 new charts.Series<TimeSeriesModel, DateTime>(
                   id: 'Pressure Single Diastolic',
-                  displayName: 'Pressure',
+                  displayName: 'Diastolic',
                   colorFn: (_, __) => charts.Color.fromHex(code: '#139932'),
                   domainFn: (TimeSeriesModel sales, _) => sales.timeCurrent,
                   measureFn: (TimeSeriesModel sales, _) => sales.value,
@@ -272,7 +351,7 @@ class _AllStatisticsState extends State<AllStatistics> {
                 ? [
                     new charts.Series<TimeSeriesModel, DateTime>(
                       id: 'Glucose Single PreMeal',
-                      displayName: 'Glucose',
+                      displayName: 'Pre Meal',
                       colorFn: (_, __) => charts.Color.fromHex(code: '#530505'),
                       domainFn: (TimeSeriesModel sales, _) => sales.timeCurrent,
                       measureFn: (TimeSeriesModel sales, _) => sales.value,
@@ -280,14 +359,23 @@ class _AllStatisticsState extends State<AllStatistics> {
                     ),
                     new charts.Series<TimeSeriesModel, DateTime>(
                       id: 'Glucose Single PostMeal',
-                      displayName: 'Glucose',
+                      displayName: 'Post Meal',
                       colorFn: (_, __) => charts.Color.fromHex(code: '#1B0973'),
                       domainFn: (TimeSeriesModel sales, _) => sales.timeCurrent,
                       measureFn: (TimeSeriesModel sales, _) => sales.value,
                       data: glucoseForStatSinglePostMeal,
                     )
                   ]
-                : []
+                : [
+                    new charts.Series<TimeSeriesModel, DateTime>(
+                      id: 'Body Weight Single',
+                      displayName: 'Weight',
+                      colorFn: (_, __) => charts.Color.fromHex(code: '#FF0000'),
+                      domainFn: (TimeSeriesModel sales, _) => sales.timeCurrent,
+                      measureFn: (TimeSeriesModel sales, _) => sales.value,
+                      data: weightForStat,
+                    )
+                  ]
         : [
             new charts.Series<TimeSeriesModel, DateTime>(
               id: 'Glucose',
@@ -305,6 +393,14 @@ class _AllStatisticsState extends State<AllStatistics> {
               measureFn: (TimeSeriesModel sales, _) => sales.value,
               data: pressureForStat,
             ),
+            new charts.Series<TimeSeriesModel, DateTime>(
+              id: 'Body Weight Single',
+              displayName: 'Weight',
+              colorFn: (_, __) => charts.Color.fromHex(code: '#FF0000'),
+              domainFn: (TimeSeriesModel sales, _) => sales.timeCurrent,
+              measureFn: (TimeSeriesModel sales, _) => sales.value,
+              data: weightForStat,
+            )
           ];
   }
 
@@ -317,6 +413,61 @@ class _AllStatisticsState extends State<AllStatistics> {
             child: Stack(
               // overflow: Overflow.visible,
               children: [
+                Visibility(
+                  visible: _time != null,
+                  child: Positioned(
+                      bottom: 50,
+                      right: 5,
+                      child: Container(
+                        padding:
+                            EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                        decoration: BoxDecoration(
+                            color: defaultColors.darkRed,
+                            boxShadow: [
+                              BoxShadow(
+                                color: defaultColors.shadowColorRed,
+                                offset: Offset(0, 5),
+                                blurRadius: 10
+                              )
+                            ],
+                            borderRadius: BorderRadius.circular(5)),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              children: [
+                                WhiteText(
+                                  text: 'Time: ',
+                                  size: 14,
+                                ),
+                                WhiteText(
+                                    size: 14,
+                                    text: _time != null
+                                        ? '${_time!.day} ${monthSelectedString(_time!.month - 1)} ${_time!.year}'
+                                        : '')
+                              ],
+                            ),
+                            Row(
+                              children: [
+                                WhiteText(
+                                  text: 'Time: ',
+                                  size: 14,
+                                ),
+                                WhiteText(
+                                    size: 14,
+                                    text: _time != null
+                                        ? '${_time!.hour == 0 ? '12' : _time!.hour > 12 ? _time!.hour - 12 : _time!.hour}:${_time!.minute < 10 ? '0${_time!.minute}' : _time!.minute}:${_time!.second < 10 ? '0${_time!.second}' : _time!.second} ${_time!.hour > 11 ? 'PM' : 'AM'}'
+                                        : '')
+                              ],
+                            ),
+                            Column(
+                              children: selectedPoint,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                            )
+                          ],
+                        ),
+                      )),
+                ),
                 Background(),
                 Flex(
                   direction: Axis.vertical,
@@ -364,7 +515,8 @@ class _AllStatisticsState extends State<AllStatistics> {
                     ),
                     Expanded(
                       child: ListView(
-                        padding: EdgeInsets.only(top: 0, left: 10, right: 10),
+                        padding: EdgeInsets.only(
+                            top: 0, left: 10, right: 10, bottom: 50),
                         children: [
                           TextButton(
                               onPressed: () {
@@ -633,10 +785,19 @@ class _AllStatisticsState extends State<AllStatistics> {
                             ),
                           ),
                           Container(
+                            padding: EdgeInsets.symmetric(horizontal: 10),
                             height: MediaQuery.of(context).size.height * 0.6,
-                            child: TimeSeriesSymbolAnnotationChart(_allStats(
-                                glucose: state.bloodglucose!,
-                                pressure: state.bloodpressure!)),
+                            child: TimeSeriesSymbolAnnotationChart(
+                              _allStats(
+                                  weight: state.bodyweight!,
+                                  glucose: state.bloodglucose!,
+                                  pressure: state.bloodpressure!),
+                              selectionModels: [
+                                new charts.SelectionModelConfig(
+                                    type: charts.SelectionModelType.info,
+                                    changedListener: _onSelectionChanged)
+                              ],
+                            ),
                           )
                         ],
                       ),

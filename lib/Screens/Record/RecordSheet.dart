@@ -11,6 +11,7 @@ import 'package:selfcare/CustomisedWidgets/PrimaryButton.dart';
 import 'package:selfcare/CustomisedWidgets/RedText.dart';
 import 'package:selfcare/Screens/Record/AddRecordForm.dart';
 import 'package:selfcare/Theme/DefaultColors.dart';
+import 'package:selfcare/redux/Actions/GetBodyWeightAction.dart';
 import 'package:selfcare/redux/Actions/GetGlucoseAction.dart';
 import 'package:selfcare/redux/Actions/GetPressureAction.dart';
 import 'package:selfcare/redux/AppState.dart';
@@ -92,7 +93,7 @@ class _RecordSheetState extends State<RecordSheet> {
                         ? 'Pre Meal Or Post Meal values cannot be zero'
                         : widget.screen == 'Blood Pressure'
                             ? 'Systolic or Diastolic values cannot be zero'
-                            : 'Weight'),
+                            : 'Weight value cannot be zero'),
                 Container(
                   margin: EdgeInsets.only(top: 15),
                   child: DarkRedText(
@@ -256,26 +257,27 @@ class _RecordSheetState extends State<RecordSheet> {
                                 ],
                               ),
                               Visibility(
+                                  visible: widget.screen == 'Body Weight',
                                   child: Column(
-                                children: [
-                                  AddRecordForm(
-                                    avatar: false,
-                                    title: 'Body Weight',
-                                    minusOnPressed: () =>
-                                        widget.onPostMealMinusPressed!(),
-                                    addOnPressed: () =>
-                                        widget.onPostMealAddPressed!(),
-                                    textEditingController: widget.postMeal,
-                                    key: Key('PreMealAddRecord2'),
-                                  ),
-                                  Padding(
-                                      padding: EdgeInsets.only(
-                                          top: MediaQuery.of(context)
-                                                  .size
-                                                  .height *
-                                              0.08)),
-                                ],
-                              )),
+                                    children: [
+                                      AddRecordForm(
+                                        avatar: false,
+                                        title: 'Body Weight',
+                                        minusOnPressed: () =>
+                                            widget.onPostMealMinusPressed!(),
+                                        addOnPressed: () =>
+                                            widget.onPostMealAddPressed!(),
+                                        textEditingController: widget.postMeal,
+                                        key: Key('PreMealAddRecord2'),
+                                      ),
+                                      Padding(
+                                          padding: EdgeInsets.only(
+                                              top: MediaQuery.of(context)
+                                                      .size
+                                                      .height *
+                                                  0.08)),
+                                    ],
+                                  )),
                               Visibility(
                                   visible: widget.screen != 'Body Weight',
                                   child: Column(
@@ -349,24 +351,23 @@ class _RecordSheetState extends State<RecordSheet> {
                                       int postMealVal =
                                           int.parse(widget.postMeal.text);
                                       if (widget.screen == 'Body Weight') {
-                                        if (preMealVal > 0 && postMealVal > 0) {
+                                        if (postMealVal > 0) {
                                           CollectionReference bodyWeight =
-                                          FirebaseFirestore.instance
-                                              .collection('users')
-                                              .doc(state.userModel!.user_id)
-                                              .collection('bodyweight');
+                                              FirebaseFirestore.instance
+                                                  .collection('users')
+                                                  .doc(state.userModel!.user_id)
+                                                  .collection('bodyweight');
                                           // log('user id has to ran here',name: users.path);
                                           bodyWeight
                                               .where('date_for',
-                                              isEqualTo:
-                                              '${dateTime!.day}-${dateTime!.month}-${dateTime!.year}')
+                                                  isEqualTo:
+                                                      '${dateTime!.day}-${dateTime!.month}-${dateTime!.year}')
                                               .get()
                                               .then((QuerySnapshot snapshot) {
                                             if (snapshot.docs.isEmpty) {
                                               bodyWeight.add({
                                                 'readings': [
                                                   {
-
                                                     'weight': int.parse(
                                                         widget.postMeal.text),
                                                     'created_at': dateTime!
@@ -376,31 +377,30 @@ class _RecordSheetState extends State<RecordSheet> {
                                                 ],
                                                 'is_deleted': false,
                                                 'date_for_timestamp_millis':
-                                                dateTime!
-                                                    .millisecondsSinceEpoch,
+                                                    dateTime!
+                                                        .millisecondsSinceEpoch,
                                                 'date_for':
-                                                '${dateTime!.day}-${dateTime!.month}-${dateTime!.year}',
+                                                    '${dateTime!.day}-${dateTime!.month}-${dateTime!.year}',
                                               }).then((value) => getIt
                                                   .get<Store<AppState>>()
-                                                  .dispatch(
-                                                  GetGlucoseAction()));
+                                                  .dispatch(GetWeightAction()));
                                               getIt
                                                   .get<Store<AppState>>()
-                                                  .dispatch(GetGlucoseAction());
+                                                  .dispatch(GetWeightAction());
                                               getIt
                                                   .get<Store<AppState>>()
                                                   .dispatch(SelectedDateAction(
-                                                  screen: widget.screen,
-                                                  selected: dateTime!));
+                                                      screen: widget.screen,
+                                                      selected:
+                                                          DateTime.now()));
                                             } else {
                                               bodyWeight
                                                   .doc(snapshot.docs[0].id)
                                                   .update({
                                                 'readings':
-                                                FieldValue.arrayUnion([
+                                                    FieldValue.arrayUnion([
                                                   {
                                                     'is_deleted': false,
-
                                                     'weight': int.parse(
                                                         widget.postMeal.text),
                                                     'created_at': dateTime!
@@ -408,17 +408,18 @@ class _RecordSheetState extends State<RecordSheet> {
                                                   }
                                                 ]),
                                               }).then((value) => getIt
-                                                  .get<Store<AppState>>()
-                                                  .dispatch(
-                                                  GetGlucoseAction()));
+                                                      .get<Store<AppState>>()
+                                                      .dispatch(
+                                                          GetWeightAction()));
                                               getIt
                                                   .get<Store<AppState>>()
-                                                  .dispatch(GetGlucoseAction());
+                                                  .dispatch(GetWeightAction());
                                               getIt
                                                   .get<Store<AppState>>()
                                                   .dispatch(SelectedDateAction(
-                                                  screen: widget.screen,
-                                                  selected: dateTime!));
+                                                      screen: widget.screen,
+                                                      selected:
+                                                          DateTime.now()));
                                             }
                                             widget.preMeal.text = '0';
                                             widget.postMeal.text = '0';
@@ -472,7 +473,8 @@ class _RecordSheetState extends State<RecordSheet> {
                                                   .get<Store<AppState>>()
                                                   .dispatch(SelectedDateAction(
                                                       screen: widget.screen,
-                                                      selected: dateTime!));
+                                                      selected:
+                                                          DateTime.now()));
                                             } else {
                                               bloodglucose
                                                   .doc(snapshot.docs[0].id)
@@ -500,7 +502,8 @@ class _RecordSheetState extends State<RecordSheet> {
                                                   .get<Store<AppState>>()
                                                   .dispatch(SelectedDateAction(
                                                       screen: widget.screen,
-                                                      selected: dateTime!));
+                                                      selected:
+                                                          DateTime.now()));
                                             }
                                             widget.preMeal.text = '0';
                                             widget.postMeal.text = '0';
@@ -555,7 +558,8 @@ class _RecordSheetState extends State<RecordSheet> {
                                                   .get<Store<AppState>>()
                                                   .dispatch(SelectedDateAction(
                                                       screen: widget.screen,
-                                                      selected: dateTime!));
+                                                      selected:
+                                                          DateTime.now()));
                                             } else {
                                               bloodpressure
                                                   .doc(snapshot.docs[0].id)
@@ -584,7 +588,8 @@ class _RecordSheetState extends State<RecordSheet> {
                                                   .get<Store<AppState>>()
                                                   .dispatch(SelectedDateAction(
                                                       screen: widget.screen,
-                                                      selected: dateTime!));
+                                                      selected:
+                                                          DateTime.now()));
                                             }
                                             widget.preMeal.text = '0';
                                             widget.postMeal.text = '0';

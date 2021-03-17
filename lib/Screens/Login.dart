@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:developer';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -8,14 +9,20 @@ import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
 import 'package:selfcare/CustomisedWidgets/Background.dart';
+import 'package:selfcare/CustomisedWidgets/DarkGreenText.dart';
 import 'package:selfcare/CustomisedWidgets/DarkRedText.dart';
 import 'package:selfcare/CustomisedWidgets/DefaultInput.dart';
 import 'package:selfcare/CustomisedWidgets/PasswordInput.dart';
 import 'package:selfcare/CustomisedWidgets/PrimaryButton.dart';
+import 'package:selfcare/CustomisedWidgets/RedText.dart';
 import 'package:selfcare/CustomisedWidgets/TextButton.dart';
+import 'package:selfcare/Data/UserModel.dart';
 import 'package:selfcare/Navigation/BottomNav.dart';
 import 'package:selfcare/Theme/DefaultColors.dart';
 import 'package:selfcare/main.dart';
+import 'package:selfcare/redux/Actions/GetBodyWeightAction.dart';
+import 'package:selfcare/redux/Actions/GetGlucoseAction.dart';
+import 'package:selfcare/redux/Actions/GetPressureAction.dart';
 import 'package:selfcare/redux/Actions/GetUserAction.dart';
 import 'package:selfcare/redux/AppState.dart';
 import 'package:selfcare/redux/middleware.dart';
@@ -65,6 +72,38 @@ class _LoginState extends State<Login> {
 //firebase auth
   FirebaseAuth auth = FirebaseAuth.instance;
 
+  Future<void> alert({String message = ''}) async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false, // user must tap button!
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [Text('ALERT')],
+          ),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[
+                RedText(text: message),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: DarkGreenText(
+                text: 'CLOSE',
+              ),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   Future login() async {
     setState(() {
       loading = true;
@@ -80,7 +119,9 @@ class _LoginState extends State<Login> {
           loading = false;
         });
         _loginCredentialsSave().then((value) {
-          getIt.get<Store<AppState>>().dispatch(GetUserAction(email: _email.text));
+          getIt
+              .get<Store<AppState>>()
+              .dispatch(GetUserAction(email: _email.text));
           Timer(
               Duration(seconds: 3),
               () => Navigator.push(
@@ -108,7 +149,61 @@ class _LoginState extends State<Login> {
         setState(() {
           passwordError = true;
         });
+      } else {
+        CollectionReference users =
+            FirebaseFirestore.instance.collection('users');
+        // QuerySnapshot snapshot =
+        users
+            .where('email', isEqualTo: _email.text.toLowerCase().trim())
+            // .where('password', isEqualTo: _password.text)
+            .get()
+            .then((QuerySnapshot snapshot) {
+          log('successful');
+          if (snapshot.size > 0) {
+            snapshot.docs.forEach((DocumentSnapshot documentSnapshot) {
+              UserModel userModel =
+                  UserModel.fromJson(documentSnapshot.data()!);
+              if (userModel.password == _password.text) {
+                getIt
+                    .get<Store<AppState>>()
+                    .dispatch(GetUserActionSuccess(userModelUser: userModel));
+                getIt
+                    .get<Store<AppState>>()
+                    .dispatch(GetGlucoseAction(user_id: userModel.user_id));
+                getIt
+                    .get<Store<AppState>>()
+                    .dispatch(GetPressureAction(user_id: userModel.user_id));
+                getIt
+                    .get<Store<AppState>>()
+                    .dispatch(GetWeightAction(user_id: userModel.user_id));
+                _loginCredentialsSave().then((value) {
+                  getIt
+                      .get<Store<AppState>>()
+                      .dispatch(GetUserAction(email: _email.text));
+                  _loginCredentialsSave().then((value) {
+                    getIt
+                        .get<Store<AppState>>()
+                        .dispatch(GetUserAction(email: _email.text));
+                    Timer(
+                        Duration(seconds: 3),
+                        () => Navigator.pushAndRemoveUntil(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => Main(),
+                            ),
+                            (route) => false));
+                  });
+                });
+              } else {
+                alert(message: 'Wrong Password, try again');
+              }
+            });
+          } else {
+            alert(message: 'User not found, contact Admin for an account');
+          }
+        });
       }
+      log(e.message!, name: 'error auth');
       return 'error';
     }
   }
@@ -149,7 +244,7 @@ class _LoginState extends State<Login> {
                                       blurRadius: 10)
                                 ]),
                             child: ListView(
-                             padding: EdgeInsets.only(bottom: 20),
+                              padding: EdgeInsets.only(bottom: 20),
                               children: [
                                 DarkRedText(
                                   text: 'Login to enjoy our services',

@@ -4,12 +4,14 @@ import 'package:flutter_redux/flutter_redux.dart';
 import 'package:get_it/get_it.dart';
 import 'package:redux/redux.dart';
 import 'package:selfcare/Data/BloodPressure.dart';
+import 'package:selfcare/Data/BodyWeight.dart';
 import 'package:selfcare/Data/UserModel.dart';
 import 'package:selfcare/Data/bloodglucosepost.dart';
 import 'package:selfcare/Navigation/BottomNav.dart';
 import 'package:selfcare/Screens/AllStatistics.dart';
 import 'package:selfcare/Screens/Login.dart';
 import 'package:selfcare/Screens/Record.dart';
+import 'package:selfcare/Screens/Splash.dart';
 import 'package:selfcare/Screens/Welcome.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:selfcare/redux/AppState.dart';
@@ -25,8 +27,9 @@ GetIt getIt = GetIt.instance;
 void main() {
   final store = new Store(
     appStateReducer,
-    middleware: [fetchUser, setDate, fetchPressure],
+    middleware: [fetchUser, setDate, fetchPressure, fetchWeight],
     initialState: new AppState(
+        selectTimeValuesWeight: BodyWeightModel(),
         selectTimeValuesPressure: BloodPressureModel(),
         selectTimeValues: BloodGlucoseModel(),
         selectedDateTimes: <String>[],
@@ -71,7 +74,7 @@ class MyApp extends StatelessWidget {
 
             // Once complete, show your application
             if (snapshot.connectionState == ConnectionState.done) {
-              return Welcome();
+              return Splash();
             }
 
             // Otherwise, show something whilst waiting for initialization to complete

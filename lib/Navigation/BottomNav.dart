@@ -48,7 +48,14 @@ class _MainState extends State<Main> {
       Home(),
       Chat(),
       Blog(),
-      Settings()
+      Settings(
+        hidenavbar: (val) {
+          print(val);
+          this.setState(() {
+            _hideNavBar = val;
+          });
+        },
+      )
 
       // Search(),
       // Community(),
@@ -118,11 +125,11 @@ class _MainState extends State<Main> {
       //     ),
       //   ),
       // ),
-      body: PersistentTabView(
+      body: PersistentTabView.custom(
         context,
         controller: _controller,
         screens: _buildScreens(),
-        items: _navBarsItems(),
+
         confineInSafeArea: true,
         backgroundColor: Colors.white,
         handleAndroidBackButtonPress: true,
@@ -131,7 +138,7 @@ class _MainState extends State<Main> {
         hideNavigationBarWhenKeyboardShows: true,
         hideNavigationBar: _hideNavBar,
         margin: EdgeInsets.zero,
-        popActionScreens: PopActionScreensType.once,
+
         bottomScreenMargin: 0.0,
         // onWillPop: () async {
         //   await showDialog(
@@ -152,36 +159,20 @@ class _MainState extends State<Main> {
         //   return false;
         // },
 
-        padding: NavBarPadding.all(0),
-        decoration: NavBarDecoration(
-            boxShadow: [
-              BoxShadow(
-                  offset: Offset(0.0, 3.0),
-                  blurRadius: 6,
-                  color: Color.fromRGBO(0, 0, 0, 0.19))
-            ],
-            colorBehindNavBar: Colors.white,
-            borderRadius: BorderRadius.circular(0.0)),
-        popAllScreensOnTapOfSelectedTab: true,
-
-        itemAnimationProperties: ItemAnimationProperties(
-          duration: Duration(milliseconds: 400),
-          curve: Curves.ease,
-        ),
         screenTransitionAnimation: ScreenTransitionAnimation(
           animateTabTransition: true,
           curve: Curves.ease,
           duration: Duration(milliseconds: 200),
         ),
+        itemCount: 4,
 // selectedTabScreenContext: ,
-        // customWidget: CustomNavBarWidget(
-        //   items: _navBarsItems(),
-        //   selectedIndex: selected,
-        //   onItemSelected: changeToBottomTab,
-        //   key: Key('value'),
-        // ),
-        navBarStyle:
-            NavBarStyle.simple, // Choose the nav bar style with this property
+        customWidget: CustomNavBarWidget(
+          items: _navBarsItems(),
+          selectedIndex: selected,
+          onItemSelected: changeToBottomTab,
+          key: Key('value'),
+        ),
+        // Choose the nav bar style with this property
       ),
     );
   }

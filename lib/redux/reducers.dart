@@ -1,5 +1,6 @@
 import 'dart:developer';
 
+import 'package:selfcare/redux/Actions/GetBodyWeightAction.dart';
 import 'package:selfcare/redux/Actions/GetGlucoseAction.dart';
 import 'package:selfcare/redux/Actions/GetPressureAction.dart';
 import 'package:selfcare/redux/middleware.dart';
@@ -10,6 +11,7 @@ import 'AppState.dart';
 AppState appStateReducer(AppState state, action) {
   if (action is GetUserAction) {
     return new AppState(
+        selectTimeValuesWeight: state.selectTimeValuesWeight,
         selectTimeValuesPressure: state.selectTimeValuesPressure,
         selectTimeValues: state.selectTimeValues,
         userModelFetch: true,
@@ -21,6 +23,7 @@ AppState appStateReducer(AppState state, action) {
         userModel: state.userModel);
   } else if (action is GetUserActionSuccess) {
     return new AppState(
+        selectTimeValuesWeight: state.selectTimeValuesWeight,
         selectTimeValuesPressure: state.selectTimeValuesPressure,
         selectTimeValues: state.selectTimeValues,
         selectedDateTimes: state.selectedDateTimes,
@@ -33,6 +36,7 @@ AppState appStateReducer(AppState state, action) {
   } else if (action is AddGlucoseAction) {
     log(state.userModel!.user_id);
     return new AppState(
+        selectTimeValuesWeight: state.selectTimeValuesWeight,
         selectTimeValuesPressure: state.selectTimeValuesPressure,
         selectTimeValues: state.selectTimeValues,
         selectedDateTimes: state.selectedDateTimes,
@@ -46,6 +50,7 @@ AppState appStateReducer(AppState state, action) {
     log('selected action');
     // log(SelectedDateAction().selected!.toString());
     return new AppState(
+        selectTimeValuesWeight: state.selectTimeValuesWeight,
         selectTimeValuesPressure: state.selectTimeValuesPressure,
         selectTimeValues: state.selectTimeValues,
         selectedDateTimes: state.selectedDateTimes,
@@ -59,6 +64,7 @@ AppState appStateReducer(AppState state, action) {
     log(action.selectedTimes.toString(), name: 'last');
 
     return new AppState(
+        selectTimeValuesWeight: state.selectTimeValuesWeight,
         selectTimeValuesPressure: state.selectTimeValuesPressure,
         selectTimeValues: state.selectTimeValues,
         selectedDateTimes: action.selectedTimes,
@@ -70,6 +76,7 @@ AppState appStateReducer(AppState state, action) {
         userModel: state.userModel);
   } else if (action is GetGlucoseAction) {
     return new AppState(
+        selectTimeValuesWeight: state.selectTimeValuesWeight,
         selectTimeValuesPressure: state.selectTimeValuesPressure,
         selectTimeValues: state.selectTimeValues,
         selectedDateTimes: state.selectedDateTimes,
@@ -81,6 +88,7 @@ AppState appStateReducer(AppState state, action) {
         userModel: state.userModel);
   } else if (action is GetGlucoseActionSuccess) {
     return new AppState(
+        selectTimeValuesWeight: state.selectTimeValuesWeight,
         selectTimeValuesPressure: state.selectTimeValuesPressure,
         selectTimeValues: state.selectTimeValues,
         selectedDateTimes: state.selectedDateTimes,
@@ -92,6 +100,7 @@ AppState appStateReducer(AppState state, action) {
         userModel: state.userModel);
   } else if (action is GetPressureAction) {
     return new AppState(
+        selectTimeValuesWeight: state.selectTimeValuesWeight,
         selectTimeValuesPressure: state.selectTimeValuesPressure,
         selectTimeValues: state.selectTimeValues,
         selectedDateTimes: state.selectedDateTimes,
@@ -103,6 +112,7 @@ AppState appStateReducer(AppState state, action) {
         userModel: state.userModel);
   } else if (action is GetPressureActionSuccess) {
     return new AppState(
+        selectTimeValuesWeight: state.selectTimeValuesWeight,
         selectTimeValuesPressure: state.selectTimeValuesPressure,
         selectTimeValues: state.selectTimeValues,
         selectedDateTimes: state.selectedDateTimes,
@@ -112,8 +122,33 @@ AppState appStateReducer(AppState state, action) {
         bloodpressure: action.pressure,
         bodyweight: state.bodyweight,
         userModel: state.userModel);
+  } else if (action is GetWeightAction) {
+    return new AppState(
+        selectTimeValuesWeight: state.selectTimeValuesWeight,
+        selectTimeValuesPressure: state.selectTimeValuesPressure,
+        selectTimeValues: state.selectTimeValues,
+        selectedDateTimes: state.selectedDateTimes,
+        userModelFetch: true,
+        selectedDate: state.selectedDate,
+        bloodglucose: state.bloodglucose,
+        bloodpressure: state.bloodpressure,
+        bodyweight: state.bodyweight,
+        userModel: state.userModel);
+  } else if (action is GetWeightActionSuccess) {
+    return new AppState(
+        selectTimeValuesWeight: state.selectTimeValuesWeight,
+        selectTimeValuesPressure: state.selectTimeValuesPressure,
+        selectTimeValues: state.selectTimeValues,
+        selectedDateTimes: state.selectedDateTimes,
+        userModelFetch: true,
+        selectedDate: state.selectedDate,
+        bloodglucose: state.bloodglucose,
+        bloodpressure: state.bloodpressure,
+        bodyweight: action.weight,
+        userModel: state.userModel);
   } else if (action is SelectTimeValuesAction) {
     return new AppState(
+        selectTimeValuesWeight: state.selectTimeValuesWeight,
         selectTimeValuesPressure: state.selectTimeValuesPressure,
         selectTimeValues: state.selectTimeValues,
         selectedDateTimes: state.selectedDateTimes,
@@ -129,6 +164,7 @@ AppState appStateReducer(AppState state, action) {
     if (action.selected != null) {
       log('success glucose');
       return new AppState(
+          selectTimeValuesWeight: state.selectTimeValuesWeight,
           selectTimeValues: action.selected,
           selectTimeValuesPressure: state.selectTimeValuesPressure,
           selectedDateTimes: state.selectedDateTimes,
@@ -139,9 +175,8 @@ AppState appStateReducer(AppState state, action) {
           bodyweight: state.bodyweight,
           userModel: state.userModel);
     } else if (action.selectedPressure != null) {
-      log('action success me',
-          name: action.selectedPressure!.systolic.toString());
       return new AppState(
+          selectTimeValuesWeight: state.selectTimeValuesWeight,
           selectTimeValues: state.selectTimeValues,
           selectTimeValuesPressure: action.selectedPressure,
           selectedDateTimes: state.selectedDateTimes,
@@ -151,8 +186,18 @@ AppState appStateReducer(AppState state, action) {
           bloodpressure: state.bloodpressure,
           bodyweight: state.bodyweight,
           userModel: state.userModel);
-    } else {
-      log('finally');
+    } else if (action.selectedWeight != null) {
+      return new AppState(
+          selectTimeValuesWeight: action.selectedWeight,
+          selectTimeValues: state.selectTimeValues,
+          selectTimeValuesPressure: state.selectTimeValuesPressure,
+          selectedDateTimes: state.selectedDateTimes,
+          userModelFetch: true,
+          selectedDate: state.selectedDate,
+          bloodglucose: state.bloodglucose,
+          bloodpressure: state.bloodpressure,
+          bodyweight: state.bodyweight,
+          userModel: state.userModel);
     }
   }
 

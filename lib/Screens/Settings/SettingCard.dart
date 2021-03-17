@@ -5,9 +5,13 @@ class SettingCard extends StatelessWidget {
   final String title;
   final Color color;
   final IconData avatar;
+  final Function onPressed;
 
-  const SettingCard({ required this.title, required this.color, required this.avatar})
-      ;
+  const SettingCard(
+      {required this.title,
+      required this.color,
+      required this.avatar,
+      required this.onPressed});
 
   @override
   Widget build(BuildContext context) {
@@ -16,7 +20,7 @@ class SettingCard extends StatelessWidget {
         elevation: 3,
         highlightElevation: 12,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
-        onPressed: () => null,
+        onPressed: () => onPressed(),
         child: Container(
             // margin: EdgeInsets.only(bottom: 15),
             padding: EdgeInsets.only(bottom: 10, top: 10, left: 10, right: 10),

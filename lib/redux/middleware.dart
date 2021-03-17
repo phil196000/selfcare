@@ -3,8 +3,10 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:redux/redux.dart';
 import 'package:selfcare/Data/BloodPressure.dart';
+import 'package:selfcare/Data/BodyWeight.dart';
 import 'package:selfcare/Data/UserModel.dart';
 import 'package:selfcare/Data/bloodglucosepost.dart';
+import 'package:selfcare/redux/Actions/GetBodyWeightAction.dart';
 import 'package:selfcare/redux/Actions/GetGlucoseAction.dart';
 import 'package:selfcare/redux/Actions/GetPressureAction.dart';
 
@@ -35,6 +37,7 @@ void fetchUser(Store<AppState> store, action, NextDispatcher next) {
           store.dispatch(GetUserActionSuccess(userModelUser: userModel));
           store.dispatch(GetGlucoseAction(user_id: userModel.user_id));
           store.dispatch(GetPressureAction(user_id: userModel.user_id));
+          store.dispatch(GetWeightAction(user_id: userModel.user_id));
         });
       }
     });
@@ -70,10 +73,12 @@ void fetchUser(Store<AppState> store, action, NextDispatcher next) {
           glucose: items,
         ));
       }
-      store.dispatch(SelectedDateAction(selected: store.state.selectedDate,screen: 'Blood Glucose'));
+      store.dispatch(SelectedDateAction(
+          selected: store.state.selectedDate, screen: 'Blood Glucose'));
     });
     // store.dispatch(SelectedDateAction(selected: store.state.selectedDate));
   } else if (action is SelectTimeValuesAction) {
+    log(action.screen, name: 'screen');
     if (action.screen == 'Blood Glucose') {
       log('glucose section');
       if (store.state.bloodglucose!.length > 0) {
@@ -95,11 +100,15 @@ void fetchUser(Store<AppState> store, action, NextDispatcher next) {
               TimeOfDay timeOfDay = TimeOfDay.fromDateTime(dateTime);
               // log(timeOfDay.hour.toString());
               String timeofString =
-                  '${timeOfDay.hour == 0 ? '12' : timeOfDay.hour > 12 ? timeOfDay.hour - 12 : timeOfDay.hour}:${timeOfDay.minute<10?'0${timeOfDay.minute}':timeOfDay.minute}} ${timeOfDay.hour > 11 ? 'PM' : 'AM'}';
+                  '${timeOfDay.hour == 0 ? '12' : timeOfDay.hour > 12 ? timeOfDay.hour - 12 : timeOfDay.hour}:${timeOfDay.minute < 10 ? '0${timeOfDay.minute}' : timeOfDay.minute}:${dateTime.second < 10 ? '0${dateTime.second}' : dateTime.second} ${timeOfDay.hour > 11 ? 'PM' : 'AM'}';
               if (action.selected == timeofString) {
+                log('matches here too', name: 'SelectTimeValuesAction');
                 store.dispatch(SelectTimeValuesActionSuccess(
-                    selected: bloodGlucoseModel, selectedPressure: null));
+                    selectedWeight: null,
+                    selected: bloodGlucoseModel,
+                    selectedPressure: null));
               }
+              log(action.selected!, name: timeofString);
             });
             log('found here');
           } else {
@@ -131,13 +140,56 @@ void fetchUser(Store<AppState> store, action, NextDispatcher next) {
               TimeOfDay timeOfDay = TimeOfDay.fromDateTime(dateTime);
               // log(timeOfDay.hour.toString());
               String timeofString =
-                  '${timeOfDay.hour == 0 ? '12' : timeOfDay.hour > 12 ? timeOfDay.hour - 12 : timeOfDay.hour}:${timeOfDay.minute<10?'0${timeOfDay.minute}':timeOfDay.minute} ${timeOfDay.hour > 11 ? 'PM' : 'AM'}';
+                  '${timeOfDay.hour == 0 ? '12' : timeOfDay.hour > 12 ? timeOfDay.hour - 12 : timeOfDay.hour}:${timeOfDay.minute < 10 ? '0${timeOfDay.minute}' : timeOfDay.minute}:${dateTime.second < 10 ? '0${dateTime.second}' : dateTime.second} ${timeOfDay.hour > 11 ? 'PM' : 'AM'}';
               log(action.selected!, name: timeofString);
 
               if (action.selected == timeofString) {
                 log('i ran when selected matched');
                 store.dispatch(SelectTimeValuesActionSuccess(
-                    selectedPressure: bloodPressureModel, selected: null));
+                    selectedWeight: null,
+                    selectedPressure: bloodPressureModel,
+                    selected: null));
+              }
+            });
+            log('found here');
+          } else {
+            //   // selectedTimes = [];
+            log('nothing', name: 'finding date data');
+          }
+        });
+      } else {
+        log('else run');
+      }
+    } else {
+      log('body weight');
+      if (store.state.bodyweight!.length > 0) {
+        store.state.bodyweight!.forEach((element) {
+          MainWeightModelwithID initMainWeightModelwithID =
+              MainWeightModelwithID.fromJson(element);
+          MainBodyWeightModel initMainBodyWeightModel =
+              MainBodyWeightModel.fromJson(initMainWeightModelwithID.data);
+          String initSelectedDate =
+              '${store.state.selectedDate!.day}-${store.state.selectedDate!.month}-${store.state.selectedDate!.year}';
+          log(initSelectedDate);
+          if (initMainBodyWeightModel.date_for == initSelectedDate) {
+            log('match');
+            initMainBodyWeightModel.readings!.forEach((element) {
+              BodyWeightModel bodyWeightModel =
+                  BodyWeightModel.fromJson(element);
+              DateTime dateTime = DateTime.fromMillisecondsSinceEpoch(
+                  bodyWeightModel.created_at);
+              TimeOfDay timeOfDay = TimeOfDay.fromDateTime(dateTime);
+              // log(timeOfDay.hour.toString());
+              String timeofString =
+                  '${timeOfDay.hour == 0 ? '12' : timeOfDay.hour > 12 ? timeOfDay.hour - 12 : timeOfDay.hour}:${timeOfDay.minute < 10 ? '0${timeOfDay.minute}' : timeOfDay.minute}:${dateTime.second < 10 ? '0${dateTime.second}' : dateTime.second} ${timeOfDay.hour > 11 ? 'PM' : 'AM'}';
+              log(action.selected!, name: timeofString);
+
+              if (action.selected == timeofString) {
+                log('i ran when selected matched');
+                store.dispatch(SelectTimeValuesActionSuccess(
+                    selectedWeight: bodyWeightModel,
+                    selectedPressure: null,
+                    selected: null));
               }
             });
             log('found here');
@@ -150,6 +202,48 @@ void fetchUser(Store<AppState> store, action, NextDispatcher next) {
         log('else run');
       }
     }
+  }
+
+  // Make sure our actions continue on to the reducer.
+  next(action);
+}
+
+void fetchWeight(Store<AppState> store, action, NextDispatcher next) {
+  // If our Middleware encounters a `FetchTodoAction`
+  if (action is GetWeightAction) {
+    CollectionReference users = FirebaseFirestore.instance
+        .collection('users')
+        .doc(store.state.userModel!.user_id)
+        .collection('bodyweight');
+    // log(store.state.userModel!.user_id);
+    // QuerySnapshot snapshot =
+    List items = [];
+    users
+        .orderBy('date_for_timestamp_millis', descending: true)
+        .get()
+        .then((QuerySnapshot snapshot) {
+      // log(snapshot.size.toString());
+      log('successful pressure blood');
+      if (snapshot.size > 0) {
+        snapshot.docs.forEach((DocumentSnapshot documentSnapshot) {
+          log(documentSnapshot.id);
+          items.add({
+            'data': documentSnapshot.data(),
+            'id': documentSnapshot.reference
+          });
+        });
+        store.dispatch(GetWeightActionSuccess(
+          weight: items,
+        ));
+      } else {
+        store.dispatch(GetWeightActionSuccess(
+          weight: items,
+        ));
+      }
+      store.dispatch(SelectedDateAction(
+          selected: store.state.selectedDate, screen: 'Body Weight'));
+    });
+    // store.dispatch(SelectedDateAction(selected: store.state.selectedDate));
   }
 
   // Make sure our actions continue on to the reducer.
@@ -189,7 +283,8 @@ void fetchPressure(Store<AppState> store, action, NextDispatcher next) {
           pressure: items,
         ));
       }
-      store.dispatch(SelectedDateAction(selected: store.state.selectedDate,screen: 'Blood Pressure'));
+      store.dispatch(SelectedDateAction(
+          selected: store.state.selectedDate, screen: 'Blood Pressure'));
     });
     // store.dispatch(SelectedDateAction(selected: store.state.selectedDate));
   }
@@ -200,7 +295,6 @@ void fetchPressure(Store<AppState> store, action, NextDispatcher next) {
 
 void setDate(Store<AppState> store, action, NextDispatcher next) {
   if (action is SelectedDateAction) {
-    log('middle ware first', name: 'middle ware');
     List<String>? selectedTimes = [];
     if (action.screen == 'Blood Glucose' &&
         store.state.bloodglucose!.length > 0) {
@@ -226,15 +320,13 @@ void setDate(Store<AppState> store, action, NextDispatcher next) {
             TimeOfDay timeOfDay = TimeOfDay.fromDateTime(dateTime);
             // log(timeOfDay.hour.toString());
             selectedTimes.add(
-                '${timeOfDay.hour == 0 ? '12' : timeOfDay.hour > 12 ? timeOfDay.hour - 12 : timeOfDay.hour}:${timeOfDay.minute < 10 ? '0${timeOfDay.minute}' : timeOfDay.minute} ${timeOfDay.hour > 11 ? 'PM' : 'AM'}');
+                '${timeOfDay.hour == 0 ? '12' : timeOfDay.hour > 12 ? timeOfDay.hour - 12 : timeOfDay.hour}:${timeOfDay.minute < 10 ? '0${timeOfDay.minute}' : timeOfDay.minute}:${dateTime.second < 10 ? '0${dateTime.second}' : dateTime.second} ${timeOfDay.hour > 11 ? 'PM' : 'AM'}');
           });
-          log('found here');
         }
       });
     }
     if (action.screen == 'Blood Pressure' &&
         store.state.bloodpressure!.length > 0) {
-      log('Blood Pressure');
       store.state.bloodpressure!.forEach((element) {
         MainPressureModelwithID initMainPressureModelwithID =
             MainPressureModelwithID.fromJson(element);
@@ -257,9 +349,35 @@ void setDate(Store<AppState> store, action, NextDispatcher next) {
             TimeOfDay timeOfDay = TimeOfDay.fromDateTime(dateTime);
             // log(timeOfDay.hour.toString());
             selectedTimes.add(
-                '${timeOfDay.hour == 0 ? '12' : timeOfDay.hour > 12 ? timeOfDay.hour - 12 : timeOfDay.hour}:${timeOfDay.minute < 10 ? '0${timeOfDay.minute}' : timeOfDay.minute} ${timeOfDay.hour > 11 ? 'PM' : 'AM'}');
+                '${timeOfDay.hour == 0 ? '12' : timeOfDay.hour > 12 ? timeOfDay.hour - 12 : timeOfDay.hour}:${timeOfDay.minute < 10 ? '0${timeOfDay.minute}' : timeOfDay.minute}:${dateTime.second < 10 ? '0${dateTime.second}' : dateTime.second} ${timeOfDay.hour > 11 ? 'PM' : 'AM'}');
           });
-          log('found here');
+        }
+      });
+    }
+    if (action.screen == 'Body Weight' && store.state.bodyweight!.length > 0) {
+      store.state.bodyweight!.forEach((element) {
+        MainWeightModelwithID initMainWeightModelwithID =
+            MainWeightModelwithID.fromJson(element);
+        MainBodyWeightModel initMainBodyWeightModel =
+            MainBodyWeightModel.fromJson(initMainWeightModelwithID.data);
+        String initSelectedDate =
+            '${action.selected!.day}-${action.selected!.month}-${action.selected!.year}';
+        if (initMainBodyWeightModel.date_for == initSelectedDate) {
+          initMainBodyWeightModel.readings!.sort((a, b) {
+            BloodGlucoseModel forA = BloodGlucoseModel.fromJson(a);
+            BloodGlucoseModel forB = BloodGlucoseModel.fromJson(b);
+            return forA.created_at - forB.created_at;
+          });
+          log(initMainBodyWeightModel.readings!.length.toString());
+          initMainBodyWeightModel.readings!.forEach((element) {
+            BodyWeightModel bodyWeightModel = BodyWeightModel.fromJson(element);
+            DateTime dateTime =
+                DateTime.fromMillisecondsSinceEpoch(bodyWeightModel.created_at);
+            TimeOfDay timeOfDay = TimeOfDay.fromDateTime(dateTime);
+            // log(timeOfDay.hour.toString());
+            selectedTimes.add(
+                '${timeOfDay.hour == 0 ? '12' : timeOfDay.hour > 12 ? timeOfDay.hour - 12 : timeOfDay.hour}:${timeOfDay.minute < 10 ? '0${timeOfDay.minute}' : timeOfDay.minute}:${dateTime.second < 10 ? '0${dateTime.second}' : dateTime.second} ${timeOfDay.hour > 11 ? 'PM' : 'AM'}');
+          });
         }
       });
     }
