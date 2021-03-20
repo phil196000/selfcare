@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:selfcare/CustomisedWidgets/RedText.dart';
 import 'package:selfcare/Theme/DefaultColors.dart';
 
@@ -8,7 +9,19 @@ class DefaultInput extends StatelessWidget {
   final String hint;
   final bool obscureText;
   final Map error;
-   DefaultInput({Key? key, required this.controller,required this.hint, this.obscureText=false, required this.error}) : super(key: key);
+  final TextInputType keyboardType;
+  final List<TextInputFormatter>? inputFormatters;
+
+  DefaultInput(
+      {Key? key,
+      required this.controller,
+      required this.hint,
+      this.obscureText = false,
+      required this.error,
+      this.inputFormatters,
+      this.keyboardType = TextInputType.text})
+      : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -20,15 +33,13 @@ class DefaultInput extends StatelessWidget {
           child: TextField(
             controller: this.controller,
             obscureText: this.obscureText,
-
+            inputFormatters: this.inputFormatters,
+            keyboardType: this.keyboardType,
             style: TextStyle(
-
                 color: defaultColors.darkRed, fontWeight: FontWeight.bold),
             cursorColor: defaultColors.darkRed,
             decoration: InputDecoration(
-                errorText: error['visible']
-                    ? error['message']
-                    : null,
+                errorText: error['visible'] ? error['message'] : null,
                 fillColor: defaultColors.white,
                 filled: true,
                 // hintText: "Enter Phone number",

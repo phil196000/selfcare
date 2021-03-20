@@ -27,7 +27,7 @@ GetIt getIt = GetIt.instance;
 void main() {
   final store = new Store(
     appStateReducer,
-    middleware: [fetchUser, setDate, fetchPressure, fetchWeight],
+    middleware: [fetchUser, setDate, fetchPressure, fetchWeight,fetchUsers],
     initialState: new AppState(
         selectTimeValuesWeight: BodyWeightModel(),
         selectTimeValuesPressure: BloodPressureModel(),

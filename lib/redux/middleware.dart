@@ -9,6 +9,7 @@ import 'package:selfcare/Data/bloodglucosepost.dart';
 import 'package:selfcare/redux/Actions/GetBodyWeightAction.dart';
 import 'package:selfcare/redux/Actions/GetGlucoseAction.dart';
 import 'package:selfcare/redux/Actions/GetPressureAction.dart';
+import 'package:selfcare/redux/Actions/GetUsersAction.dart';
 
 import 'Actions/GetUserAction.dart';
 import 'AppState.dart';
@@ -27,7 +28,7 @@ void fetchUser(Store<AppState> store, action, NextDispatcher next) {
     CollectionReference users = FirebaseFirestore.instance.collection('users');
     // QuerySnapshot snapshot =
     users
-        .where('email', isEqualTo: GetUserAction().email)
+        .where('email', isEqualTo: action.email)
         .get()
         .then((QuerySnapshot snapshot) {
       log('successful');
@@ -45,9 +46,9 @@ void fetchUser(Store<AppState> store, action, NextDispatcher next) {
   } else if (action is GetGlucoseAction) {
     CollectionReference users = FirebaseFirestore.instance
         .collection('users')
-        .doc(store.state.userModel!.user_id)
+        .doc(action.user_id)
         .collection('bloodglucose');
-    log(store.state.userModel!.user_id);
+    // log(store.state.userModel!.user_id);
     // QuerySnapshot snapshot =
     List items = [];
     users
@@ -208,12 +209,37 @@ void fetchUser(Store<AppState> store, action, NextDispatcher next) {
   next(action);
 }
 
+void fetchUsers(Store<AppState> store, action, NextDispatcher next) {
+  if (action is GetUsersAction) {
+    CollectionReference users = FirebaseFirestore.instance.collection('users');
+    Stream<QuerySnapshot> snapshot = users.snapshots();
+
+    snapshot.listen((element) {
+      List<UserModel> initialUsers = [];
+      element.docs.forEach((e) {
+        log('i ran');
+        UserModel userModel = UserModel.fromJson(e.data()!);
+        // log(userModel.full_name, name: 'full name');
+
+        initialUsers.add(userModel);
+      });
+      store.dispatch(GetUsersActionSuccess(users: initialUsers));
+      // log('listener');
+      log(initialUsers.length.toString(), name: 'initial users');
+    });
+    // snapshot.single.then((value) => log(value.size.toString(),name: 'Streams'));
+
+    log('users fetch done');
+  }
+  next(action);
+}
+
 void fetchWeight(Store<AppState> store, action, NextDispatcher next) {
   // If our Middleware encounters a `FetchTodoAction`
   if (action is GetWeightAction) {
     CollectionReference users = FirebaseFirestore.instance
         .collection('users')
-        .doc(store.state.userModel!.user_id)
+        .doc(action.user_id)
         .collection('bodyweight');
     // log(store.state.userModel!.user_id);
     // QuerySnapshot snapshot =
@@ -255,7 +281,7 @@ void fetchPressure(Store<AppState> store, action, NextDispatcher next) {
   if (action is GetPressureAction) {
     CollectionReference users = FirebaseFirestore.instance
         .collection('users')
-        .doc(store.state.userModel!.user_id)
+        .doc(action.user_id)
         .collection('bloodpressure');
     // log(store.state.userModel!.user_id);
     // QuerySnapshot snapshot =

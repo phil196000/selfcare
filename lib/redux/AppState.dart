@@ -4,6 +4,7 @@ import 'package:selfcare/Data/UserModel.dart';
 import 'package:selfcare/Data/bloodglucosepost.dart';
 
 class AppState {
+  final List<UserModel>? users;
   final List? bloodglucose;
   final List? bloodpressure;
   final List? bodyweight;
@@ -18,6 +19,7 @@ class AppState {
 
 
   AppState({
+    this.users = const <UserModel>[],
     this.selectTimeValuesWeight,
     this.selectTimeValuesPressure,
     this.selectTimeValues,

@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:developer';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:crypt/crypt.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -17,6 +18,7 @@ import 'package:selfcare/CustomisedWidgets/PrimaryButton.dart';
 import 'package:selfcare/CustomisedWidgets/RedText.dart';
 import 'package:selfcare/CustomisedWidgets/TextButton.dart';
 import 'package:selfcare/Data/UserModel.dart';
+import 'package:selfcare/Navigation/AdminBottomNav.dart';
 import 'package:selfcare/Navigation/BottomNav.dart';
 import 'package:selfcare/Theme/DefaultColors.dart';
 import 'package:selfcare/main.dart';
@@ -122,16 +124,17 @@ class _LoginState extends State<Login> {
           getIt
               .get<Store<AppState>>()
               .dispatch(GetUserAction(email: _email.text));
-          Timer(
-              Duration(seconds: 3),
-              () => Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => Main(),
-                  )));
+          getUserData();
+          // Timer(
+          //     Duration(seconds: 3),
+          //     () => Navigator.push(
+          //         context,
+          //         MaterialPageRoute(
+          //           builder: (context) => Main(),
+          //         )));
         });
 
-        return 'success';
+        // return 'success';
       }
       // return userCredential;
     } on FirebaseAuthException catch (e) {
@@ -150,62 +153,142 @@ class _LoginState extends State<Login> {
           passwordError = true;
         });
       } else {
-        CollectionReference users =
-            FirebaseFirestore.instance.collection('users');
-        // QuerySnapshot snapshot =
-        users
-            .where('email', isEqualTo: _email.text.toLowerCase().trim())
-            // .where('password', isEqualTo: _password.text)
-            .get()
-            .then((QuerySnapshot snapshot) {
-          log('successful');
-          if (snapshot.size > 0) {
-            snapshot.docs.forEach((DocumentSnapshot documentSnapshot) {
-              UserModel userModel =
-                  UserModel.fromJson(documentSnapshot.data()!);
-              if (userModel.password == _password.text) {
-                getIt
-                    .get<Store<AppState>>()
-                    .dispatch(GetUserActionSuccess(userModelUser: userModel));
-                getIt
-                    .get<Store<AppState>>()
-                    .dispatch(GetGlucoseAction(user_id: userModel.user_id));
-                getIt
-                    .get<Store<AppState>>()
-                    .dispatch(GetPressureAction(user_id: userModel.user_id));
-                getIt
-                    .get<Store<AppState>>()
-                    .dispatch(GetWeightAction(user_id: userModel.user_id));
-                _loginCredentialsSave().then((value) {
-                  getIt
-                      .get<Store<AppState>>()
-                      .dispatch(GetUserAction(email: _email.text));
-                  _loginCredentialsSave().then((value) {
-                    getIt
-                        .get<Store<AppState>>()
-                        .dispatch(GetUserAction(email: _email.text));
-                    Timer(
-                        Duration(seconds: 3),
-                        () => Navigator.pushAndRemoveUntil(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => Main(),
-                            ),
-                            (route) => false));
-                  });
-                });
-              } else {
-                alert(message: 'Wrong Password, try again');
-              }
-            });
-          } else {
-            alert(message: 'User not found, contact Admin for an account');
-          }
-        });
+        getUserData();
       }
       log(e.message!, name: 'error auth');
       return 'error';
     }
+  }
+
+  void getUserData() {
+    CollectionReference users = FirebaseFirestore.instance.collection('users');
+    // QuerySnapshot snapshot =
+    users
+        .where('email', isEqualTo: _email.text.toLowerCase().trim())
+        // .where('password', isEqualTo: _password.text)
+        .get()
+        .then((QuerySnapshot snapshot) {
+      log('successful');
+      if (snapshot.size > 0) {
+        snapshot.docs.forEach((DocumentSnapshot documentSnapshot) {
+          UserModel userModel = UserModel.fromJson(documentSnapshot.data()!);
+          // if (userModel.password ==
+          //     Crypt.sha256(_password.text,
+          //             rounds: 10000, salt: 'selfcarepasswordsalt')
+          //         .toString()) {
+
+          if (userModel.password == _password.text.trim()) {
+            getIt
+                .get<Store<AppState>>()
+                .dispatch(GetUserActionSuccess(userModelUser: userModel));
+            getIt
+                .get<Store<AppState>>()
+                .dispatch(GetGlucoseAction(user_id: userModel.user_id));
+            getIt
+                .get<Store<AppState>>()
+                .dispatch(GetPressureAction(user_id: userModel.user_id));
+            getIt
+                .get<Store<AppState>>()
+                .dispatch(GetWeightAction(user_id: userModel.user_id));
+            _loginCredentialsSave().then((value) {
+              getIt
+                  .get<Store<AppState>>()
+                  .dispatch(GetUserAction(email: _email.text));
+              _loginCredentialsSave().then((value) {
+                getIt
+                    .get<Store<AppState>>()
+                    .dispatch(GetUserAction(email: _email.text));
+                if (userModel.roles.length > 1) {
+                  log('i should ran');
+                  showDialog(
+                    context: context,
+                    builder: (context) {
+                      return SimpleDialog(
+                          title: RedText(
+                            text:
+                                'Hello Welcome,\nYou have access to enter as:',
+                          ),
+                          children: userModel.roles.map((String e) {
+                            return Container(
+                                margin: EdgeInsets.only(top: 15),
+                                child: SimpleDialogOption(
+                                  onPressed: () {
+                                    if (e == 'USER') {
+                                      Navigator.pushAndRemoveUntil(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) => Main(),
+                                          ),
+                                          (route) => false);
+                                    } else {
+                                      Navigator.pushAndRemoveUntil(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) => AdminMain(),
+                                          ),
+                                          (route) => false);
+                                    }
+                                  },
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    children: [
+                                      Icon(
+                                        e.toLowerCase() == 'user'
+                                            ? Icons.person
+                                            : e.toLowerCase() == 'manager'
+                                                ? Icons.supervised_user_circle
+                                                : Icons.admin_panel_settings,
+                                        size: 36.0,
+                                        color: e.toLowerCase() == 'user'
+                                            ? defaultColors.green
+                                            : e.toLowerCase() == 'manager'
+                                                ? defaultColors.darkblue
+                                                : defaultColors.primary,
+                                      ),
+                                      Padding(
+                                        padding:
+                                            const EdgeInsetsDirectional.only(
+                                                start: 16.0),
+                                        child: Text(
+                                          e,
+                                          style: TextStyle(
+                                              color: e.toLowerCase() == 'user'
+                                                  ? defaultColors.green
+                                                  : e.toLowerCase() == 'manager'
+                                                      ? defaultColors.darkblue
+                                                      : defaultColors.primary,
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 18),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ));
+                          }).toList());
+                    },
+                  );
+                } else {
+                  if (userModel.roles.contains('USER')) {
+                    Navigator.pushAndRemoveUntil(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => Main(),
+                        ),
+                        (route) => false);
+                  }
+                }
+              });
+            });
+          } else {
+            alert(message: 'Wrong Password, try again');
+          }
+        });
+      } else {
+        alert(message: 'User not found, contact Admin for an account');
+      }
+    });
   }
 
   @override
@@ -347,7 +430,7 @@ class _LoginState extends State<Login> {
                       Visibility(
                           visible: !isKeyboardVisible, child: Spacer(flex: 2))
                     ],
-                  )
+                  ),
                 ],
               );
             },

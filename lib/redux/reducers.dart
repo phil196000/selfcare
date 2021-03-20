@@ -3,13 +3,40 @@ import 'dart:developer';
 import 'package:selfcare/redux/Actions/GetBodyWeightAction.dart';
 import 'package:selfcare/redux/Actions/GetGlucoseAction.dart';
 import 'package:selfcare/redux/Actions/GetPressureAction.dart';
+import 'package:selfcare/redux/Actions/GetUsersAction.dart';
 import 'package:selfcare/redux/middleware.dart';
 
 import 'Actions/GetUserAction.dart';
 import 'AppState.dart';
 
 AppState appStateReducer(AppState state, action) {
-  if (action is GetUserAction) {
+  if (action is GetUsersAction) {
+    return new AppState(
+        users: state.users,
+        selectTimeValuesWeight: state.selectTimeValuesWeight,
+        selectTimeValuesPressure: state.selectTimeValuesPressure,
+        selectTimeValues: state.selectTimeValues,
+        userModelFetch: true,
+        selectedDateTimes: state.selectedDateTimes,
+        selectedDate: state.selectedDate,
+        bloodglucose: state.bloodglucose,
+        bloodpressure: state.bloodpressure,
+        bodyweight: state.bodyweight,
+        userModel: state.userModel);
+  } else if (action is GetUsersActionSuccess) {
+    return new AppState(
+        users: action.users,
+        selectTimeValuesWeight: state.selectTimeValuesWeight,
+        selectTimeValuesPressure: state.selectTimeValuesPressure,
+        selectTimeValues: state.selectTimeValues,
+        selectedDateTimes: state.selectedDateTimes,
+        selectedDate: state.selectedDate,
+        bloodglucose: state.bloodglucose,
+        bloodpressure: state.bloodpressure,
+        bodyweight: state.bodyweight,
+        userModelFetch: false,
+        userModel: state.userModel);
+  } else if (action is GetUserAction) {
     return new AppState(
         selectTimeValuesWeight: state.selectTimeValuesWeight,
         selectTimeValuesPressure: state.selectTimeValuesPressure,
