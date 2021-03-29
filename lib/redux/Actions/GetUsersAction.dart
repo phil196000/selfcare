@@ -11,3 +11,4 @@ class GetUsersActionSuccess {
 
   GetUsersActionSuccess({this.users});
 }
+

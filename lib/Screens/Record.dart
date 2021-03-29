@@ -128,14 +128,12 @@ class _RecordState extends State<Record> {
     if (widget.title == 'Blood Glucose' &&
         bloodGlucoseModel.post_meal != null) {
       return ((bloodGlucoseModel.pre_meal + bloodGlucoseModel.post_meal) / 2)
-          .floor()
-          .toString();
+          .toStringAsFixed(1);
     } else if (widget.title == 'Blood Pressure') {
       return ((bloodPressureModel.systolic + bloodPressureModel.diastolic) / 2)
-          .floor()
-          .toString();
+          .toStringAsFixed(1);
     } else if (widget.title == 'Body Weight') {
-      return bodyWeightModel.weight.toString();
+      return bodyWeightModel.weight.toStringAsFixed(1);
     }
     return '';
   }
@@ -236,7 +234,6 @@ class _RecordState extends State<Record> {
                           .dispatch(GetPressureAction());
                       getIt.get<Store<AppState>>().dispatch(GetGlucoseAction());
                       getIt.get<Store<AppState>>().dispatch(GetWeightAction());
-
                     });
                     if (snapshot.size == snapshot.docs.indexOf(element)) {
                       log('i ran');
@@ -245,7 +242,6 @@ class _RecordState extends State<Record> {
                           .get<Store<AppState>>()
                           .dispatch(GetPressureAction());
                       getIt.get<Store<AppState>>().dispatch(GetWeightAction());
-
                     }
                   });
                 });
@@ -890,7 +886,7 @@ class _RecordState extends State<Record> {
 
 class GraphModel {
   final String? title;
-  final int? value;
+  final double? value;
 
   GraphModel(this.title, this.value);
 }

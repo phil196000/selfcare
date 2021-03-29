@@ -60,49 +60,62 @@ class AddRecordForm extends StatelessWidget {
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(5)),
                     child: Icon(Icons.remove))),
-            Container(
-              margin: EdgeInsets.only(top: 5),
-              width: MediaQuery.of(context).size.width * 0.15,
-              child: TextField(
-                inputFormatters: [
-                  LengthLimitingTextInputFormatter(3),
-                ],
-                // maxLength: 3,
-                controller: this.textEditingController,
-                // controller: this.controller,
-                // obscureText: this.obscureText,
-                keyboardType: TextInputType.number,
-                style: TextStyle(
-                    color: defaultColors.darkRed, fontWeight: FontWeight.bold),
-                cursorColor: defaultColors.darkRed,
-                decoration: InputDecoration(
-                    fillColor: defaultColors.white,
-                    filled: true,
-                    // hintText: "Enter Phone number",
-                    hintStyle: TextStyle(
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                Container(
+                  margin: EdgeInsets.only(top: 5),
+                  width: MediaQuery.of(context).size.width * 0.19,
+                  child: TextField(
+                    inputFormatters: [
+                      LengthLimitingTextInputFormatter(5),
+                    ],
+                    // maxLength: 3,
+                    controller: this.textEditingController,
+                    // controller: this.controller,
+                    // obscureText: this.obscureText,
+                    keyboardType: TextInputType.number,
+                    style: TextStyle(
                         color: defaultColors.darkRed,
-                        fontWeight: FontWeight.normal),
-                    focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(0),
-                        borderSide: BorderSide(
-                            style: BorderStyle.solid,
-                            color: defaultColors.primary,
-                            width: 2)),
-                    border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(0),
-                        borderSide:
-                            BorderSide(color: defaultColors.primary, width: 2)),
-                    enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(0),
-                        borderSide: BorderSide(
-                            style: BorderStyle.solid,
-                            color: defaultColors.primary,
-                            width: 2)),
-                    disabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(0),
-                        borderSide: BorderSide(
-                            color: defaultColors.primary, width: 2))),
-              ),
+                        fontWeight: FontWeight.bold),
+                    cursorColor: defaultColors.darkRed,
+                    decoration: InputDecoration(
+                        fillColor: defaultColors.white,
+                        filled: true,
+                        // hintText: "Enter Phone number",
+                        hintStyle: TextStyle(
+                            color: defaultColors.darkRed,
+                            fontWeight: FontWeight.normal),
+                        focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(0),
+                            borderSide: BorderSide(
+                                style: BorderStyle.solid,
+                                color: defaultColors.primary,
+                                width: 2)),
+                        border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(0),
+                            borderSide: BorderSide(
+                                color: defaultColors.primary, width: 2)),
+                        enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(0),
+                            borderSide: BorderSide(
+                                style: BorderStyle.solid,
+                                color: defaultColors.primary,
+                                width: 2)),
+                        disabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(0),
+                            borderSide: BorderSide(
+                                color: defaultColors.primary, width: 2))),
+                  ),
+                ),
+                DarkRedText(
+                    size: 16,
+                    text: title == 'Pre Meal' || title == 'Post Meal'
+                        ? 'mmol/L'
+                        : title == 'Systolic' || title == 'Diastolic'
+                            ? 'mm/hg'
+                            : 'kg')
+              ],
             ),
             Container(
                 width: 38,

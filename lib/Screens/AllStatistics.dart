@@ -154,7 +154,7 @@ class _AllStatisticsState extends State<AllStatistics> {
                     value: ((bloodGlucoseModel.post_meal +
                                 bloodGlucoseModel.post_meal) /
                             2)
-                        .floor()));
+                        ));
               }
             } else {
               if (singleChoice == 'Glucose') {
@@ -185,7 +185,7 @@ class _AllStatisticsState extends State<AllStatistics> {
                     value: ((bloodGlucoseModel.post_meal +
                                 bloodGlucoseModel.post_meal) /
                             2)
-                        .floor()));
+                        ));
               }
             } else {
               if (singleChoice == 'Glucose') {
@@ -209,7 +209,7 @@ class _AllStatisticsState extends State<AllStatistics> {
                   value: ((bloodGlucoseModel.post_meal +
                               bloodGlucoseModel.post_meal) /
                           2)
-                      .floor()));
+                      ));
             }
           } else {
             if (singleChoice == 'Glucose') {
@@ -253,7 +253,7 @@ class _AllStatisticsState extends State<AllStatistics> {
                     value: ((bloodPressureModel.systolic +
                                 bloodPressureModel.diastolic) /
                             2)
-                        .floor()));
+                        ));
               }
             } else {
               if (singleChoice == 'Pressure') {
@@ -285,7 +285,7 @@ class _AllStatisticsState extends State<AllStatistics> {
                     value: ((bloodPressureModel.systolic +
                                 bloodPressureModel.diastolic) /
                             2)
-                        .floor()));
+                        ));
               }
             } else {
               if (singleChoice == 'Pressure') {
@@ -309,7 +309,7 @@ class _AllStatisticsState extends State<AllStatistics> {
                   value: ((bloodPressureModel.systolic +
                               bloodPressureModel.diastolic) /
                           2)
-                      .floor()));
+                      ));
             }
           } else {
             if (singleChoice == 'Pressure') {
@@ -819,7 +819,7 @@ class TimeSeriesModel {
   final DateTime? timeCurrent;
   final DateTime? timePrevious;
   final DateTime? timeTarget;
-  final int? value;
+  final double? value;
 
   TimeSeriesModel(
       {this.timeCurrent, this.timePrevious, this.timeTarget, this.value});

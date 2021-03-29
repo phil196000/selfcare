@@ -9,6 +9,8 @@ part of 'UserModel.dart';
 UserModel _$UserModelFromJson(Map<String, dynamic> json) {
   return UserModel(
     age: json['age'] as int,
+    added_by: json['added_by'] as String,
+    updated: json['updated'] as List<dynamic>,
     gender: json['gender'] as String,
     country: json['country'] as String,
     created_at: json['created_at'] as int,
@@ -19,11 +21,13 @@ UserModel _$UserModelFromJson(Map<String, dynamic> json) {
     roles: (json['roles'] as List<dynamic>).map((e) => e as String).toList(),
     user_id: json['user_id'] as String,
     full_name: json['full_name'] as String,
+    online: json['online'] as bool,
     email: json['email'] as String,
   );
 }
 
 Map<String, dynamic> _$UserModelToJson(UserModel instance) => <String, dynamic>{
+      'online': instance.online,
       'full_name': instance.full_name,
       'email': instance.email,
       'age': instance.age,
@@ -36,4 +40,6 @@ Map<String, dynamic> _$UserModelToJson(UserModel instance) => <String, dynamic>{
       'created_at': instance.created_at,
       'user_id': instance.user_id,
       'gender': instance.gender,
+      'added_by': instance.added_by,
+      'updated': instance.updated,
     };

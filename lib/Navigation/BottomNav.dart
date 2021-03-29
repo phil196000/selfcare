@@ -2,13 +2,17 @@ import 'dart:developer';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
+import 'package:flutter_redux/flutter_redux.dart';
 import 'package:persistent_bottom_nav_bar/persistent-tab-view.dart';
 import 'package:redux/redux.dart';
+import 'package:selfcare/CustomisedWidgets/WhiteText.dart';
 import 'package:selfcare/Screens/Blog.dart';
 import 'package:selfcare/Screens/Chat.dart';
 import 'package:selfcare/Screens/Home.dart';
 import 'package:selfcare/Screens/Settings.dart';
 import 'package:selfcare/Theme/DefaultColors.dart';
+import 'package:selfcare/redux/AppState.dart';
 
 class Main extends StatefulWidget {
   @override
@@ -46,7 +50,14 @@ class _MainState extends State<Main> {
   List<Widget> _buildScreens() {
     return [
       Home(),
-      Chat(),
+      Chat(
+        hidenavbar: (val) {
+          print(val);
+          this.setState(() {
+            _hideNavBar = val;
+          });
+        },
+      ),
       Blog(),
       Settings(
         hidenavbar: (val) {
@@ -113,68 +124,42 @@ class _MainState extends State<Main> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      // appBar: AppBar(title: const Text('Navigation Bar Demo')),
-      // drawer: Drawer(
-      //   child: Center(
-      //     child: Column(
-      //       mainAxisAlignment: MainAxisAlignment.center,
-      //       children: <Widget>[
-      //         const Text('This is the Drawer'),
-      //       ],
-      //     ),
-      //   ),
-      // ),
-      body: PersistentTabView.custom(
-        context,
-        controller: _controller,
-        screens: _buildScreens(),
+    return Scaffold(body: KeyboardVisibilityBuilder(
+      builder: (context, isKeyboardVisible) {
+        return PersistentTabView.custom(
+          context,
+          controller: _controller,
+          screens: _buildScreens(),
 
-        confineInSafeArea: true,
-        backgroundColor: Colors.white,
-        handleAndroidBackButtonPress: true,
-        resizeToAvoidBottomInset: true,
-        stateManagement: true,
-        hideNavigationBarWhenKeyboardShows: true,
-        hideNavigationBar: _hideNavBar,
-        margin: EdgeInsets.zero,
+          confineInSafeArea: true,
+          backgroundColor: Colors.white,
+          handleAndroidBackButtonPress: true,
+          resizeToAvoidBottomInset: true,
+          stateManagement: true,
+          hideNavigationBarWhenKeyboardShows: false,
 
-        bottomScreenMargin: 0.0,
-        // onWillPop: () async {
-        //   await showDialog(
-        //     context: context,
-        //     useSafeArea: true,
-        //     builder: (context) => Container(
-        //       height: 50.0,
-        //       width: 50.0,
-        //       color: Colors.white,
-        //       child: RaisedButton(
-        //         child: Text("Close"),
-        //         onPressed: () {
-        //           Navigator.pop(context);
-        //         },
-        //       ),
-        //     ),
-        //   );
-        //   return false;
-        // },
+          hideNavigationBar: _hideNavBar,
+          margin: EdgeInsets.zero,
 
-        screenTransitionAnimation: ScreenTransitionAnimation(
-          animateTabTransition: true,
-          curve: Curves.ease,
-          duration: Duration(milliseconds: 200),
-        ),
-        itemCount: 4,
-// selectedTabScreenContext: ,
-        customWidget: CustomNavBarWidget(
-          items: _navBarsItems(),
-          selectedIndex: selected,
-          onItemSelected: changeToBottomTab,
-          key: Key('value'),
-        ),
-        // Choose the nav bar style with this property
-      ),
-    );
+          bottomScreenMargin: 0.0,
+
+          screenTransitionAnimation: ScreenTransitionAnimation(
+            animateTabTransition: true,
+            curve: Curves.ease,
+            duration: Duration(milliseconds: 200),
+          ),
+          itemCount: 4,
+
+          customWidget: CustomNavBarWidget(
+            items: _navBarsItems(),
+            selectedIndex: selected,
+            onItemSelected: changeToBottomTab,
+            key: Key('value'),
+          ),
+          // Choose the nav bar style with this property
+        );
+      },
+    ));
   }
 }
 
@@ -192,66 +177,98 @@ class CustomNavBarWidget extends StatelessWidget {
 
   DefaultColors defaultColors = DefaultColors();
 
-  Widget _buildItem(PersistentBottomNavBarItem item, bool isSelected) {
-    return Container(
-      alignment: Alignment.center,
-      height: 40,
-      margin: EdgeInsets.only(right: 10),
-      decoration: BoxDecoration(
-          color: isSelected ? defaultColors.primary : defaultColors.white,
-          borderRadius: BorderRadius.circular(5),
-          boxShadow: [
-            BoxShadow(
-                offset: Offset(0, isSelected ? 5 : 0),
-                blurRadius: isSelected ? 10 : 0,
-                color: isSelected
-                    ? defaultColors.shadowColorRed
-                    : Colors.transparent)
-          ]),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        mainAxisSize: MainAxisSize.min,
-        children: <Widget>[
-          Flexible(child: item.icon),
-          Visibility(
-              visible: isSelected,
-              child: Container(
-                margin: EdgeInsets.only(left: 5),
-                child: Text(
-                  item.title,
-                  style: TextStyle(
-                      color: defaultColors.white, fontWeight: FontWeight.bold),
-                ),
-              ))
-        ],
-      ),
-    );
+  Widget _buildItem(
+      PersistentBottomNavBarItem item, bool isSelected, int unreadCount) {
+    return Stack(children: [
+      Container(
+          alignment: Alignment.center,
+          height: 40,
+          margin: EdgeInsets.only(right: 10),
+          decoration: BoxDecoration(
+              color: isSelected ? defaultColors.primary : defaultColors.white,
+              borderRadius: BorderRadius.circular(5),
+              boxShadow: [
+                BoxShadow(
+                    offset: Offset(0, isSelected ? 5 : 0),
+                    blurRadius: isSelected ? 10 : 0,
+                    color: isSelected
+                        ? defaultColors.shadowColorRed
+                        : Colors.transparent)
+              ]),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              Flexible(child: item.icon),
+              Visibility(
+                  visible: isSelected,
+                  child: Container(
+                    margin: EdgeInsets.only(left: 5),
+                    child: Text(
+                      item.title,
+                      style: TextStyle(
+                          color: defaultColors.white,
+                          fontWeight: FontWeight.bold),
+                    ),
+                  ))
+            ],
+          )),
+      Visibility(
+        visible: item.title == 'Chat' && unreadCount != null && unreadCount > 0,
+        child: Positioned(
+          right: isSelected ? 0 : 35,
+          top: 0,
+          child: Container(
+            padding: EdgeInsets.symmetric(horizontal: 5, vertical: 3),
+            decoration: BoxDecoration(
+                color: defaultColors.darkRed,
+                boxShadow: [
+                  BoxShadow(
+                      color: defaultColors.shadowColorGrey,
+                      offset: Offset(0, 5),
+                      blurRadius: 10)
+                ],
+                borderRadius: BorderRadius.circular(10)),
+            child: WhiteText(
+              size: 8,
+              text: unreadCount.toString(),
+            ),
+          ),
+        ),
+      )
+    ]);
   }
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      color: Colors.white,
-      child: Container(
-        width: double.infinity,
-        padding: EdgeInsets.symmetric(horizontal: 15, vertical: 10),
-        height: kBottomNavigationBarHeight,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: items.map((item) {
-            int index = items.indexOf(item);
-            return Flexible(
-              child: GestureDetector(
-                onTap: () {
-                  this.onItemSelected(index);
-                },
-                child: _buildItem(item, selectedIndex == index),
-              ),
-            );
-          }).toList(),
-        ),
-      ),
+    return StoreConnector(
+      builder: (context, AppState state) {
+        return Container(
+          color: Colors.white,
+          child: Container(
+            width: double.infinity,
+            padding: EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+            height: kBottomNavigationBarHeight,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: items.map((item) {
+                int index = items.indexOf(item);
+                return Flexible(
+                  child: GestureDetector(
+                    onTap: () {
+                      this.onItemSelected(index);
+                    },
+                    child: _buildItem(item, selectedIndex == index,
+                        state.chatsModel!.user_unread_count),
+                  ),
+                );
+              }).toList(),
+            ),
+          ),
+        );
+      },
+      converter: (Store<AppState> store) => store.state,
     );
   }
 }

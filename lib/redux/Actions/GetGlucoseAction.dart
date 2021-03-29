@@ -3,9 +3,9 @@ import 'package:selfcare/Data/BodyWeight.dart';
 import 'package:selfcare/Data/bloodglucosepost.dart';
 
 class GetGlucoseAction {
-  final String? user_id;
+  final String user_id;
 
-  GetGlucoseAction({this.user_id});
+  GetGlucoseAction({this.user_id=''});
 }
 
 class GetGlucoseActionSuccess {

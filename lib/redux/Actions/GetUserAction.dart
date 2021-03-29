@@ -11,3 +11,12 @@ class GetUserActionSuccess {
 
   GetUserActionSuccess({this.userModelUser});
 }
+
+class GetUserEditAction{
+final UserModel? userEditModel;
+GetUserEditAction({this.userEditModel});
+}
+class GetUserEditActionSuccess{
+  final UserModel? userEditModel;
+  GetUserEditActionSuccess({this.userEditModel});
+}

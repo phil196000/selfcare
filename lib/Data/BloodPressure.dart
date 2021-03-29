@@ -1,8 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class BloodPressureModel {
-  final int systolic;
-  final int diastolic;
+  final double systolic;
+  final double diastolic;
   final int created_at;
   final bool is_deleted;
 
@@ -13,9 +13,9 @@ class BloodPressureModel {
       this.created_at = 0});
 
   BloodPressureModel.fromJson(Map<String, dynamic> json)
-      : systolic = json['systolic'],
+      : systolic = double.parse(json['systolic'].toString()),
         is_deleted = json['is_deleted'],
-        diastolic = json['diastolic'],
+        diastolic = double.parse(json['diastolic'].toString()),
         created_at = json['created_at'];
 
   Map<String, dynamic> toJson() => {

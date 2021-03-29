@@ -1,8 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class BloodGlucoseModel {
-  final int pre_meal;
-  final int post_meal;
+  final double pre_meal;
+  final double post_meal;
   final int created_at;
   final bool is_deleted;
 
@@ -13,9 +13,9 @@ class BloodGlucoseModel {
       required this.created_at});
 
   BloodGlucoseModel.fromJson(Map<String, dynamic> json)
-      : pre_meal = json['pre_meal'],
+      : pre_meal = double.parse(json['pre_meal'].toString()),
         is_deleted = json['is_deleted'],
-        post_meal = json['post_meal'],
+        post_meal = double.parse(json['post_meal'].toString()),
         created_at = json['created_at'];
 
   Map<String, dynamic> toJson() => {

@@ -22,6 +22,7 @@ import 'package:selfcare/Navigation/AdminBottomNav.dart';
 import 'package:selfcare/Navigation/BottomNav.dart';
 import 'package:selfcare/Theme/DefaultColors.dart';
 import 'package:selfcare/main.dart';
+import 'package:selfcare/redux/Actions/ChatActions.dart';
 import 'package:selfcare/redux/Actions/GetBodyWeightAction.dart';
 import 'package:selfcare/redux/Actions/GetGlucoseAction.dart';
 import 'package:selfcare/redux/Actions/GetPressureAction.dart';
@@ -55,7 +56,7 @@ class _LoginState extends State<Login> {
 //Shared Preference
   Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
 
-  Future<void> _loginCredentialsSave() async {
+  Future<void> _loginCredentialsSave({required String passwordCrypt}) async {
     final SharedPreferences prefs = await _prefs;
 
     prefs
@@ -66,7 +67,7 @@ class _LoginState extends State<Login> {
         .then((value) => prefs
             .setString(
               "password",
-              _password.text.trim(),
+              passwordCrypt,
             )
             .then((value) => log('success')));
   }
@@ -111,16 +112,16 @@ class _LoginState extends State<Login> {
       loading = true;
     });
     try {
+
       UserCredential userCredential = await FirebaseAuth.instance
           .signInWithEmailAndPassword(
-              email: _email.text.toLowerCase().trim(),
-              password: _password.text.trim());
+              email: _email.text.toLowerCase().trim(), password: _password.text.trim());
 
       if (userCredential.user != null) {
         setState(() {
           loading = false;
         });
-        _loginCredentialsSave().then((value) {
+        _loginCredentialsSave(passwordCrypt: _password.text.trim()).then((value) {
           getIt
               .get<Store<AppState>>()
               .dispatch(GetUserAction(email: _email.text));
@@ -148,7 +149,7 @@ class _LoginState extends State<Login> {
           emailError['message'] = 'No user found for that email.';
         });
       } else if (e.code == 'wrong-password') {
-        print('Wrong password provided for that user.');
+        log('Wrong password provided for that user.');
         setState(() {
           passwordError = true;
         });
@@ -190,96 +191,94 @@ class _LoginState extends State<Login> {
             getIt
                 .get<Store<AppState>>()
                 .dispatch(GetWeightAction(user_id: userModel.user_id));
-            _loginCredentialsSave().then((value) {
+            getIt
+                .get<Store<AppState>>()
+                .dispatch(ChatAction(user_id: userModel.user_id));
+            _loginCredentialsSave(
+                    passwordCrypt:
+                        _password.text.trim())
+                .then((value) {
               getIt
                   .get<Store<AppState>>()
                   .dispatch(GetUserAction(email: _email.text));
-              _loginCredentialsSave().then((value) {
-                getIt
-                    .get<Store<AppState>>()
-                    .dispatch(GetUserAction(email: _email.text));
-                if (userModel.roles.length > 1) {
-                  log('i should ran');
-                  showDialog(
-                    context: context,
-                    builder: (context) {
-                      return SimpleDialog(
-                          title: RedText(
-                            text:
-                                'Hello Welcome,\nYou have access to enter as:',
-                          ),
-                          children: userModel.roles.map((String e) {
-                            return Container(
-                                margin: EdgeInsets.only(top: 15),
-                                child: SimpleDialogOption(
-                                  onPressed: () {
-                                    if (e == 'USER') {
-                                      Navigator.pushAndRemoveUntil(
-                                          context,
-                                          MaterialPageRoute(
-                                            builder: (context) => Main(),
-                                          ),
-                                          (route) => false);
-                                    } else {
-                                      Navigator.pushAndRemoveUntil(
-                                          context,
-                                          MaterialPageRoute(
-                                            builder: (context) => AdminMain(),
-                                          ),
-                                          (route) => false);
-                                    }
-                                  },
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.center,
-                                    children: [
-                                      Icon(
-                                        e.toLowerCase() == 'user'
-                                            ? Icons.person
-                                            : e.toLowerCase() == 'manager'
-                                                ? Icons.supervised_user_circle
-                                                : Icons.admin_panel_settings,
-                                        size: 36.0,
-                                        color: e.toLowerCase() == 'user'
-                                            ? defaultColors.green
-                                            : e.toLowerCase() == 'manager'
-                                                ? defaultColors.darkblue
-                                                : defaultColors.primary,
-                                      ),
-                                      Padding(
-                                        padding:
-                                            const EdgeInsetsDirectional.only(
-                                                start: 16.0),
-                                        child: Text(
-                                          e,
-                                          style: TextStyle(
-                                              color: e.toLowerCase() == 'user'
-                                                  ? defaultColors.green
-                                                  : e.toLowerCase() == 'manager'
-                                                      ? defaultColors.darkblue
-                                                      : defaultColors.primary,
-                                              fontWeight: FontWeight.bold,
-                                              fontSize: 18),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ));
-                          }).toList());
-                    },
-                  );
-                } else {
-                  if (userModel.roles.contains('USER')) {
-                    Navigator.pushAndRemoveUntil(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => Main(),
+              if (userModel.roles.length > 1) {
+                log('i should ran');
+                showDialog(
+                  context: context,
+                  builder: (context) {
+                    return SimpleDialog(
+                        title: RedText(
+                          text: 'Hello Welcome,\nYou have access to enter as:',
                         ),
-                        (route) => false);
-                  }
+                        children: userModel.roles.map((String e) {
+                          return Container(
+                              margin: EdgeInsets.only(top: 15),
+                              child: SimpleDialogOption(
+                                onPressed: () {
+                                  if (e == 'USER') {
+                                    Navigator.pushAndRemoveUntil(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => Main(),
+                                        ),
+                                        (route) => false);
+                                  } else {
+                                    Navigator.pushAndRemoveUntil(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => AdminMain(),
+                                        ),
+                                        (route) => false);
+                                  }
+                                },
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    Icon(
+                                      e.toLowerCase() == 'user'
+                                          ? Icons.person
+                                          : e.toLowerCase() == 'manager'
+                                              ? Icons.supervised_user_circle
+                                              : Icons.admin_panel_settings,
+                                      size: 36.0,
+                                      color: e.toLowerCase() == 'user'
+                                          ? defaultColors.green
+                                          : e.toLowerCase() == 'manager'
+                                              ? defaultColors.darkblue
+                                              : defaultColors.primary,
+                                    ),
+                                    Padding(
+                                      padding: const EdgeInsetsDirectional.only(
+                                          start: 16.0),
+                                      child: Text(
+                                        e,
+                                        style: TextStyle(
+                                            color: e.toLowerCase() == 'user'
+                                                ? defaultColors.green
+                                                : e.toLowerCase() == 'manager'
+                                                    ? defaultColors.darkblue
+                                                    : defaultColors.primary,
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 18),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ));
+                        }).toList());
+                  },
+                );
+              } else {
+                if (userModel.roles.contains('USER')) {
+                  Navigator.pushAndRemoveUntil(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => Main(),
+                      ),
+                      (route) => false);
                 }
-              });
+              }
             });
           } else {
             alert(message: 'Wrong Password, try again');

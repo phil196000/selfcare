@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class BodyWeightModel {
-  final int weight;
+  final double weight;
   final int created_at;
   final bool is_deleted;
 
@@ -9,7 +9,7 @@ class BodyWeightModel {
       {this.weight = 0, this.is_deleted = false, this.created_at = 0});
 
   BodyWeightModel.fromJson(Map<String, dynamic> json)
-      : weight = json['weight'],
+      : weight = double.parse(json['weight'].toString()),
         is_deleted = json['is_deleted'],
         created_at = json['created_at'];
 

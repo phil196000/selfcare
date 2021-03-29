@@ -22,6 +22,11 @@ final List<dynamic> imgList = [
     'image': 'lib/Assets/onboarding/chat.png',
     'msg': 'Chat with our experts at anytime you want'
   },
+  {
+    'image': 'lib/Assets/onboarding/tip.png',
+    'msg':
+        'Get health tips on prevention and management of diabetes, hypertension and obesity'
+  },
 ];
 
 class Welcome extends StatefulWidget {

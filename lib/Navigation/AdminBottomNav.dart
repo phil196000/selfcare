@@ -2,6 +2,7 @@ import 'dart:developer';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_redux/flutter_redux.dart';
 import 'package:persistent_bottom_nav_bar/persistent-tab-view.dart';
 import 'package:redux/redux.dart';
 import 'package:selfcare/Screens/Admin/AdminHome.dart';
@@ -11,6 +12,7 @@ import 'package:selfcare/Screens/Chat.dart';
 import 'package:selfcare/Screens/Home.dart';
 import 'package:selfcare/Screens/Settings.dart';
 import 'package:selfcare/Theme/DefaultColors.dart';
+import 'package:selfcare/redux/AppState.dart';
 
 class AdminMain extends StatefulWidget {
   @override
@@ -47,16 +49,14 @@ class _AdminMainState extends State<AdminMain> {
 
   List<Widget> _buildScreens() {
     return [
-      AdminHome(    hidenavbar: (val) {
-
-
-        this.setState(() {
-          _hideNavBar = val;
-        });
-      },),
-      HealthTips(
-
-      )
+      AdminHome(
+        hidenavbar: (val) {
+          this.setState(() {
+            _hideNavBar = val;
+          });
+        },
+      ),
+      HealthTips()
 
       // Search(),
       // Community(),
@@ -92,68 +92,37 @@ class _AdminMainState extends State<AdminMain> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      // appBar: AppBar(title: const Text('Navigation Bar Demo')),
-      // drawer: Drawer(
-      //   child: Center(
-      //     child: Column(
-      //       mainAxisAlignment: MainAxisAlignment.center,
-      //       children: <Widget>[
-      //         const Text('This is the Drawer'),
-      //       ],
-      //     ),
-      //   ),
-      // ),
-      body: PersistentTabView.custom(
-        context,
-        controller: _controller,
-        screens: _buildScreens(),
-
-        confineInSafeArea: true,
-        backgroundColor: Colors.white,
-        handleAndroidBackButtonPress: true,
-        resizeToAvoidBottomInset: true,
-        stateManagement: true,
-        hideNavigationBarWhenKeyboardShows: true,
-        hideNavigationBar: _hideNavBar,
-        margin: EdgeInsets.zero,
-
-        bottomScreenMargin: 0.0,
-        // onWillPop: () async {
-        //   await showDialog(
-        //     context: context,
-        //     useSafeArea: true,
-        //     builder: (context) => Container(
-        //       height: 50.0,
-        //       width: 50.0,
-        //       color: Colors.white,
-        //       child: RaisedButton(
-        //         child: Text("Close"),
-        //         onPressed: () {
-        //           Navigator.pop(context);
-        //         },
-        //       ),
-        //     ),
-        //   );
-        //   return false;
-        // },
-
-        screenTransitionAnimation: ScreenTransitionAnimation(
-          animateTabTransition: true,
-          curve: Curves.ease,
-          duration: Duration(milliseconds: 200),
+    return StoreConnector(builder: (context, AppState state) {
+      return Scaffold(
+        body: PersistentTabView.custom(
+          context,
+          controller: _controller,
+          screens: _buildScreens(),
+          confineInSafeArea: true,
+          backgroundColor: Colors.white,
+          handleAndroidBackButtonPress: true,
+          resizeToAvoidBottomInset: true,
+          stateManagement: true,
+          hideNavigationBarWhenKeyboardShows: true,
+          hideNavigationBar: _hideNavBar,
+          margin: EdgeInsets.zero,
+          bottomScreenMargin: 0.0,
+          screenTransitionAnimation: ScreenTransitionAnimation(
+            animateTabTransition: true,
+            curve: Curves.ease,
+            duration: Duration(milliseconds: 200),
+          ),
+          itemCount: 2,
+          customWidget: CustomNavBarWidget(
+            items: _navBarsItems(),
+            selectedIndex: selected,
+            onItemSelected: changeToBottomTab,
+            key: Key('value'),
+          ),
+          // Choose the nav bar style with this property
         ),
-        itemCount: 2,
-// selectedTabScreenContext: ,
-        customWidget: CustomNavBarWidget(
-          items: _navBarsItems(),
-          selectedIndex: selected,
-          onItemSelected: changeToBottomTab,
-          key: Key('value'),
-        ),
-        // Choose the nav bar style with this property
-      ),
-    );
+      );
+    }, converter: (Store<AppState> store) => store.state,);
   }
 }
 

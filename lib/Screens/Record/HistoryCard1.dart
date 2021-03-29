@@ -10,6 +10,7 @@ class HistoryCard1 extends StatelessWidget {
   final String time;
   final Function delete;
   final bool showAvatars;
+  final bool showDelete;
 
   HistoryCard1(
       {required Key key,
@@ -18,6 +19,7 @@ class HistoryCard1 extends StatelessWidget {
       required this.unit,
       required this.time,
       required this.delete,
+      this.showDelete = true,
       this.showAvatars = true})
       : super(key: key);
 
@@ -44,13 +46,17 @@ class HistoryCard1 extends StatelessWidget {
                 text: time,
                 size: 14,
               ),
-              IconButton(
-                  padding: EdgeInsets.zero,
-                  color: defaultColors.primary,
-                  icon: Icon(Icons.delete_forever),
-                  onPressed: () => delete())
+              Visibility(
+                child: IconButton(
+                    padding: EdgeInsets.zero,
+                    color: defaultColors.primary,
+                    icon: Icon(Icons.delete_forever),
+                    onPressed: () => delete()),
+                visible: this.showDelete,
+              )
             ],
           ),
+          SizedBox(height: 10,),
           Visibility(
             visible: unit == 'kg',
             child: Row(

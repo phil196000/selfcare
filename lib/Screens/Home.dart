@@ -154,8 +154,7 @@ class _HomeState extends State<Home> {
                                       ? ((glucoseSort[0].pre_meal +
                                                   glucoseSort[0].post_meal) /
                                               2)
-                                          .floor()
-                                          .toString()
+                                          .toStringAsFixed(1)
                                       : '',
                                   unit: 'mg/dl',
                                   background: defaultColors.darkRed,
@@ -168,8 +167,7 @@ class _HomeState extends State<Home> {
                                       ? ((pressureSort[0].systolic +
                                                   pressureSort[0].diastolic) /
                                               2)
-                                          .floor()
-                                          .toString()
+                                          .toStringAsFixed(1)
                                       : '',
                                   unit: 'mm/hg',
                                   background: defaultColors.black,
@@ -180,7 +178,9 @@ class _HomeState extends State<Home> {
                                 visible: weightSort.length > 0,
                                 child: RecentCard(
                                     value: weightSort.length > 0
-                                        ? weightSort[0].weight.toString()
+                                        ? weightSort[0]
+                                            .weight
+                                            .toStringAsFixed(1)
                                         : '',
                                     unit: 'kg',
                                     background: defaultColors.primary,

@@ -268,7 +268,7 @@ class _RecordSheetState extends State<RecordSheet> {
                                         addOnPressed: () =>
                                             widget.onPostMealAddPressed!(),
                                         textEditingController: widget.postMeal,
-                                        key: Key('PreMealAddRecord2'),
+                                        key: Key('BodyWeight'),
                                       ),
                                       Padding(
                                           padding: EdgeInsets.only(
@@ -346,10 +346,10 @@ class _RecordSheetState extends State<RecordSheet> {
                                     text: 'Save',
                                     onPressed: () {
                                       log('${dateTime!.day}-${dateTime!.month}-${dateTime!.year}');
-                                      int preMealVal =
-                                          int.parse(widget.preMeal.text);
-                                      int postMealVal =
-                                          int.parse(widget.postMeal.text);
+                                      double preMealVal =
+                                          double.parse(widget.preMeal.text);
+                                      double postMealVal =
+                                          double.parse(widget.postMeal.text);
                                       if (widget.screen == 'Body Weight') {
                                         if (postMealVal > 0) {
                                           CollectionReference bodyWeight =
@@ -368,7 +368,7 @@ class _RecordSheetState extends State<RecordSheet> {
                                               bodyWeight.add({
                                                 'readings': [
                                                   {
-                                                    'weight': int.parse(
+                                                    'weight': double.parse(
                                                         widget.postMeal.text),
                                                     'created_at': dateTime!
                                                         .millisecondsSinceEpoch,
@@ -383,10 +383,10 @@ class _RecordSheetState extends State<RecordSheet> {
                                                     '${dateTime!.day}-${dateTime!.month}-${dateTime!.year}',
                                               }).then((value) => getIt
                                                   .get<Store<AppState>>()
-                                                  .dispatch(GetWeightAction()));
+                                                  .dispatch(GetWeightAction(user_id: state.userModel!.user_id)));
                                               getIt
                                                   .get<Store<AppState>>()
-                                                  .dispatch(GetWeightAction());
+                                                  .dispatch(GetWeightAction(user_id: state.userModel!.user_id));
                                               getIt
                                                   .get<Store<AppState>>()
                                                   .dispatch(SelectedDateAction(
@@ -410,10 +410,10 @@ class _RecordSheetState extends State<RecordSheet> {
                                               }).then((value) => getIt
                                                       .get<Store<AppState>>()
                                                       .dispatch(
-                                                          GetWeightAction()));
+                                                          GetWeightAction(user_id: state.userModel!.user_id)));
                                               getIt
                                                   .get<Store<AppState>>()
-                                                  .dispatch(GetWeightAction());
+                                                  .dispatch(GetWeightAction(user_id: state.userModel!.user_id));
                                               getIt
                                                   .get<Store<AppState>>()
                                                   .dispatch(SelectedDateAction(
@@ -430,7 +430,7 @@ class _RecordSheetState extends State<RecordSheet> {
                                         }
                                       }
                                       if (widget.screen == 'Blood Glucose') {
-                                        if (preMealVal > 0 && postMealVal > 0) {
+                                        if (preMealVal > 0 || postMealVal > 0) {
                                           CollectionReference bloodglucose =
                                               FirebaseFirestore.instance
                                                   .collection('users')
@@ -447,9 +447,9 @@ class _RecordSheetState extends State<RecordSheet> {
                                               bloodglucose.add({
                                                 'readings': [
                                                   {
-                                                    'pre_meal': int.parse(
+                                                    'pre_meal': double.parse(
                                                         widget.preMeal.text),
-                                                    'post_meal': int.parse(
+                                                    'post_meal': double.parse(
                                                         widget.postMeal.text),
                                                     'created_at': dateTime!
                                                         .millisecondsSinceEpoch,
@@ -465,10 +465,10 @@ class _RecordSheetState extends State<RecordSheet> {
                                               }).then((value) => getIt
                                                   .get<Store<AppState>>()
                                                   .dispatch(
-                                                      GetGlucoseAction()));
+                                                      GetGlucoseAction(user_id: state.userModel!.user_id)));
                                               getIt
                                                   .get<Store<AppState>>()
-                                                  .dispatch(GetGlucoseAction());
+                                                  .dispatch(GetGlucoseAction(user_id: state.userModel!.user_id));
                                               getIt
                                                   .get<Store<AppState>>()
                                                   .dispatch(SelectedDateAction(
@@ -483,9 +483,9 @@ class _RecordSheetState extends State<RecordSheet> {
                                                     FieldValue.arrayUnion([
                                                   {
                                                     'is_deleted': false,
-                                                    'pre_meal': int.parse(
+                                                    'pre_meal': double.parse(
                                                         widget.preMeal.text),
-                                                    'post_meal': int.parse(
+                                                    'post_meal': double.parse(
                                                         widget.postMeal.text),
                                                     'created_at': dateTime!
                                                         .millisecondsSinceEpoch,
@@ -494,10 +494,10 @@ class _RecordSheetState extends State<RecordSheet> {
                                               }).then((value) => getIt
                                                       .get<Store<AppState>>()
                                                       .dispatch(
-                                                          GetGlucoseAction()));
+                                                          GetGlucoseAction(user_id: state.userModel!.user_id)));
                                               getIt
                                                   .get<Store<AppState>>()
-                                                  .dispatch(GetGlucoseAction());
+                                                  .dispatch(GetGlucoseAction(user_id: state.userModel!.user_id));
                                               getIt
                                                   .get<Store<AppState>>()
                                                   .dispatch(SelectedDateAction(
@@ -531,9 +531,9 @@ class _RecordSheetState extends State<RecordSheet> {
                                               bloodpressure.add({
                                                 'readings': [
                                                   {
-                                                    'systolic': int.parse(
+                                                    'systolic': double.parse(
                                                         widget.preMeal.text),
-                                                    'diastolic': int.parse(
+                                                    'diastolic': double.parse(
                                                         widget.postMeal.text),
                                                     'created_at': dateTime!
                                                         .millisecondsSinceEpoch,
@@ -549,11 +549,11 @@ class _RecordSheetState extends State<RecordSheet> {
                                               }).then((value) => getIt
                                                   .get<Store<AppState>>()
                                                   .dispatch(
-                                                      GetPressureAction()));
+                                                      GetPressureAction(user_id: state.userModel!.user_id)));
                                               getIt
                                                   .get<Store<AppState>>()
                                                   .dispatch(
-                                                      GetPressureAction());
+                                                      GetPressureAction(user_id: state.userModel!.user_id));
                                               getIt
                                                   .get<Store<AppState>>()
                                                   .dispatch(SelectedDateAction(
@@ -568,9 +568,9 @@ class _RecordSheetState extends State<RecordSheet> {
                                                     FieldValue.arrayUnion([
                                                   {
                                                     'is_deleted': false,
-                                                    'systolic': int.parse(
+                                                    'systolic': double.parse(
                                                         widget.preMeal.text),
-                                                    'diastolic': int.parse(
+                                                    'diastolic': double.parse(
                                                         widget.postMeal.text),
                                                     'created_at': dateTime!
                                                         .millisecondsSinceEpoch,
@@ -579,11 +579,11 @@ class _RecordSheetState extends State<RecordSheet> {
                                               }).then((value) => getIt
                                                       .get<Store<AppState>>()
                                                       .dispatch(
-                                                          GetPressureAction()));
+                                                          GetPressureAction(user_id: state.userModel!.user_id)));
                                               getIt
                                                   .get<Store<AppState>>()
                                                   .dispatch(
-                                                      GetPressureAction());
+                                                      GetPressureAction(user_id: state.userModel!.user_id));
                                               getIt
                                                   .get<Store<AppState>>()
                                                   .dispatch(SelectedDateAction(

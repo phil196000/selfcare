@@ -10,7 +10,7 @@ class ButtonText extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return TextButton(
-        onPressed: ()=>this.onPressed,
+        onPressed: ()=>this.onPressed!(),
         child: RedText(
           text: this.text,
           size: 14,

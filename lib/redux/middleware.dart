@@ -4,11 +4,15 @@ import 'package:flutter/material.dart';
 import 'package:redux/redux.dart';
 import 'package:selfcare/Data/BloodPressure.dart';
 import 'package:selfcare/Data/BodyWeight.dart';
+import 'package:selfcare/Data/Chats.dart';
+import 'package:selfcare/Data/RecordsModel.dart';
 import 'package:selfcare/Data/UserModel.dart';
 import 'package:selfcare/Data/bloodglucosepost.dart';
+import 'package:selfcare/redux/Actions/ChatActions.dart';
 import 'package:selfcare/redux/Actions/GetBodyWeightAction.dart';
 import 'package:selfcare/redux/Actions/GetGlucoseAction.dart';
 import 'package:selfcare/redux/Actions/GetPressureAction.dart';
+import 'package:selfcare/redux/Actions/GetRecordsAction.dart';
 import 'package:selfcare/redux/Actions/GetUsersAction.dart';
 
 import 'Actions/GetUserAction.dart';
@@ -43,12 +47,18 @@ void fetchUser(Store<AppState> store, action, NextDispatcher next) {
       }
     });
     log('user fetch done');
+  } else if (action is GetUserEditAction) {
+    store.dispatch(
+        GetUserEditActionSuccess(userEditModel: action.userEditModel));
   } else if (action is GetGlucoseAction) {
+    // if (action.user_id.length > 0) {
     CollectionReference users = FirebaseFirestore.instance
         .collection('users')
-        .doc(action.user_id)
+        .doc(action.user_id.length > 0
+            ? action.user_id
+            : store.state.userModel!.user_id)
         .collection('bloodglucose');
-    // log(store.state.userModel!.user_id);
+    log(action.user_id, name: 'user id');
     // QuerySnapshot snapshot =
     List items = [];
     users
@@ -58,7 +68,6 @@ void fetchUser(Store<AppState> store, action, NextDispatcher next) {
       log(snapshot.size.toString());
       log('successful glucose blood');
       if (snapshot.size > 0) {
-        MainBloodGlucoseModel mainBloodGlucoseModel;
         snapshot.docs.forEach((DocumentSnapshot documentSnapshot) {
           log(documentSnapshot.id);
           items.add({
@@ -77,6 +86,7 @@ void fetchUser(Store<AppState> store, action, NextDispatcher next) {
       store.dispatch(SelectedDateAction(
           selected: store.state.selectedDate, screen: 'Blood Glucose'));
     });
+    // }
     // store.dispatch(SelectedDateAction(selected: store.state.selectedDate));
   } else if (action is SelectTimeValuesAction) {
     log(action.screen, name: 'screen');
@@ -209,6 +219,120 @@ void fetchUser(Store<AppState> store, action, NextDispatcher next) {
   next(action);
 }
 
+void fetchUserRecords(Store<AppState> store, action, NextDispatcher next) {
+  if (action is GetUserRecordsAction) {
+    CollectionReference glucose = FirebaseFirestore.instance
+        .collection('users')
+        .doc(action.user_id)
+        .collection('bloodglucose');
+    glucose
+        .orderBy('date_for_timestamp_millis', descending: true)
+        .get()
+        .then((value) {
+      List<MainBloodGlucoseModel> initList = [];
+      value.docs.forEach((element) {
+        MainBloodGlucoseModel bloodGlucoseModel =
+            MainBloodGlucoseModel.fromJson(element.data()!);
+        initList.add(bloodGlucoseModel);
+      });
+      store.dispatch(GetGlucoseRecordsActionSuccess(glucoseRecords: initList));
+    });
+    CollectionReference pressure = FirebaseFirestore.instance
+        .collection('users')
+        .doc(action.user_id)
+        .collection('bloodpressure');
+    pressure
+        .orderBy('date_for_timestamp_millis', descending: true)
+        .get()
+        .then((value) {
+      List<MainBloodPressureModel> initList = [];
+      value.docs.forEach((element) {
+        MainBloodPressureModel bloodPressureModel =
+            MainBloodPressureModel.fromJson(element.data()!);
+        initList.add(bloodPressureModel);
+      });
+      store
+          .dispatch(GetPressureRecordsActionSuccess(pressureRecords: initList));
+    });
+    CollectionReference weight = FirebaseFirestore.instance
+        .collection('users')
+        .doc(action.user_id)
+        .collection('bodyweight');
+    weight
+        .orderBy('date_for_timestamp_millis', descending: true)
+        .get()
+        .then((value) {
+      List<MainBodyWeightModel> initList = [];
+      value.docs.forEach((element) {
+        MainBodyWeightModel bodyWeightModel =
+            MainBodyWeightModel.fromJson(element.data()!);
+        initList.add(bodyWeightModel);
+      });
+      store.dispatch(GetWeightRecordsActionSuccess(weightRecords: initList));
+    });
+    log('users fetch done');
+  }
+  next(action);
+}
+
+void fetchChats(Store<AppState> store, action, NextDispatcher next) {
+  if (action is ChatAction) {
+    Query users = FirebaseFirestore.instance
+        .collection('chats')
+        .where('user_ids', arrayContains: action.user_id);
+    Stream<QuerySnapshot> snapshot = users.snapshots();
+
+    snapshot.listen((element) {
+      MainChatsModel chatsModel = MainChatsModel();
+      element.docs.forEach((e) {
+        log('i ran');
+        // UserModel userModel = UserModel.fromJson(e.data()!);
+        // log(userModel.full_name, name: 'full name');
+
+        chatsModel = MainChatsModel.fromJson(e.data()!);
+        chatsModel.chats.sort((a, b) {
+          ChatModel aMod = ChatModel.fromJson(a);
+          ChatModel bMod = ChatModel.fromJson(b);
+          return aMod.time_stamp - bMod.time_stamp;
+        });
+      });
+      store.dispatch(ChatActionSuccess(mainChatsModel: chatsModel));
+      // log('listener');
+      // log(initialUsers.length.toString(), name: 'initial users');
+    });
+    // snapshot.single.then((value) => log(value.size.toString(),name: 'Streams'));
+
+    log('users fetch done');
+  } else if (action is UnreadAction) {
+    Query users = FirebaseFirestore.instance
+        .collection('chats')
+        .where('rep_unread_count', isGreaterThan: 0);
+
+    Stream<QuerySnapshot> snapshot = users.snapshots();
+
+    snapshot.listen((element) {
+      MainChatsModel chatsModel = MainChatsModel();
+      List<UnreadModel> unreads = [];
+      element.docs.forEach((e) {
+        log('i unread ran', name: element.size.toString());
+        // UserModel userModel = UserModel.fromJson(e.data()!);
+        // log(userModel.full_name, name: 'full name');
+
+        chatsModel = MainChatsModel.fromJson(e.data()!);
+        unreads.add(UnreadModel(
+            chat_id: chatsModel.chat_id!,
+            rep_unread_count: chatsModel.rep_unread_count,
+            user_ids: chatsModel.user_ids));
+      });
+      log(unreads.length.toString(), name: 'unreads Length');
+      store.dispatch(UnreadActionSuccess(unreads: unreads));
+      // log('listener');
+      // log(initialUsers.length.toString(), name: 'initial users');
+    });
+  }
+  next(action);
+}
+
 void fetchUsers(Store<AppState> store, action, NextDispatcher next) {
   if (action is GetUsersAction) {
     CollectionReference users = FirebaseFirestore.instance.collection('users');
@@ -239,7 +363,9 @@ void fetchWeight(Store<AppState> store, action, NextDispatcher next) {
   if (action is GetWeightAction) {
     CollectionReference users = FirebaseFirestore.instance
         .collection('users')
-        .doc(action.user_id)
+        .doc(action.user_id.length > 0
+            ? action.user_id
+            : store.state.userModel!.user_id)
         .collection('bodyweight');
     // log(store.state.userModel!.user_id);
     // QuerySnapshot snapshot =
@@ -281,7 +407,9 @@ void fetchPressure(Store<AppState> store, action, NextDispatcher next) {
   if (action is GetPressureAction) {
     CollectionReference users = FirebaseFirestore.instance
         .collection('users')
-        .doc(action.user_id)
+        .doc(action.user_id.length > 0
+            ? action.user_id
+            : store.state.userModel!.user_id)
         .collection('bloodpressure');
     // log(store.state.userModel!.user_id);
     // QuerySnapshot snapshot =

@@ -12,6 +12,7 @@ import 'package:selfcare/Navigation/AdminBottomNav.dart';
 import 'package:selfcare/Navigation/BottomNav.dart';
 import 'package:selfcare/Screens/Welcome.dart';
 import 'package:selfcare/Theme/DefaultColors.dart';
+import 'package:selfcare/redux/Actions/ChatActions.dart';
 import 'package:selfcare/redux/Actions/GetBodyWeightAction.dart';
 import 'package:selfcare/redux/Actions/GetGlucoseAction.dart';
 import 'package:selfcare/redux/Actions/GetPressureAction.dart';
@@ -69,7 +70,9 @@ class _SplashState extends State<Splash> with TickerProviderStateMixin {
             getIt
                 .get<Store<AppState>>()
                 .dispatch(GetWeightAction(user_id: userModel.user_id));
-
+            getIt
+                .get<Store<AppState>>()
+                .dispatch(ChatAction(user_id: userModel.user_id));
             getIt.get<Store<AppState>>().dispatch(GetUserAction(email: email));
 
             getIt.get<Store<AppState>>().dispatch(GetUserAction(email: email));
@@ -77,6 +80,7 @@ class _SplashState extends State<Splash> with TickerProviderStateMixin {
               log('i should ran');
               showDialog(
                 context: context,
+                barrierDismissible: false,
                 builder: (context) {
                   return SimpleDialog(
                       title: RedText(
@@ -268,7 +272,18 @@ class _SplashState extends State<Splash> with TickerProviderStateMixin {
               scale: _animation,
               child: Image.asset('lib/Assets/logo.png'),
             ),
-          )
+          ),
+          // Positioned(
+          //     bottom: 20,
+          //     child: Container(
+          //       width: MediaQuery.of(context).size.width * 1,
+          //       margin: EdgeInsets.only(top: 10),
+          //       padding: EdgeInsets.symmetric(horizontal: 15),
+          //       child: RedText(
+          //         text:
+          //             'Get health tips on prevention and management of diabetes, hypertension and obesity',
+          //       ),
+          //     ))
         ],
       )),
     );

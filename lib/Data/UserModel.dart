@@ -11,7 +11,9 @@ part 'UserModel.g.dart';
 class UserModel {
   UserModel(
       {this.age = 0,
-        this.gender ='',
+      this.added_by = '',
+      this.updated = const [],
+      this.gender = '',
       this.country = '',
       this.created_at = 0,
       this.is_active = false,
@@ -21,8 +23,10 @@ class UserModel {
       this.roles = const [],
       this.user_id = '',
       this.full_name = '',
+      this.online = true,
       this.email = ''});
 
+  bool online;
   String full_name;
   String email;
   int age;
@@ -35,6 +39,8 @@ class UserModel {
   int created_at;
   String user_id;
   String gender;
+  String added_by;
+  List updated;
 
   /// A necessary factory constructor for creating a new User instance
   /// from a map. Pass the map to the generated `_$UserFromJson()` constructor.
