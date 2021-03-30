@@ -50,7 +50,8 @@ void main() {
       fetchWeight,
       fetchUsers,
       fetchUserRecords,
-      fetchChats
+      fetchChats,
+      fetchTips
     ],
     initialState: new AppState(
         unreadList: <UnreadModel>[],

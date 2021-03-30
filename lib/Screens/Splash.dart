@@ -76,8 +76,8 @@ class _SplashState extends State<Splash> with TickerProviderStateMixin {
             getIt.get<Store<AppState>>().dispatch(GetUserAction(email: email));
 
             getIt.get<Store<AppState>>().dispatch(GetUserAction(email: email));
+
             if (userModel.roles.length > 1) {
-              log('i should ran');
               showDialog(
                 context: context,
                 barrierDismissible: false,
@@ -99,6 +99,7 @@ class _SplashState extends State<Splash> with TickerProviderStateMixin {
                                       ),
                                       (route) => false);
                                 } else {
+
                                   Navigator.pushAndRemoveUntil(
                                       context,
                                       MaterialPageRoute(
@@ -151,6 +152,13 @@ class _SplashState extends State<Splash> with TickerProviderStateMixin {
                     context,
                     MaterialPageRoute(
                       builder: (context) => Main(),
+                    ),
+                    (route) => false);
+              } else if (userModel.roles.contains('ADMIN')) {
+                Navigator.pushAndRemoveUntil(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => AdminMain(),
                     ),
                     (route) => false);
               }

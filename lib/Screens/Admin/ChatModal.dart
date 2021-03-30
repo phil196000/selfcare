@@ -95,7 +95,7 @@ class _ChatDialogState extends State<ChatDialog> {
               children: [
                 WhiteText(text: widget.userModel!.full_name),
                 WhiteText(
-                  text: widget.userModel!.online ? 'Online' : 'Offline',
+                  text: widget.userModel!.online!=null ? 'Online' : 'Offline',
                   size: 12,
                   weight: FontWeight.normal,
                 ),

@@ -5,6 +5,7 @@ import 'package:redux/redux.dart';
 import 'package:selfcare/Data/BloodPressure.dart';
 import 'package:selfcare/Data/BodyWeight.dart';
 import 'package:selfcare/Data/Chats.dart';
+import 'package:selfcare/Data/HealthTip.dart';
 import 'package:selfcare/Data/RecordsModel.dart';
 import 'package:selfcare/Data/UserModel.dart';
 import 'package:selfcare/Data/bloodglucosepost.dart';
@@ -14,6 +15,7 @@ import 'package:selfcare/redux/Actions/GetGlucoseAction.dart';
 import 'package:selfcare/redux/Actions/GetPressureAction.dart';
 import 'package:selfcare/redux/Actions/GetRecordsAction.dart';
 import 'package:selfcare/redux/Actions/GetUsersAction.dart';
+import 'package:selfcare/redux/Actions/TipsAction.dart';
 
 import 'Actions/GetUserAction.dart';
 import 'AppState.dart';
@@ -332,7 +334,30 @@ void fetchChats(Store<AppState> store, action, NextDispatcher next) {
   }
   next(action);
 }
+void fetchTips(Store<AppState> store, action, NextDispatcher next) {
+  if (action is TipsAction) {
+    Query tips = FirebaseFirestore.instance.collection('tips').orderBy('created_at',descending: true);
+    Stream<QuerySnapshot> snapshot = tips.snapshots();
 
+    snapshot.listen((element) {
+      List<TipModel> initialTips = [];
+      element.docs.forEach((e) {
+        // log('i ran');
+        TipModel tipModel = TipModel.fromJson(e.data()!);
+        // log(userModel.full_name, name: 'full name');
+
+        initialTips.add(tipModel);
+      });
+      store.dispatch(TipsActionSuccess(tips: initialTips));
+      // log('listener');
+      // log(initialTips.length.toString(), name: 'initial users');
+    });
+    // snapshot.single.then((value) => log(value.size.toString(),name: 'Streams'));
+
+    log('users fetch done');
+  }
+  next(action);
+}
 void fetchUsers(Store<AppState> store, action, NextDispatcher next) {
   if (action is GetUsersAction) {
     CollectionReference users = FirebaseFirestore.instance.collection('users');

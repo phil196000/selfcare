@@ -1,7 +1,7 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:selfcare/Data/BloodPressure.dart';
 import 'package:selfcare/Data/BodyWeight.dart';
 import 'package:selfcare/Data/Chats.dart';
+import 'package:selfcare/Data/HealthTip.dart';
 import 'package:selfcare/Data/RecordsModel.dart';
 import 'package:selfcare/Data/UserModel.dart';
 import 'package:selfcare/Data/bloodglucosepost.dart';
@@ -20,6 +20,7 @@ class AppState {
   final BloodPressureModel? selectTimeValuesPressure;
   final BodyWeightModel? selectTimeValuesWeight;
   final UserModel? userModelEdit;
+  final List<TipModel> tips;
 
 // final RecordsModel? userRecords;
   final List<MainBloodGlucoseModel> glucoseRecords;
@@ -27,8 +28,10 @@ class AppState {
   final List<MainBodyWeightModel> weightRecords;
   final MainChatsModel? chatsModel;
   final List<UnreadModel> unreadList;
+
   AppState({
-    this.unreadList = const [],
+    this.tips = const <TipModel>[],
+    this.unreadList = const <UnreadModel>[],
     this.chatsModel,
     this.glucoseRecords = const [],
     this.pressureRecords = const [],

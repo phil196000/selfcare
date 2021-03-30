@@ -126,18 +126,12 @@ class _LoginState extends State<Login> {
               .get<Store<AppState>>()
               .dispatch(GetUserAction(email: _email.text));
           getUserData();
-          // Timer(
-          //     Duration(seconds: 3),
-          //     () => Navigator.push(
-          //         context,
-          //         MaterialPageRoute(
-          //           builder: (context) => Main(),
-          //         )));
+
         });
 
-        // return 'success';
+
       }
-      // return userCredential;
+
     } on FirebaseAuthException catch (e) {
       setState(() {
         loading = false;
@@ -173,10 +167,7 @@ class _LoginState extends State<Login> {
       if (snapshot.size > 0) {
         snapshot.docs.forEach((DocumentSnapshot documentSnapshot) {
           UserModel userModel = UserModel.fromJson(documentSnapshot.data()!);
-          // if (userModel.password ==
-          //     Crypt.sha256(_password.text,
-          //             rounds: 10000, salt: 'selfcarepasswordsalt')
-          //         .toString()) {
+
 
           if (userModel.password == _password.text.trim()) {
             getIt
@@ -205,6 +196,7 @@ class _LoginState extends State<Login> {
                 log('i should ran');
                 showDialog(
                   context: context,
+                  barrierDismissible: false,
                   builder: (context) {
                     return SimpleDialog(
                         title: RedText(

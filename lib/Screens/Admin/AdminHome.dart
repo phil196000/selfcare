@@ -26,6 +26,7 @@ import 'package:selfcare/redux/Actions/ChatActions.dart';
 import 'package:selfcare/redux/Actions/GetRecordsAction.dart';
 import 'package:selfcare/redux/Actions/GetUserAction.dart';
 import 'package:selfcare/redux/Actions/GetUsersAction.dart';
+import 'package:selfcare/redux/Actions/TipsAction.dart';
 import 'package:selfcare/redux/AppState.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -52,6 +53,7 @@ class _AdminHomeState extends State<AdminHome> {
     super.initState();
     getIt.get<Store<AppState>>().dispatch(GetUsersAction());
     getIt.get<Store<AppState>>().dispatch(UnreadAction());
+    getIt.get<Store<AppState>>().dispatch(TipsAction());
   }
 
   void openChatDialog(

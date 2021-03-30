@@ -56,7 +56,13 @@ class _AdminMainState extends State<AdminMain> {
           });
         },
       ),
-      HealthTips()
+      HealthTips(
+        hidenavbar: (val) {
+          this.setState(() {
+            _hideNavBar = val;
+          });
+        },
+      )
 
       // Search(),
       // Community(),
@@ -92,37 +98,40 @@ class _AdminMainState extends State<AdminMain> {
 
   @override
   Widget build(BuildContext context) {
-    return StoreConnector(builder: (context, AppState state) {
-      return Scaffold(
-        body: PersistentTabView.custom(
-          context,
-          controller: _controller,
-          screens: _buildScreens(),
-          confineInSafeArea: true,
-          backgroundColor: Colors.white,
-          handleAndroidBackButtonPress: true,
-          resizeToAvoidBottomInset: true,
-          stateManagement: true,
-          hideNavigationBarWhenKeyboardShows: true,
-          hideNavigationBar: _hideNavBar,
-          margin: EdgeInsets.zero,
-          bottomScreenMargin: 0.0,
-          screenTransitionAnimation: ScreenTransitionAnimation(
-            animateTabTransition: true,
-            curve: Curves.ease,
-            duration: Duration(milliseconds: 200),
+    return StoreConnector(
+      builder: (context, AppState state) {
+        return Scaffold(
+          body: PersistentTabView.custom(
+            context,
+            controller: _controller,
+            screens: _buildScreens(),
+            confineInSafeArea: true,
+            backgroundColor: Colors.white,
+            handleAndroidBackButtonPress: true,
+            resizeToAvoidBottomInset: true,
+            stateManagement: true,
+            hideNavigationBarWhenKeyboardShows: true,
+            hideNavigationBar: _hideNavBar,
+            margin: EdgeInsets.zero,
+            bottomScreenMargin: 0.0,
+            screenTransitionAnimation: ScreenTransitionAnimation(
+              animateTabTransition: true,
+              curve: Curves.ease,
+              duration: Duration(milliseconds: 200),
+            ),
+            itemCount: 2,
+            customWidget: CustomNavBarWidget(
+              items: _navBarsItems(),
+              selectedIndex: selected,
+              onItemSelected: changeToBottomTab,
+              key: Key('value'),
+            ),
+            // Choose the nav bar style with this property
           ),
-          itemCount: 2,
-          customWidget: CustomNavBarWidget(
-            items: _navBarsItems(),
-            selectedIndex: selected,
-            onItemSelected: changeToBottomTab,
-            key: Key('value'),
-          ),
-          // Choose the nav bar style with this property
-        ),
-      );
-    }, converter: (Store<AppState> store) => store.state,);
+        );
+      },
+      converter: (Store<AppState> store) => store.state,
+    );
   }
 }
 

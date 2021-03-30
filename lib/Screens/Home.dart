@@ -17,6 +17,8 @@ import 'package:selfcare/Data/RecordCardModel.dart';
 import 'package:selfcare/Data/bloodglucosepost.dart';
 import 'package:selfcare/Screens/AllStatistics.dart';
 import 'package:selfcare/Theme/DefaultColors.dart';
+import 'package:selfcare/main.dart';
+import 'package:selfcare/redux/Actions/TipsAction.dart';
 import 'package:selfcare/redux/AppState.dart';
 
 import 'Record.dart';
@@ -32,6 +34,13 @@ List recentRecording = [
 
 class _HomeState extends State<Home> {
   DefaultColors defaultColors = DefaultColors();
+
+  @override
+  void initState() {
+    super.initState();
+    log('home ran');
+    getIt.get<Store<AppState>>().dispatch(TipsAction());
+  }
 
   @override
   Widget build(BuildContext context) {

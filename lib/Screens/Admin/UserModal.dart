@@ -39,21 +39,10 @@ class _UserFormDialogState extends State<UserFormDialog> {
   late TextEditingController phone = TextEditingController();
   late TextEditingController age = TextEditingController();
   late TextEditingController area = TextEditingController();
-  late TextEditingController region = TextEditingController();
+
   late TextEditingController password = TextEditingController();
   late TextEditingController confirm = TextEditingController();
-
-// String encryptedDecryptedPassword({String password='',bool encrypt = true}){
-//   final iv = Encrypt.IV.fromLength(16);
-//
-//   final encrypter = Encrypt.Encrypter(Encrypt.AES( Encrypt.Key.fromUtf8('my 32 length key................')));
-//   if(!encrypt){
-//
-//     return encrypter.decrypt(encrypted, iv: iv);
-//   }
-//    return encrypter.encrypt(password, iv: iv).base64;
-// }
-
+  String? region;
   String? gender;
   bool is_active = true;
   List<String> checked = [];
@@ -119,13 +108,11 @@ class _UserFormDialogState extends State<UserFormDialog> {
       'phone_number': phone.text,
       'gender': gender,
       'roles': checked,
-      'location': {
-        'name': area.text.toUpperCase().trim(),
-        'region': region.text.toUpperCase().trim()
-      },
+      'location': {'name': area.text.toUpperCase().trim(), 'region': region},
       'int created_at': DateTime.now().millisecondsSinceEpoch,
       'user_id': users.id,
-      'updated': []
+      'updated': [],
+      'online': false
     }).then((value) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         onVisible: () => Timer(Duration(seconds: 2), () => widget.closeModal()),
@@ -157,8 +144,8 @@ class _UserFormDialogState extends State<UserFormDialog> {
           // ).toString();
           users.update({'password': password.text.trim()}).then((value) {
             ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-              onVisible: () =>
-                  Timer(Duration(seconds: 2), () => widget.closeModal()),
+              // onVisible: () =>
+              //     Timer(Duration(seconds: 2), () => widget.closeModal()),
               backgroundColor: Colors.green,
               content: Container(
                 // color: Colors.yellow,
@@ -261,10 +248,7 @@ class _UserFormDialogState extends State<UserFormDialog> {
       'phone_number': phone.text,
       'gender': gender,
       'roles': checked,
-      'location': {
-        'name': area.text.toUpperCase().trim(),
-        'region': region.text.toUpperCase().trim()
-      },
+      'location': {'name': area.text.toUpperCase().trim(), 'region': region},
       'updated': FieldValue.arrayUnion([
         {
           'updated_by': userModel.user_id,
@@ -291,7 +275,7 @@ class _UserFormDialogState extends State<UserFormDialog> {
                   password: userModel.password,
                   location: {
                 'name': area.text.toUpperCase().trim(),
-                'region': region.text.toUpperCase().trim()
+                'region': region
               })));
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         // onVisible: () =>
@@ -309,7 +293,6 @@ class _UserFormDialogState extends State<UserFormDialog> {
       _showMyDialogError(message: error.toString());
     });
   }
-
 
   void checkUser(
       {bool create = true, BuildContext? cont, required UserModel userModel}) {
@@ -388,8 +371,9 @@ class _UserFormDialogState extends State<UserFormDialog> {
       phone = TextEditingController(text: widget.userModel!.phone_number);
       age = TextEditingController(text: widget.userModel!.age.toString());
       area = TextEditingController(text: widget.userModel!.location['name']);
-      region =
-          TextEditingController(text: widget.userModel!.location['region']);
+      region = widget.userModel!.location['region'];
+      // region =
+      //     TextEditingController(text: widget.userModel!.location['region']);
       // password = TextEditingController(text: widget.userModel!.password);
       // confirm = TextEditingController(text: widget.userModel!.password);
       setState(() {
@@ -419,6 +403,7 @@ class _UserFormDialogState extends State<UserFormDialog> {
                     icon: Icon(Icons.save),
                     onPressed: () {
                       if (page == 0) {
+                        log(region.toString());
                         if (full_name.text.length > 2 &&
                             email.text.contains('@') &&
                             email.text.contains('.') &&
@@ -428,7 +413,7 @@ class _UserFormDialogState extends State<UserFormDialog> {
                                 0 &&
                             gender != null &&
                             area.text.length > 0 &&
-                            region.text.length > 0 &&
+                            region != null &&
                             checked.length > 0) {
                           if (widget.option == 'Edit') {
                             // log(state.userModelEdit!.full_name,
@@ -447,37 +432,8 @@ class _UserFormDialogState extends State<UserFormDialog> {
                                 '${state.userModelEdit!.location['name']}'
                                         .toUpperCase() !=
                                     area.text.trim().toUpperCase() ||
-                                '${state.userModelEdit!.location['region']}'
-                                        .toUpperCase() !=
-                                    region.text.trim().toUpperCase()) {
-                              // log(full_name.text, name: 'full_name.text');
-                              // log(state.userModelEdit!.full_name,
-                              //     name: 'user model');
-                              // log(full_name.text, name: 'full name text');
-                              // getIt
-                              //     .get<Store<AppState>>()
-                              //     .dispatch(GetUserEditAction(
-                              //         userEditModel: UserModel(
-                              //             full_name: full_name.text.trim(),
-                              //             email: state.userModelEdit!.email !=
-                              //                     email.text
-                              //                         .trim()
-                              //                         .toLowerCase()
-                              //                 ? email.text.trim().toLowerCase()
-                              //                 : state.userModelEdit!.email,
-                              //             age: int.parse(age.text),
-                              //             country: 'Ghana',
-                              //             is_active: is_active,
-                              //             phone_number: phone.text,
-                              //             gender: gender!,
-                              //             roles: checked,
-                              //             password:
-                              //                 state.userModelEdit!.password,
-                              //             location: {
-                              //           'name': area.text.toUpperCase().trim(),
-                              //           'region':
-                              //               region.text.toUpperCase().trim()
-                              //         })));
+                                state.userModelEdit!.location['region'] !=
+                                    region) {
                               if (state.userModelEdit!.email !=
                                   email.text.trim().toLowerCase()) {
                                 log('email section ran');
@@ -499,21 +455,20 @@ class _UserFormDialogState extends State<UserFormDialog> {
                             } else {
                               _showMyDialogError(message: 'No changes made');
                             }
+                          } else {
+                            if (password.text.length > 7 &&
+                                confirm.text.length > 7 &&
+                                password.text == confirm.text) {
+                              createUser();
+                            } else {
+                              _showMyDialogError(
+                                  message: password.text.length < 8
+                                      ? 'Password must be 8 or more characters'
+                                      : confirm.text.length < 8
+                                          ? 'Confirm Password must be 8 or more characters'
+                                          : 'Password and Confirm password not equal');
+                            }
                           }
-                          // else {
-                          //   if (password.text.length > 7 &&
-                          //       confirm.text.length > 7 &&
-                          //       password.text == confirm.text) {
-                          //     checkUser(userModel: state.userModelEdit!);
-                          //   } else {
-                          //     _showMyDialogError(
-                          //         message: password.text.length < 8
-                          //             ? 'Password must be 8 or more characters'
-                          //             : confirm.text.length < 8
-                          //                 ? 'Confirm Password must be 8 or more characters'
-                          //                 : 'Password and Confirm password not equal');
-                          //   }
-                          // }
                         } else {
                           _showMyDialogError(
                               message: full_name.text.length < 3
@@ -536,14 +491,17 @@ class _UserFormDialogState extends State<UserFormDialog> {
                                                           ? 'Gender not selected'
                                                           : area.text.length < 1
                                                               ? 'Area must be provided'
-                                                              : region.text
-                                                                          .length <
-                                                                      1
+                                                              : region == null
                                                                   ? 'Region must be provided'
                                                                   : checked.length ==
                                                                           0
                                                                       ? 'Role must be assigned'
-                                                                      : '');
+                                                                      : password.text.length <
+                                                                              8
+                                                                          ? 'Password must be 8 or more characters'
+                                                                          : confirm.text.length < 8
+                                                                              ? 'Confirm Password must be 8 or more characters'
+                                                                              : 'Password and Confirm password not equal');
                         }
                       } else {
                         if (password.text.length > 7 &&
@@ -769,10 +727,92 @@ class _UserFormDialogState extends State<UserFormDialog> {
                             ),
                             Expanded(
                               flex: 4,
-                              child: DefaultInput(
-                                  controller: region,
-                                  hint: 'Region',
-                                  error: full_name_error),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  RedText(
+                                    text: 'Region',
+                                  ),
+                                  Container(
+                                    alignment: Alignment.center,
+                                    height: 60,
+                                    decoration: BoxDecoration(
+                                        color: DefaultColors().white,
+                                        border: Border.all(
+                                          width: 2,
+                                          color: DefaultColors().primary,
+                                        ),
+                                        borderRadius: BorderRadius.circular(0),
+                                        boxShadow: [
+                                          // BoxShadow(
+                                          //     color: DefaultColors().shadowColorGrey,
+                                          //     offset: Offset(0, 5),
+                                          //     blurRadius: 10)
+                                        ]),
+                                    margin: EdgeInsets.only(top: 5),
+                                    padding:
+                                        EdgeInsets.symmetric(horizontal: 10),
+                                    child: DropdownButton<String>(
+                                      value: region,
+
+                                      icon: Icon(
+                                          Icons.keyboard_arrow_down_outlined),
+                                      iconSize: 24,
+                                      elevation: 16,
+                                      isExpanded: true,
+
+                                      hint: Text('Select a Region'),
+                                      style:
+                                          TextStyle(color: Colors.deepPurple),
+                                      // selectedItemBuilder: ,
+                                      underline: Container(
+                                        height: 0,
+                                        color: Colors.deepPurpleAccent,
+                                      ),
+                                      onChanged: (String? newValue) {
+                                        // getIt.get<Store<AppState>>().dispatch(
+                                        //     SelectTimeValuesAction(
+                                        //         screen: widget.title, selected: newValue));
+                                        setState(() {
+                                          region = newValue!;
+                                        });
+                                      },
+                                      items: [
+                                        'Ashanti',
+                                        'Bono Region',
+                                        'Bono East',
+                                        'Ahafo',
+                                        'Central',
+                                        'Eastern',
+                                        'Greater Accra',
+                                        'Northern',
+                                        'Savannah',
+                                        'North East',
+                                        'Upper East',
+                                        'Upper West',
+                                        'Volta',
+                                        'Oti',
+                                        'Western',
+                                        'Western North'
+                                      ].map<DropdownMenuItem<String>>(
+                                          (String value) {
+                                        return DropdownMenuItem<String>(
+                                          value: value,
+                                          child: Text(
+                                            value,
+                                            textAlign: TextAlign.center,
+                                            style: TextStyle(
+                                              color: DefaultColors().darkblue,
+                                            ),
+                                          ),
+                                        );
+                                      }).toList(),
+                                    ),
+                                  ),
+                                ],
+                              ),
                             )
                           ],
                         ),

@@ -7,6 +7,7 @@ import 'package:selfcare/redux/Actions/GetGlucoseAction.dart';
 import 'package:selfcare/redux/Actions/GetPressureAction.dart';
 import 'package:selfcare/redux/Actions/GetRecordsAction.dart';
 import 'package:selfcare/redux/Actions/GetUsersAction.dart';
+import 'package:selfcare/redux/Actions/TipsAction.dart';
 import 'package:selfcare/redux/middleware.dart';
 
 import 'Actions/GetUserAction.dart';
@@ -14,9 +15,53 @@ import 'AppState.dart';
 
 AppState appStateReducer(AppState state, action) {
   // log('reducer ran', name: 'reducer');
-  if (action is UnreadAction) {
+  if (action is TipsAction) {
     // if (action.userEditModel!.user_id.length > 0)
     return new AppState(
+        tips: state.tips,
+        unreadList: state.unreadList,
+        chatsModel: state.chatsModel,
+        glucoseRecords: state.glucoseRecords,
+        pressureRecords: state.pressureRecords,
+        weightRecords: state.weightRecords,
+        userModelEdit: state.userModelEdit,
+        users: state.users,
+        selectTimeValuesWeight: state.selectTimeValuesWeight,
+        selectTimeValuesPressure: state.selectTimeValuesPressure,
+        selectTimeValues: state.selectTimeValues,
+        userModelFetch: true,
+        selectedDateTimes: state.selectedDateTimes,
+        selectedDate: state.selectedDate,
+        bloodglucose: state.bloodglucose,
+        bloodpressure: state.bloodpressure,
+        bodyweight: state.bodyweight,
+        userModel: state.userModel);
+  } else if (action is TipsActionSuccess) {
+    // log(action.userEditModel!.user_id, name: 'get user edit');
+
+    return new AppState(
+      tips: action.tips,
+        unreadList: state.unreadList,
+        chatsModel: state.chatsModel,
+        glucoseRecords: state.glucoseRecords,
+        pressureRecords: state.pressureRecords,
+        weightRecords: state.weightRecords,
+        userModelEdit: state.userModelEdit,
+        users: state.users,
+        selectTimeValuesWeight: state.selectTimeValuesWeight,
+        selectTimeValuesPressure: state.selectTimeValuesPressure,
+        selectTimeValues: state.selectTimeValues,
+        userModelFetch: true,
+        selectedDateTimes: state.selectedDateTimes,
+        selectedDate: state.selectedDate,
+        bloodglucose: state.bloodglucose,
+        bloodpressure: state.bloodpressure,
+        bodyweight: state.bodyweight,
+        userModel: state.userModel);
+  } else if (action is UnreadAction) {
+    // if (action.userEditModel!.user_id.length > 0)
+    return new AppState(
+        tips: state.tips,
         unreadList: state.unreadList,
         chatsModel: state.chatsModel,
         glucoseRecords: state.glucoseRecords,
@@ -38,6 +83,7 @@ AppState appStateReducer(AppState state, action) {
     // log(action.userEditModel!.user_id, name: 'get user edit');
 
     return new AppState(
+        tips: state.tips,
         unreadList: action.unreads,
         chatsModel: state.chatsModel,
         glucoseRecords: state.glucoseRecords,
@@ -58,6 +104,7 @@ AppState appStateReducer(AppState state, action) {
   } else if (action is ChatAction) {
     // if (action.userEditModel!.user_id.length > 0)
     return new AppState(
+        tips: state.tips,
         unreadList: state.unreadList,
         chatsModel: state.chatsModel,
         glucoseRecords: state.glucoseRecords,
@@ -79,6 +126,7 @@ AppState appStateReducer(AppState state, action) {
     // log(action.userEditModel!.user_id, name: 'get user edit');
 
     return new AppState(
+        tips: state.tips,
         unreadList: state.unreadList,
         chatsModel: action.mainChatsModel,
         glucoseRecords: state.glucoseRecords,
@@ -99,6 +147,7 @@ AppState appStateReducer(AppState state, action) {
   } else if (action is GetUserRecordsAction) {
     // if (action.userEditModel!.user_id.length > 0)
     return new AppState(
+        tips: state.tips,
         unreadList: state.unreadList,
         chatsModel: state.chatsModel,
         glucoseRecords: state.glucoseRecords,
@@ -120,6 +169,7 @@ AppState appStateReducer(AppState state, action) {
     // log(action.userEditModel!.user_id, name: 'get user edit');
 
     return new AppState(
+        tips: state.tips,
         unreadList: state.unreadList,
         chatsModel: state.chatsModel,
         glucoseRecords: action.glucoseRecords,
@@ -140,6 +190,7 @@ AppState appStateReducer(AppState state, action) {
   } else if (action is GetPressureRecordsActionSuccess) {
     // log(action.userEditModel!.user_id, name: 'get user edit');
     return new AppState(
+        tips: state.tips,
         unreadList: state.unreadList,
         chatsModel: state.chatsModel,
         glucoseRecords: state.glucoseRecords,
@@ -161,6 +212,7 @@ AppState appStateReducer(AppState state, action) {
     // log(action.userEditModel!.user_id, name: 'get user edit');
 
     return new AppState(
+        tips: state.tips,
         unreadList: state.unreadList,
         chatsModel: state.chatsModel,
         glucoseRecords: state.glucoseRecords,
@@ -182,6 +234,7 @@ AppState appStateReducer(AppState state, action) {
     // log(action.userEditModel!.user_id, name: 'get user edit');
     // if (action.userEditModel!.user_id.length > 0)
     return new AppState(
+        tips: state.tips,
         unreadList: state.unreadList,
         chatsModel: state.chatsModel,
         glucoseRecords: state.glucoseRecords,
@@ -203,6 +256,7 @@ AppState appStateReducer(AppState state, action) {
     // log(action.userEditModel!.user_id, name: 'get user edit');
     if (action.userEditModel != null)
       return new AppState(
+          tips: state.tips,
           unreadList: state.unreadList,
           chatsModel: state.chatsModel,
           glucoseRecords: state.glucoseRecords,
@@ -222,6 +276,7 @@ AppState appStateReducer(AppState state, action) {
           userModel: state.userModel);
   } else if (action is GetUsersAction) {
     return new AppState(
+        tips: state.tips,
         unreadList: state.unreadList,
         chatsModel: state.chatsModel,
         glucoseRecords: state.glucoseRecords,
@@ -241,6 +296,7 @@ AppState appStateReducer(AppState state, action) {
         userModel: state.userModel);
   } else if (action is GetUsersActionSuccess) {
     return new AppState(
+        tips: state.tips,
         unreadList: state.unreadList,
         chatsModel: state.chatsModel,
         glucoseRecords: state.glucoseRecords,
@@ -260,6 +316,7 @@ AppState appStateReducer(AppState state, action) {
         userModel: state.userModel);
   } else if (action is GetUserAction) {
     return new AppState(
+        tips: state.tips,
         unreadList: state.unreadList,
         chatsModel: state.chatsModel,
         glucoseRecords: state.glucoseRecords,
@@ -279,6 +336,7 @@ AppState appStateReducer(AppState state, action) {
         userModel: state.userModel);
   } else if (action is GetUserActionSuccess) {
     return new AppState(
+        tips: state.tips,
         unreadList: state.unreadList,
         chatsModel: state.chatsModel,
         glucoseRecords: state.glucoseRecords,
@@ -299,6 +357,7 @@ AppState appStateReducer(AppState state, action) {
   } else if (action is AddGlucoseAction) {
     // log(state.userModel!.user_id);
     return new AppState(
+        tips: state.tips,
         unreadList: state.unreadList,
         chatsModel: state.chatsModel,
         glucoseRecords: state.glucoseRecords,
@@ -320,6 +379,7 @@ AppState appStateReducer(AppState state, action) {
     // log('selected action');
     // log(SelectedDateAction().selected!.toString());
     return new AppState(
+        tips: state.tips,
         unreadList: state.unreadList,
         chatsModel: state.chatsModel,
         glucoseRecords: state.glucoseRecords,
@@ -341,6 +401,7 @@ AppState appStateReducer(AppState state, action) {
     // log(action.selectedTimes.toString(), name: 'last');
 
     return new AppState(
+        tips: state.tips,
         unreadList: state.unreadList,
         chatsModel: state.chatsModel,
         glucoseRecords: state.glucoseRecords,
@@ -360,6 +421,7 @@ AppState appStateReducer(AppState state, action) {
         userModel: state.userModel);
   } else if (action is GetGlucoseAction) {
     return new AppState(
+        tips: state.tips,
         unreadList: state.unreadList,
         chatsModel: state.chatsModel,
         glucoseRecords: state.glucoseRecords,
@@ -379,6 +441,7 @@ AppState appStateReducer(AppState state, action) {
         userModel: state.userModel);
   } else if (action is GetGlucoseActionSuccess) {
     return new AppState(
+        tips: state.tips,
         unreadList: state.unreadList,
         chatsModel: state.chatsModel,
         glucoseRecords: state.glucoseRecords,
@@ -398,6 +461,7 @@ AppState appStateReducer(AppState state, action) {
         userModel: state.userModel);
   } else if (action is GetPressureAction) {
     return new AppState(
+        tips: state.tips,
         unreadList: state.unreadList,
         chatsModel: state.chatsModel,
         glucoseRecords: state.glucoseRecords,
@@ -417,6 +481,7 @@ AppState appStateReducer(AppState state, action) {
         userModel: state.userModel);
   } else if (action is GetPressureActionSuccess) {
     return new AppState(
+        tips: state.tips,
         unreadList: state.unreadList,
         chatsModel: state.chatsModel,
         glucoseRecords: state.glucoseRecords,
@@ -436,6 +501,7 @@ AppState appStateReducer(AppState state, action) {
         userModel: state.userModel);
   } else if (action is GetWeightAction) {
     return new AppState(
+        tips: state.tips,
         unreadList: state.unreadList,
         chatsModel: state.chatsModel,
         glucoseRecords: state.glucoseRecords,
@@ -455,6 +521,7 @@ AppState appStateReducer(AppState state, action) {
         userModel: state.userModel);
   } else if (action is GetWeightActionSuccess) {
     return new AppState(
+        tips: state.tips,
         unreadList: state.unreadList,
         chatsModel: state.chatsModel,
         glucoseRecords: state.glucoseRecords,
@@ -474,6 +541,7 @@ AppState appStateReducer(AppState state, action) {
         userModel: state.userModel);
   } else if (action is SelectTimeValuesAction) {
     return new AppState(
+        tips: state.tips,
         unreadList: state.unreadList,
         chatsModel: state.chatsModel,
         users: state.users,
@@ -494,6 +562,7 @@ AppState appStateReducer(AppState state, action) {
     if (action.selected != null) {
       // log('success glucose');
       return new AppState(
+          tips: state.tips,
           unreadList: state.unreadList,
           chatsModel: state.chatsModel,
           users: state.users,
@@ -510,6 +579,7 @@ AppState appStateReducer(AppState state, action) {
           userModel: state.userModel);
     } else if (action.selectedPressure != null) {
       return new AppState(
+          tips: state.tips,
           unreadList: state.unreadList,
           chatsModel: state.chatsModel,
           users: state.users,
@@ -526,6 +596,7 @@ AppState appStateReducer(AppState state, action) {
           userModel: state.userModel);
     } else if (action.selectedWeight != null) {
       return new AppState(
+          tips: state.tips,
           unreadList: state.unreadList,
           chatsModel: state.chatsModel,
           users: state.users,
