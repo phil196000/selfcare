@@ -112,26 +112,23 @@ class _LoginState extends State<Login> {
       loading = true;
     });
     try {
-
       UserCredential userCredential = await FirebaseAuth.instance
           .signInWithEmailAndPassword(
-              email: _email.text.toLowerCase().trim(), password: _password.text.trim());
+              email: _email.text.toLowerCase().trim(),
+              password: _password.text.trim());
 
       if (userCredential.user != null) {
         setState(() {
           loading = false;
         });
-        _loginCredentialsSave(passwordCrypt: _password.text.trim()).then((value) {
+        _loginCredentialsSave(passwordCrypt: _password.text.trim())
+            .then((value) {
           getIt
               .get<Store<AppState>>()
               .dispatch(GetUserAction(email: _email.text));
           getUserData();
-
         });
-
-
       }
-
     } on FirebaseAuthException catch (e) {
       setState(() {
         loading = false;
@@ -168,117 +165,126 @@ class _LoginState extends State<Login> {
         snapshot.docs.forEach((DocumentSnapshot documentSnapshot) {
           UserModel userModel = UserModel.fromJson(documentSnapshot.data()!);
 
-
-          if (userModel.password == _password.text.trim()) {
-            getIt
-                .get<Store<AppState>>()
-                .dispatch(GetUserActionSuccess(userModelUser: userModel));
-            getIt
-                .get<Store<AppState>>()
-                .dispatch(GetGlucoseAction(user_id: userModel.user_id));
-            getIt
-                .get<Store<AppState>>()
-                .dispatch(GetPressureAction(user_id: userModel.user_id));
-            getIt
-                .get<Store<AppState>>()
-                .dispatch(GetWeightAction(user_id: userModel.user_id));
-            getIt
-                .get<Store<AppState>>()
-                .dispatch(ChatAction(user_id: userModel.user_id));
-            _loginCredentialsSave(
-                    passwordCrypt:
-                        _password.text.trim())
-                .then((value) {
+          if (userModel.is_active) {
+            if (userModel.password == _password.text.trim()) {
               getIt
                   .get<Store<AppState>>()
-                  .dispatch(GetUserAction(email: _email.text));
-              if (userModel.roles.length > 1) {
-                log('i should ran');
-                showDialog(
-                  context: context,
-                  barrierDismissible: false,
-                  builder: (context) {
-                    return SimpleDialog(
-                        title: RedText(
-                          text: 'Hello Welcome,\nYou have access to enter as:',
-                        ),
-                        children: userModel.roles.map((String e) {
-                          return Container(
-                              margin: EdgeInsets.only(top: 15),
-                              child: SimpleDialogOption(
-                                onPressed: () {
-                                  if (e == 'USER') {
-                                    Navigator.pushAndRemoveUntil(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) => Main(),
-                                        ),
-                                        (route) => false);
-                                  } else {
-                                    Navigator.pushAndRemoveUntil(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) => AdminMain(),
-                                        ),
-                                        (route) => false);
-                                  }
-                                },
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: [
-                                    Icon(
-                                      e.toLowerCase() == 'user'
-                                          ? Icons.person
-                                          : e.toLowerCase() == 'manager'
-                                              ? Icons.supervised_user_circle
-                                              : Icons.admin_panel_settings,
-                                      size: 36.0,
-                                      color: e.toLowerCase() == 'user'
-                                          ? defaultColors.green
-                                          : e.toLowerCase() == 'manager'
-                                              ? defaultColors.darkblue
-                                              : defaultColors.primary,
-                                    ),
-                                    Padding(
-                                      padding: const EdgeInsetsDirectional.only(
-                                          start: 16.0),
-                                      child: Text(
-                                        e,
-                                        style: TextStyle(
-                                            color: e.toLowerCase() == 'user'
-                                                ? defaultColors.green
-                                                : e.toLowerCase() == 'manager'
-                                                    ? defaultColors.darkblue
-                                                    : defaultColors.primary,
-                                            fontWeight: FontWeight.bold,
-                                            fontSize: 18),
+                  .dispatch(GetUserActionSuccess(userModelUser: userModel));
+              getIt
+                  .get<Store<AppState>>()
+                  .dispatch(GetGlucoseAction(user_id: userModel.user_id));
+              getIt
+                  .get<Store<AppState>>()
+                  .dispatch(GetPressureAction(user_id: userModel.user_id));
+              getIt
+                  .get<Store<AppState>>()
+                  .dispatch(GetWeightAction(user_id: userModel.user_id));
+              getIt
+                  .get<Store<AppState>>()
+                  .dispatch(ChatAction(user_id: userModel.user_id));
+              _loginCredentialsSave(passwordCrypt: _password.text.trim())
+                  .then((value) {
+                getIt
+                    .get<Store<AppState>>()
+                    .dispatch(GetUserAction(email: _email.text));
+                if (userModel.roles.length > 1) {
+                  log('i should ran');
+                  showDialog(
+                    context: context,
+                    barrierDismissible: false,
+                    builder: (context) {
+                      return SimpleDialog(
+                          title: RedText(
+                            text:
+                                'Hello Welcome,\nYou have access to enter as:',
+                          ),
+                          children: userModel.roles.map((String e) {
+                            return Container(
+                                margin: EdgeInsets.only(top: 15),
+                                child: SimpleDialogOption(
+                                  onPressed: () {
+                                    if (e == 'USER') {
+                                      Navigator.pushAndRemoveUntil(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) => Main(),
+                                          ),
+                                          (route) => false);
+                                    } else {
+                                      Navigator.pushAndRemoveUntil(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) => AdminMain(),
+                                          ),
+                                          (route) => false);
+                                    }
+                                  },
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    children: [
+                                      Icon(
+                                        e.toLowerCase() == 'user'
+                                            ? Icons.person
+                                            : e.toLowerCase() == 'manager'
+                                                ? Icons.supervised_user_circle
+                                                : Icons.admin_panel_settings,
+                                        size: 36.0,
+                                        color: e.toLowerCase() == 'user'
+                                            ? defaultColors.green
+                                            : e.toLowerCase() == 'manager'
+                                                ? defaultColors.darkblue
+                                                : defaultColors.primary,
                                       ),
-                                    ),
-                                  ],
-                                ),
-                              ));
-                        }).toList());
-                  },
-                );
-              } else {
-                if (userModel.roles.contains('USER')) {
-                  Navigator.pushAndRemoveUntil(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => Main(),
-                      ),
-                      (route) => false);
+                                      Padding(
+                                        padding:
+                                            const EdgeInsetsDirectional.only(
+                                                start: 16.0),
+                                        child: Text(
+                                          e,
+                                          style: TextStyle(
+                                              color: e.toLowerCase() == 'user'
+                                                  ? defaultColors.green
+                                                  : e.toLowerCase() == 'manager'
+                                                      ? defaultColors.darkblue
+                                                      : defaultColors.primary,
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 18),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ));
+                          }).toList());
+                    },
+                  );
+                } else {
+                  if (userModel.roles.contains('USER')) {
+                    Navigator.pushAndRemoveUntil(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => Main(),
+                        ),
+                        (route) => false);
+                  }
                 }
-              }
-            });
+              });
+            } else {
+              alert(message: 'Wrong Password, try again');
+            }
           } else {
-            alert(message: 'Wrong Password, try again');
+            alert(
+                message:
+                    'Your account has been de-activated, contact the Admin');
           }
         });
       } else {
         alert(message: 'User not found, contact Admin for an account');
       }
+    });
+    setState(() {
+      loading = false;
     });
   }
 
@@ -351,7 +357,7 @@ class _LoginState extends State<Login> {
                                       MainAxisAlignment.spaceBetween,
                                   children: [
                                     Visibility(
-                                      visible: state.userModelFetch,
+                                      visible: loading,
                                       child: Container(
                                         color: defaultColors.white,
                                         height: 20,

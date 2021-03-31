@@ -316,7 +316,22 @@ class _AdminHomeState extends State<AdminHome> {
                             visible: e.user_id == state.userModel!.user_id,
                           ),
                           title: Text(e.full_name),
-                          subtitle: Text(e.roles.toString()),
+                          subtitle: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(e.roles.toString()),
+                              e.is_active
+                                  ? DarkGreenText(
+                                      text: 'Active',
+                                      size: 10,
+                                    )
+                                  : DarkRedText(
+                                      text: 'InActive',
+                                      size: 10,
+                                    )
+                            ],
+                          ),
+
                           // leading: Icon(Icons.label),
                           trailing: Container(
                             width: MediaQuery.of(context).size.width * 0.4,
@@ -325,7 +340,11 @@ class _AdminHomeState extends State<AdminHome> {
                                 Visibility(
                                     visible: (e.user_id !=
                                             state.userModel!.user_id) &&
-                                        state.unreadList.length != 0,
+                                        state.unreadList.length != 0 &&
+                                        unreadValue(
+                                                unreadList: state.unreadList,
+                                                usMod: e) !=
+                                            '0',
                                     child: Stack(
                                       // overflow: Overflow.visible,
                                       clipBehavior: Clip.none,

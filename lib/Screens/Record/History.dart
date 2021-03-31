@@ -196,7 +196,7 @@ class _HistoryState extends State<History> {
                                     time:
                                         '${timeOfDay.hour == 0 ? '12' : timeOfDay.hour > 12 ? timeOfDay.hour - 12 : timeOfDay.hour}:${timeOfDay.minute < 10 ? '0${timeOfDay.minute}' : timeOfDay.minute} ${timeOfDay.hour > 11 ? 'PM' : 'AM'}',
                                     unit: widget.record == 'Blood Glucose'
-                                        ? 'mg/dl'
+                                        ? 'mmol/L'
                                         : 'mm/hg',
                                     values: [
                                       bloodglucoseModel.pre_meal.toString(),
@@ -297,7 +297,7 @@ class _HistoryState extends State<History> {
                                         time:
                                             '${timeOfDay.hour == 0 ? '12' : timeOfDay.hour > 12 ? timeOfDay.hour - 12 : timeOfDay.hour}:${timeOfDay.minute < 10 ? '0${timeOfDay.minute}' : timeOfDay.minute} ${timeOfDay.hour > 11 ? 'PM' : 'AM'}',
                                         unit: widget.record == 'Blood Glucose'
-                                            ? 'mg/dl'
+                                            ? 'mmol/L'
                                             : 'mm/hg',
                                         values: [
                                           bloodpressureModel.systolic
@@ -405,7 +405,7 @@ class _HistoryState extends State<History> {
                                                 '${timeOfDay.hour == 0 ? '12' : timeOfDay.hour > 12 ? timeOfDay.hour - 12 : timeOfDay.hour}:${timeOfDay.minute < 10 ? '0${timeOfDay.minute}' : timeOfDay.minute} ${timeOfDay.hour > 11 ? 'PM' : 'AM'}',
                                             unit:
                                                 widget.record == 'Blood Glucose'
-                                                    ? 'mg/dl'
+                                                    ? 'mmol/L'
                                                     : widget.record ==
                                                             'Blood Pressure'
                                                         ? 'mm/hg'

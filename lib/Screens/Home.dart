@@ -6,6 +6,8 @@ import 'package:flutter_redux/flutter_redux.dart';
 import 'package:persistent_bottom_nav_bar/persistent-tab-view.dart';
 import 'package:redux/redux.dart';
 import 'package:selfcare/CustomisedWidgets/Background.dart';
+import 'package:selfcare/CustomisedWidgets/DarkBlueText.dart';
+import 'package:selfcare/CustomisedWidgets/DarkGreenText.dart';
 import 'package:selfcare/CustomisedWidgets/DarkRedText.dart';
 import 'package:selfcare/CustomisedWidgets/RecentCard.dart';
 import 'package:selfcare/CustomisedWidgets/RecordCard.dart';
@@ -38,7 +40,7 @@ class _HomeState extends State<Home> {
   @override
   void initState() {
     super.initState();
-    log('home ran');
+    // log('home ran');
     getIt.get<Store<AppState>>().dispatch(TipsAction());
   }
 
@@ -49,6 +51,13 @@ class _HomeState extends State<Home> {
         List<BloodGlucoseModel> glucoseSort = [];
         List<BloodPressureModel> pressureSort = [];
         List<BodyWeightModel> weightSort = [];
+        String date = '';
+        if (state.tips.length > 0) {
+          DateTime dateTime =
+              DateTime.fromMillisecondsSinceEpoch(state.tips[0].created_at);
+          date =
+              '${dateTime.day} ${monthSelectedString(dateTime.month - 1)} ${dateTime.year} at ${dateTime.hour == 0 ? '12' : dateTime.hour > 12 ? dateTime.hour - 12 : dateTime.hour}:${dateTime.minute < 10 ? '0${dateTime.minute}' : dateTime.minute}:${dateTime.second < 10 ? '0${dateTime.second}' : dateTime.second} ${dateTime.hour > 11 ? 'PM' : 'AM'}';
+        }
         if (state.bloodglucose!.length > 0) {
           state.bloodglucose!.forEach((element) {
             MainGlucoseModelwithID mainGlucoseModelwithID =
@@ -165,7 +174,7 @@ class _HomeState extends State<Home> {
                                               2)
                                           .toStringAsFixed(1)
                                       : '',
-                                  unit: 'mg/dl',
+                                  unit: 'mmol/L',
                                   background: defaultColors.darkRed,
                                   poster: Image.asset('lib/Assets/sugar.png'),
                                 )),
@@ -198,8 +207,131 @@ class _HomeState extends State<Home> {
                           ],
                         ),
                   Container(
+                      margin: EdgeInsets.only(top: 15, bottom: 10),
+                      child: DarkRedText(
+                        size: 13,
+                        text: 'Tip for the Day',
+                      )),
+                  state.tips.length == 0
+                      ? RedText(
+                          text: 'No tips available',
+                        )
+                      : Hero(
+                          tag: state.tips[0].tip_id,
+                          child: Container(
+                            padding: EdgeInsets.symmetric(
+                                horizontal: 15, vertical: 10),
+                            margin:
+                                EdgeInsets.only(top: 5, left: 15, right: 15),
+                            decoration: BoxDecoration(
+                                color: defaultColors.darkblue,
+                                borderRadius: BorderRadius.circular(10),
+                                boxShadow: [
+                                  BoxShadow(
+                                      color: defaultColors.shadowColorGrey,
+                                      offset: Offset(0, 5),
+                                      blurRadius: 10)
+                                ]),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    WhiteText(text: state.tips[0].title),
+                                  ],
+                                ),
+                                SizedBox(
+                                  height: 10,
+                                ),
+                                WhiteText(
+                                    size: 10,
+                                    weight: FontWeight.normal,
+                                    text: state.tips[0].description.length > 150
+                                        ? state.tips[0].description
+                                                .substring(0, 150) +
+                                            '${state.tips[0].description.length > 150 ? '...' : ''}'
+                                        : state.tips[0].description),
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    DarkGreenText(
+                                      text: date,
+                                      size: 10,
+                                    ),
+                                    TextButton(
+                                      child: Row(
+                                        children: [
+                                          WhiteText(
+                                            text: 'Read More',
+                                            size: 10,
+                                          ),
+                                          Container(
+                                            margin: EdgeInsets.only(left: 5),
+                                            padding: EdgeInsets.symmetric(
+                                                horizontal: 5, vertical: 5),
+                                            decoration: BoxDecoration(
+                                                color: defaultColors.white,
+                                                borderRadius:
+                                                    BorderRadius.circular(20),
+                                                boxShadow: [
+                                                  BoxShadow(
+                                                      offset: Offset(0, 5),
+                                                      blurRadius: 10,
+                                                      color: defaultColors
+                                                          .shadowColorGrey)
+                                                ]),
+                                            child: Icon(
+                                              Icons.arrow_forward,
+                                              size: 20,
+                                            ),
+                                          )
+                                        ],
+                                      ),
+                                      onPressed: () {
+                                        Navigator.of(context).push(
+                                            MaterialPageRoute<void>(builder:
+                                                (BuildContext context) {
+                                          return Scaffold(
+                                            appBar: AppBar(
+                                              backgroundColor:
+                                                  defaultColors.darkblue,
+                                              title: Text(state.tips[0].title),
+                                              leading: IconButton(
+                                                onPressed: () {
+                                                  Navigator.pop(context);
+                                                },
+                                                icon: Icon(Icons.close),
+                                              ),
+                                            ),
+                                            body: Hero(
+                                                tag: state.tips[0].tip_id,
+                                                child: Container(
+                                                    // The blue background emphasizes that it's a new route.
+                                                    color: Colors.white,
+                                                    padding:
+                                                        const EdgeInsets.all(
+                                                            16.0),
+                                                    alignment:
+                                                        Alignment.topLeft,
+                                                    child: DarkBlueText(
+                                                      text: state
+                                                          .tips[0].description,
+                                                    ))),
+                                          );
+                                        }));
+                                      },
+                                    )
+                                  ],
+                                )
+                              ],
+                            ),
+                          )),
+                  Container(
                       margin: EdgeInsets.only(
-                          top: MediaQuery.of(context).size.height * 0.12,
+                          top: MediaQuery.of(context).size.height * 0.05,
                           bottom: 10),
                       child: DarkRedText(
                         size: 13,

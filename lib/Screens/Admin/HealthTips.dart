@@ -168,8 +168,10 @@ class _HealthTipsState extends State<HealthTips> {
                                 WhiteText(
                                     size: 10,
                                     weight: FontWeight.normal,
-                                    text: e.description.substring(0, 150) +
-                                        '${e.description.length > 150 ? '...' : ''}'),
+                                    text: e.description.length > 150
+                                        ? e.description.substring(0, 150) +
+                                            '${e.description.length > 150 ? '...' : ''}'
+                                        : e.description),
                                 Row(
                                   mainAxisAlignment:
                                       MainAxisAlignment.spaceBetween,

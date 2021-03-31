@@ -146,10 +146,8 @@ class _RecordsDialogState extends State<RecordsDialog> {
                             Visibility(
                                 visible: state.glucoseRecords.length == 0,
                                 child: RedText(
-                                  text:
-                                      'No records yet',
+                                  text: 'No records yet',
                                 )),
-
                             ...state.glucoseRecords.map((e) {
                               DateTime dateTime =
                                   DateTime.fromMillisecondsSinceEpoch(
@@ -208,25 +206,20 @@ class _RecordsDialogState extends State<RecordsDialog> {
                                                 !bloodglucoseModel.is_deleted,
                                             child: HistoryCard1(
                                               showDelete: false,
-                                              // delete: () {
-                                              //   _singleDelete(
-                                              //     e: e,
-                                              //     modelwithID: initMainGlucoseModelwithID,
-                                              //   );
-                                              //   // log(initMainGlucoseModelwithID.id.toString());
-                                              // },
                                               key: Key(bloodglucoseModel
                                                   .created_at
                                                   .toString()),
                                               showAvatars:
                                                   page == 0 ? true : false,
-                                              title: page == 0
-                                                  ? ['Pre\nMeal', 'Post\nMeal']
-                                                  : ['Systolic', 'Diastolic'],
+                                              title: [
+                                                'Pre\nMeal',
+                                                'Post\nMeal'
+                                              ],
                                               time:
                                                   '${timeOfDay.hour == 0 ? '12' : timeOfDay.hour > 12 ? timeOfDay.hour - 12 : timeOfDay.hour}:${timeOfDay.minute < 10 ? '0${timeOfDay.minute}' : timeOfDay.minute} ${timeOfDay.hour > 11 ? 'PM' : 'AM'}',
-                                              unit:
-                                                  page == 1 ? 'mg/dl' : 'mm/hg',
+                                              unit: page == 1
+                                                  ? 'mmol/L'
+                                                  : 'mmol/L',
                                               values: [
                                                 bloodglucoseModel.pre_meal
                                                     .toString(),
@@ -246,11 +239,9 @@ class _RecordsDialogState extends State<RecordsDialog> {
                               top: 10, left: 15, right: 15, bottom: 100),
                           children: [
                             Visibility(
-                                visible:
-                                    state.pressureRecords.length == 0,
+                                visible: state.pressureRecords.length == 0,
                                 child: RedText(
-                                  text:
-                                      'No records yet',
+                                  text: 'No records yet',
                                 )),
                             ...state.pressureRecords.map((e) {
                               DateTime dateTime =
@@ -322,13 +313,10 @@ class _RecordsDialogState extends State<RecordsDialog> {
                                                   .toString()),
                                               showAvatars:
                                                   page == 1 ? true : false,
-                                              title: page == 1
-                                                  ? ['Pre\nMeal', 'Post\nMeal']
-                                                  : ['Systolic', 'Diastolic'],
+                                              title: ['Systolic', 'Diastolic'],
                                               time:
                                                   '${timeOfDay.hour == 0 ? '12' : timeOfDay.hour > 12 ? timeOfDay.hour - 12 : timeOfDay.hour}:${timeOfDay.minute < 10 ? '0${timeOfDay.minute}' : timeOfDay.minute} ${timeOfDay.hour > 11 ? 'PM' : 'AM'}',
-                                              unit:
-                                                  page == 1 ? 'mg/dl' : 'mm/hg',
+                                              unit: 'mm/hg',
                                               values: [
                                                 bloodpressureModel.systolic
                                                     .toString(),
@@ -349,8 +337,7 @@ class _RecordsDialogState extends State<RecordsDialog> {
                             Visibility(
                                 visible: state.weightRecords.length == 0,
                                 child: RedText(
-                                  text:
-                                      'No records yet',
+                                  text: 'No records yet',
                                 )),
                             ...state.weightRecords.map((e) {
                               DateTime dateTime =
@@ -423,11 +410,7 @@ class _RecordsDialogState extends State<RecordsDialog> {
                                                   : ['Systolic', 'Diastolic'],
                                               time:
                                                   '${timeOfDay.hour == 0 ? '12' : timeOfDay.hour > 12 ? timeOfDay.hour - 12 : timeOfDay.hour}:${timeOfDay.minute < 10 ? '0${timeOfDay.minute}' : timeOfDay.minute} ${timeOfDay.hour > 11 ? 'PM' : 'AM'}',
-                                              unit: page == 2
-                                                  ? 'mg/dl'
-                                                  : page == 2
-                                                      ? 'mm/hg'
-                                                      : 'kg',
+                                              unit: 'kg',
                                               values: [
                                                 bodyWeighteModel.weight
                                                     .toString(),

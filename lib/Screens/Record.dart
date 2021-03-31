@@ -461,7 +461,7 @@ class _RecordState extends State<Record> {
                                             bloodPressureModel:
                                                 state.selectTimeValuesPressure),
                                         unit: widget.title == 'Blood Glucose'
-                                            ? "mg/dl"
+                                            ? "mmol/L"
                                             : 'mm/hg',
                                         background:
                                             widget.title == 'Blood Glucose'
@@ -485,7 +485,7 @@ class _RecordState extends State<Record> {
                                             bloodGlucoseModel:
                                                 state.selectTimeValues!),
                                         unit: widget.title == 'Blood Glucose'
-                                            ? "mg/dl"
+                                            ? "mmol/L"
                                             : 'mm/hg',
                                         background:
                                             widget.title == 'Blood Glucose'
@@ -533,7 +533,7 @@ class _RecordState extends State<Record> {
                                               child: WhiteText(
                                                 text: widget.title ==
                                                         'Blood Glucose'
-                                                    ? "mg/dl"
+                                                    ? "mmol/L"
                                                     : widget.title ==
                                                             'Bood Pressure'
                                                         ? 'mm/hg'
