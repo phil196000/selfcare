@@ -31,7 +31,7 @@ class _AllStatisticsState extends State<AllStatistics> {
   bool choicePressure = true;
   bool choiceWeight = true;
   bool showFilterChips = true;
-  bool statChoice = false;
+  bool statChoice = true;
   String singleChoice = 'Glucose';
   List<Widget> selectedPoint = [];
 
@@ -152,9 +152,8 @@ class _AllStatisticsState extends State<AllStatistics> {
                     timeCurrent: DateTime.fromMillisecondsSinceEpoch(
                         bloodGlucoseModel.created_at),
                     value: ((bloodGlucoseModel.post_meal +
-                                bloodGlucoseModel.post_meal) /
-                            2)
-                        ));
+                            bloodGlucoseModel.post_meal) /
+                        2)));
               }
             } else {
               if (singleChoice == 'Glucose') {
@@ -183,9 +182,8 @@ class _AllStatisticsState extends State<AllStatistics> {
                     timeCurrent: DateTime.fromMillisecondsSinceEpoch(
                         bloodGlucoseModel.created_at),
                     value: ((bloodGlucoseModel.post_meal +
-                                bloodGlucoseModel.post_meal) /
-                            2)
-                        ));
+                            bloodGlucoseModel.post_meal) /
+                        2)));
               }
             } else {
               if (singleChoice == 'Glucose') {
@@ -207,9 +205,8 @@ class _AllStatisticsState extends State<AllStatistics> {
                   timeCurrent: DateTime.fromMillisecondsSinceEpoch(
                       bloodGlucoseModel.created_at),
                   value: ((bloodGlucoseModel.post_meal +
-                              bloodGlucoseModel.post_meal) /
-                          2)
-                      ));
+                          bloodGlucoseModel.post_meal) /
+                      2)));
             }
           } else {
             if (singleChoice == 'Glucose') {
@@ -251,9 +248,8 @@ class _AllStatisticsState extends State<AllStatistics> {
                     timeCurrent: DateTime.fromMillisecondsSinceEpoch(
                         bloodPressureModel.created_at),
                     value: ((bloodPressureModel.systolic +
-                                bloodPressureModel.diastolic) /
-                            2)
-                        ));
+                            bloodPressureModel.diastolic) /
+                        2)));
               }
             } else {
               if (singleChoice == 'Pressure') {
@@ -283,9 +279,8 @@ class _AllStatisticsState extends State<AllStatistics> {
                     timeCurrent: DateTime.fromMillisecondsSinceEpoch(
                         bloodPressureModel.created_at),
                     value: ((bloodPressureModel.systolic +
-                                bloodPressureModel.diastolic) /
-                            2)
-                        ));
+                            bloodPressureModel.diastolic) /
+                        2)));
               }
             } else {
               if (singleChoice == 'Pressure') {
@@ -307,9 +302,8 @@ class _AllStatisticsState extends State<AllStatistics> {
                   timeCurrent: DateTime.fromMillisecondsSinceEpoch(
                       bloodPressureModel.created_at),
                   value: ((bloodPressureModel.systolic +
-                              bloodPressureModel.diastolic) /
-                          2)
-                      ));
+                          bloodPressureModel.diastolic) /
+                      2)));
             }
           } else {
             if (singleChoice == 'Pressure') {
@@ -425,10 +419,9 @@ class _AllStatisticsState extends State<AllStatistics> {
                             color: defaultColors.darkRed,
                             boxShadow: [
                               BoxShadow(
-                                color: defaultColors.shadowColorRed,
-                                offset: Offset(0, 5),
-                                blurRadius: 10
-                              )
+                                  color: defaultColors.shadowColorRed,
+                                  offset: Offset(0, 5),
+                                  blurRadius: 10)
                             ],
                             borderRadius: BorderRadius.circular(5)),
                         child: Column(
@@ -551,8 +544,8 @@ class _AllStatisticsState extends State<AllStatistics> {
                               spacing: 5,
                               children: [
                                 ChoiceChip(
-                                  backgroundColor: Colors.transparent,
-                                  selectedColor: defaultColors.lightdarkRed,
+                                  backgroundColor: defaultColors.lightdarkRed,
+                                  selectedColor: defaultColors.white,
                                   shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(25),
                                       side: BorderSide(
@@ -569,8 +562,8 @@ class _AllStatisticsState extends State<AllStatistics> {
                                   padding: EdgeInsets.symmetric(horizontal: 5),
                                 ),
                                 ChoiceChip(
-                                  backgroundColor: Colors.transparent,
-                                  selectedColor: defaultColors.lightdarkRed,
+                                  backgroundColor: defaultColors.lightdarkRed,
+                                  selectedColor: defaultColors.white,
                                   shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(25),
                                       side: BorderSide(
@@ -607,8 +600,8 @@ class _AllStatisticsState extends State<AllStatistics> {
                               spacing: 5,
                               children: [
                                 ChoiceChip(
-                                  backgroundColor: Colors.transparent,
-                                  selectedColor: defaultColors.lightdarkRed,
+                                  backgroundColor: defaultColors.lightdarkRed,
+                                  selectedColor: defaultColors.white,
                                   shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(25),
                                       side: BorderSide(
@@ -625,8 +618,8 @@ class _AllStatisticsState extends State<AllStatistics> {
                                   padding: EdgeInsets.symmetric(horizontal: 5),
                                 ),
                                 ChoiceChip(
-                                  backgroundColor: Colors.transparent,
-                                  selectedColor: defaultColors.lightdarkRed,
+                                  backgroundColor: defaultColors.lightdarkRed,
+                                  selectedColor: defaultColors.white,
                                   shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(25),
                                       side: BorderSide(
@@ -643,8 +636,8 @@ class _AllStatisticsState extends State<AllStatistics> {
                                   padding: EdgeInsets.symmetric(horizontal: 5),
                                 ),
                                 ChoiceChip(
-                                  backgroundColor: Colors.transparent,
-                                  selectedColor: defaultColors.lightdarkRed,
+                                  backgroundColor: defaultColors.lightdarkRed,
+                                  selectedColor: defaultColors.white,
                                   shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(25),
                                       side: BorderSide(
@@ -669,8 +662,8 @@ class _AllStatisticsState extends State<AllStatistics> {
                               spacing: 5,
                               children: [
                                 FilterChip(
-                                  backgroundColor: Colors.transparent,
-                                  selectedColor: defaultColors.lightdarkRed,
+                                  backgroundColor: defaultColors.lightdarkRed,
+                                  selectedColor: defaultColors.white,
                                   shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(25),
                                       side: BorderSide(
@@ -687,8 +680,8 @@ class _AllStatisticsState extends State<AllStatistics> {
                                   padding: EdgeInsets.symmetric(horizontal: 5),
                                 ),
                                 FilterChip(
-                                  backgroundColor: Colors.transparent,
-                                  selectedColor: defaultColors.lightdarkRed,
+                                  backgroundColor: defaultColors.lightdarkRed,
+                                  selectedColor: defaultColors.white,
                                   shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(25),
                                       side: BorderSide(
@@ -705,8 +698,8 @@ class _AllStatisticsState extends State<AllStatistics> {
                                   padding: EdgeInsets.symmetric(horizontal: 5),
                                 ),
                                 FilterChip(
-                                  backgroundColor: Colors.transparent,
-                                  selectedColor: defaultColors.lightdarkRed,
+                                  backgroundColor: defaultColors.lightdarkRed,
+                                  selectedColor: defaultColors.white,
                                   shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(25),
                                       side: BorderSide(

@@ -168,11 +168,12 @@ class _HomeState extends State<Home> {
                             Visibility(
                                 visible: glucoseSort.length > 0,
                                 child: RecentCard(
+                                  showGlucose: true,
+                                  title1: 'Pre\nMeal:',
+                                  title2: 'Post\nMeal:',
+                                  value2: glucoseSort[0].post_meal.toString(),
                                   value: glucoseSort.length > 0
-                                      ? ((glucoseSort[0].pre_meal +
-                                                  glucoseSort[0].post_meal) /
-                                              2)
-                                          .toStringAsFixed(1)
+                                      ? '${glucoseSort[0].pre_meal}'
                                       : '',
                                   unit: 'mmol/L',
                                   background: defaultColors.darkRed,
@@ -182,10 +183,9 @@ class _HomeState extends State<Home> {
                               visible: pressureSort.length > 0,
                               child: RecentCard(
                                   value: pressureSort.length > 0
-                                      ? ((pressureSort[0].systolic +
-                                                  pressureSort[0].diastolic) /
-                                              2)
-                                          .toStringAsFixed(1)
+                                      ? pressureSort[0].systolic.toString() +
+                                          '\n/' +
+                                          pressureSort[0].diastolic.toString()
                                       : '',
                                   unit: 'mm/hg',
                                   background: defaultColors.black,

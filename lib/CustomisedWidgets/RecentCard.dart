@@ -9,12 +9,21 @@ class RecentCard extends StatelessWidget {
   final String unit;
   final Color background;
   final Image? poster;
+  final String title1;
+  final String title2;
+  final String value2;
+  final bool showGlucose;
 
   RecentCard(
       {Key? key,
+      this.showGlucose = false,
+      this.title2 = '',
+      this.value2 = '',
+      this.title1 = '',
       required this.value,
       required this.unit,
-      this.background = Colors.red, this.poster})
+      this.background = Colors.red,
+      this.poster})
       : super(key: key);
 
   @override
@@ -29,10 +38,42 @@ class RecentCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [
           Container(
-            child: WhiteText(
-              text: this.value,
-              size: 30,
-            ),
+            child: showGlucose
+                ? Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          WhiteText(
+                            text: this.title1,
+                            size: 10,
+                          ),
+                          WhiteText(
+                            text: this.value,
+                            size: 30,
+                          )
+                        ],
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          WhiteText(
+                            text: this.title2,
+                            size: 10,
+                          ),
+                          WhiteText(
+                            text: this.value2,
+                            size: 30,
+                          )
+                        ],
+                      )
+                    ],
+                  )
+                : WhiteText(
+                    text: this.value,
+                    size: 30,
+                  ),
             alignment: Alignment.centerRight,
             margin: EdgeInsets.only(bottom: 8),
           ),

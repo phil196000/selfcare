@@ -47,13 +47,13 @@ class _SplashState extends State<Splash> with TickerProviderStateMixin {
   void getUserData({required String email, required String password}) {
     CollectionReference users = FirebaseFirestore.instance.collection('users');
     // QuerySnapshot snapshot =
-    log(email, name: 'email');
+    // log(email, name: 'email');
     users
         .where('email', isEqualTo: email.toLowerCase().trim())
         // .where('password', isEqualTo: _password.text)
         .get()
         .then((QuerySnapshot snapshot) {
-      log('successful');
+      // log('successful');
       if (snapshot.size > 0) {
         snapshot.docs.forEach((DocumentSnapshot documentSnapshot) {
           UserModel userModel = UserModel.fromJson(documentSnapshot.data()!);
@@ -195,7 +195,7 @@ class _SplashState extends State<Splash> with TickerProviderStateMixin {
 
         // return 'success';
       } else {
-        log(_email, name: 'email');
+        // log(_email, name: 'email');
         Navigator.pushAndRemoveUntil(
             context,
             MaterialPageRoute(
@@ -240,8 +240,8 @@ class _SplashState extends State<Splash> with TickerProviderStateMixin {
       _prefs.then((SharedPreferences prefs) {
         var email = prefs.getString('email') ?? null;
         var password = prefs.getString('password') ?? null;
-        log(email.toString(), name: 'email');
-        log(password.toString(), name: 'password');
+        // log(email.toString(), name: 'email');
+        // log(password.toString(), name: 'password');
         if (email != null && password != null) {
           login(email, password);
           // Navigator.pushAndRemoveUntil(

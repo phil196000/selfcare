@@ -590,8 +590,8 @@ class _RecordState extends State<Record> {
                                 Row(
                                   children: [
                                     ChoiceChip(
-                                      backgroundColor: Colors.transparent,
-                                      selectedColor: defaultColors.lightdarkRed,
+                                      backgroundColor: defaultColors.lightdarkRed,
+                                      selectedColor: defaultColors.white,
                                       shape: RoundedRectangleBorder(
                                           borderRadius:
                                               BorderRadius.circular(25),
@@ -621,8 +621,8 @@ class _RecordState extends State<Record> {
                                               color: defaultColors.darkRed)),
                                       labelStyle: TextStyle(
                                           color: defaultColors.darkRed),
-                                      backgroundColor: defaultColors.white,
-                                      selectedColor: defaultColors.lightdarkRed,
+                                      backgroundColor: defaultColors.lightdarkRed,
+                                      selectedColor: defaultColors.white,
                                       onSelected: (bool selected) {
                                         this.setState(() {
                                           choice = !selected;

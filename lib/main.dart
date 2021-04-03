@@ -14,33 +14,27 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:selfcare/redux/AppState.dart';
 import 'package:selfcare/redux/middleware.dart';
 import 'package:selfcare/redux/reducers.dart';
-
+import 'package:firebase_messaging/firebase_messaging.dart';
 //Global ServiceLocator
 GetIt getIt = GetIt.instance;
-// The default value is 40 MB. The threshold must be set to at least 1 MB,
-// and can be set to Settings.CACHE_SIZE_UNLIMITED to disable garbage collection.
+const AndroidNotificationChannel channel = AndroidNotificationChannel(
+  'high_importance_channel', // id
+  'High Importance Notifications', // title
+  'This channel is used for important notifications.', // description
+  importance: Importance.max,
+);
 final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
 FlutterLocalNotificationsPlugin();
 /// Streams are created so that app can respond to notification-related events
 /// since the plugin is initialised in the `main` function
 // final BehaviorSubject<ReceivedNotification> didReceiveLocalNotificationSubject =
 // BehaviorSubject<ReceivedNotification>();
-// class ReceivedNotification {
-//   ReceivedNotification({
-//     required this.id,
-//     required this.title,
-//     required this.body,
-//     required this.payload,
-//   });
-//
-//   final int id;
-//   final String? title;
-//   final String? body;
-//   final String? payload;
-// }
+
 //
 // String? selectedNotificationPayload;
+
 void main() {
+  // FirebaseMessaging messaging = FirebaseMessaging.instance;
   final store = new Store(
     appStateReducer,
     middleware: [

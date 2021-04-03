@@ -27,9 +27,13 @@ dependencies:
   firebase_auth: ^1.0.1
   cloud_firestore: ^1.0.1
   firebase_messaging: ^9.1.0
+  #Notification
   flutter_local_notifications: ^5.0.0
   flutter_local_notifications_platform_interface: ^3.0.0
+  path_provider: ^2.0.0
+  rxdart: ^0.26.0-nullsafety.1
   timezone: ^0.7.0-nullsafety.0
+
   adobe_xd: ^1.0.0+1
   http: ^0.13.0
   lottie: ^1.0.1

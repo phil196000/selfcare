@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:persistent_bottom_nav_bar/persistent-tab-view.dart';
 import 'package:selfcare/CustomisedWidgets/Background.dart';
 import 'package:selfcare/CustomisedWidgets/DarkGreenText.dart';
 import 'package:selfcare/CustomisedWidgets/DarkRedText.dart';
@@ -7,6 +8,7 @@ import 'package:selfcare/CustomisedWidgets/RedText.dart';
 import 'package:selfcare/Data/SettingCardModels.dart';
 import 'package:selfcare/Navigation/BottomNav.dart';
 import 'package:selfcare/Screens/Login.dart';
+import 'package:selfcare/Screens/Settings/Reminder.dart';
 import 'package:selfcare/Screens/Settings/SettingCard.dart';
 import 'package:selfcare/Theme/DefaultColors.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -154,6 +156,8 @@ class _SettingsState extends State<Settings> {
                       onPressed: () {
                         if (settingCardModel.title == 'Sign Out') {
                           logout();
+                        } else if (settingCardModel.title == 'Reminder') {
+                          pushNewScreen(context, screen: Reminder());
                         }
                       },
                       title: settingCardModel.title,
