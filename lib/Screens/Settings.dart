@@ -1,6 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_redux/flutter_redux.dart';
 import 'package:persistent_bottom_nav_bar/persistent-tab-view.dart';
+import 'package:redux/redux.dart';
 import 'package:selfcare/CustomisedWidgets/Background.dart';
 import 'package:selfcare/CustomisedWidgets/DarkGreenText.dart';
 import 'package:selfcare/CustomisedWidgets/DarkRedText.dart';
@@ -8,9 +10,11 @@ import 'package:selfcare/CustomisedWidgets/RedText.dart';
 import 'package:selfcare/Data/SettingCardModels.dart';
 import 'package:selfcare/Navigation/BottomNav.dart';
 import 'package:selfcare/Screens/Login.dart';
+import 'package:selfcare/Screens/Settings/Account.dart';
 import 'package:selfcare/Screens/Settings/Reminder.dart';
 import 'package:selfcare/Screens/Settings/SettingCard.dart';
 import 'package:selfcare/Theme/DefaultColors.dart';
+import 'package:selfcare/redux/AppState.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class Settings extends StatefulWidget {
@@ -93,82 +97,93 @@ class _SettingsState extends State<Settings> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: SafeArea(
-          child: Stack(
-        children: [
-          Background(),
-          ListView(
-            padding: EdgeInsets.only(top: 15, right: 10, left: 10, bottom: 50),
+    return StoreConnector(
+      builder: (context, AppState state) {
+        return Scaffold(
+          body: SafeArea(
+              child: Stack(
             children: [
-              ...[
-                {
-                  'title': 'Account',
-                  'avatar': Icons.person,
-                  'color': defaultColors.primary
-                },
-                {
-                  'title': 'Reminder',
-                  'avatar': Icons.alarm,
-                  'color': defaultColors.darkRed
-                },
-                {
-                  'title': 'About',
-                  'avatar': Icons.history_edu,
-                  'color': defaultColors.black
-                },
-                {
-                  'title': 'Privacy Policy',
-                  'avatar': Icons.privacy_tip,
-                  'color': defaultColors.darkblue
-                },
-                {
-                  'title': 'Rate This App',
-                  'avatar': Icons.star_rate,
-                  'color': defaultColors.green
-                },
-                {
-                  'title': 'Check for Update',
-                  'avatar': Icons.system_update,
-                  'color': defaultColors.yellow
-                },
-                {
-                  'title': 'License',
-                  'avatar': Icons.file_copy,
-                  'color': defaultColors.cyan
-                },
-                {
-                  'title': 'Contact Us',
-                  'avatar': Icons.contact_phone_sharp,
-                  'color': defaultColors.grey
-                },
-                {
-                  'title': 'Sign Out',
-                  'avatar': Icons.logout,
-                  'color': Colors.deepPurple
-                },
-              ].map((e) {
-                SettingCardModel settingCardModel =
-                    SettingCardModel.fromJson(e);
-                return Container(
-                    margin: EdgeInsets.only(bottom: 18),
-                    child: SettingCard(
-                      onPressed: () {
-                        if (settingCardModel.title == 'Sign Out') {
-                          logout();
-                        } else if (settingCardModel.title == 'Reminder') {
-                          pushNewScreen(context, screen: Reminder());
-                        }
-                      },
-                      title: settingCardModel.title,
-                      avatar: settingCardModel.avatar,
-                      color: settingCardModel.color,
-                    ));
-              })
+              Background(),
+              ListView(
+                padding:
+                    EdgeInsets.only(top: 15, right: 10, left: 10, bottom: 50),
+                children: [
+                  ...[
+                    {
+                      'title': 'Account',
+                      'avatar': Icons.person,
+                      'color': defaultColors.primary
+                    },
+                    {
+                      'title': 'Reminder',
+                      'avatar': Icons.alarm,
+                      'color': defaultColors.darkRed
+                    },
+                    {
+                      'title': 'About',
+                      'avatar': Icons.history_edu,
+                      'color': defaultColors.black
+                    },
+                    {
+                      'title': 'Privacy Policy',
+                      'avatar': Icons.privacy_tip,
+                      'color': defaultColors.darkblue
+                    },
+                    {
+                      'title': 'Rate This App',
+                      'avatar': Icons.star_rate,
+                      'color': defaultColors.green
+                    },
+                    {
+                      'title': 'Check for Update',
+                      'avatar': Icons.system_update,
+                      'color': defaultColors.yellow
+                    },
+                    {
+                      'title': 'License',
+                      'avatar': Icons.file_copy,
+                      'color': defaultColors.cyan
+                    },
+                    {
+                      'title': 'Contact Us',
+                      'avatar': Icons.contact_phone_sharp,
+                      'color': defaultColors.grey
+                    },
+                    {
+                      'title': 'Sign Out',
+                      'avatar': Icons.logout,
+                      'color': Colors.deepPurple
+                    },
+                  ].map((e) {
+                    SettingCardModel settingCardModel =
+                        SettingCardModel.fromJson(e);
+                    return Container(
+                        margin: EdgeInsets.only(bottom: 18),
+                        child: SettingCard(
+                          onPressed: () {
+                            if (settingCardModel.title == 'Sign Out') {
+                              logout();
+                            } else if (settingCardModel.title == 'Reminder') {
+                              pushNewScreen(context, screen: Reminder());
+                            } else if (settingCardModel.title == 'Account') {
+                              pushNewScreen(context,
+                                  screen: Account(
+                                    userModel: state.userModel,
+                                  ));
+                            }
+                          },
+                          title: settingCardModel.title,
+                          avatar: settingCardModel.avatar,
+                          color: settingCardModel.color,
+                        ));
+                  })
+                ],
+              ),
             ],
-          ),
-        ],
-      )),
+          )),
+        );
+      },
+      converter: (Store<AppState> store) => store.state,
     );
   }
 }

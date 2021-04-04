@@ -76,10 +76,10 @@ class _AdminMainState extends State<AdminMain> {
             Icons.home,
             color: selected == 0 ? defaultColors.white : defaultColors.primary,
           ),
-          title: ("Home"),
-          activeColorAlternate: defaultColors.white,
-          activeColor: defaultColors.primary,
-          inactiveColor: defaultColors.primary,
+          title: "Home",
+          // activeColorAlternate: defaultColors.white,
+          // activeColor: defaultColors.primary,
+          // inactiveColor: defaultColors.primary,
           contentPadding: 0,
           textStyle: TextStyle(fontWeight: FontWeight.bold)),
       PersistentBottomNavBarItem(
@@ -87,10 +87,10 @@ class _AdminMainState extends State<AdminMain> {
             Icons.local_hospital,
             color: selected == 1 ? defaultColors.white : defaultColors.primary,
           ),
-          title: ("Health Tips"),
-          activeColorAlternate: defaultColors.white,
-          activeColor: defaultColors.primary,
-          inactiveColor: defaultColors.primary,
+          title: "Health Tips",
+          // activeColorAlternate: defaultColors.white,
+          // activeColor: defaultColors.primary,
+          // inactiveColor: defaultColors.primary,
           contentPadding: 0,
           textStyle: TextStyle(fontWeight: FontWeight.bold)),
     ];
@@ -176,7 +176,7 @@ class CustomNavBarWidget extends StatelessWidget {
               child: Container(
                 margin: EdgeInsets.only(left: 5),
                 child: Text(
-                  item.title,
+                  item.title!,
                   style: TextStyle(
                       color: defaultColors.white, fontWeight: FontWeight.bold),
                 ),

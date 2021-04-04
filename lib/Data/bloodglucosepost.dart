@@ -7,10 +7,10 @@ class BloodGlucoseModel {
   final bool is_deleted;
 
   BloodGlucoseModel(
-      {required this.pre_meal,
-      required this.post_meal,
+      { this.pre_meal=0.0,
+       this.post_meal = 0.0,
       this.is_deleted = false,
-      required this.created_at});
+       this.created_at=0});
 
   BloodGlucoseModel.fromJson(Map<String, dynamic> json)
       : pre_meal = double.parse(json['pre_meal'].toString()),

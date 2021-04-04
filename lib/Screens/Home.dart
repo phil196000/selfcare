@@ -1,7 +1,9 @@
 import 'dart:developer';
 
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:persistent_bottom_nav_bar/persistent-tab-view.dart';
 import 'package:redux/redux.dart';
@@ -37,10 +39,61 @@ List recentRecording = [
 class _HomeState extends State<Home> {
   DefaultColors defaultColors = DefaultColors();
 
+  void messageInteraction() async {
+    // Get any messages which caused the application to open from
+    // a terminated state.
+
+    FirebaseMessaging.instance.getInitialMessage().then((value) {
+      log('i ran', name: 'opened the app');
+      // log(value!.notification!.body!.toString(), name: 'opened the app');
+      // if (value!.data['type'] == 'chat') {
+      //   // Navigator.pushNamed(context, '/chat',
+      //   //     arguments: ChatArguments(initialMessage));
+      // }
+    });
+
+    // If the message also contains a data property with a "type" of "chat",
+    // navigate to a chat screen
+
+    // Also handle any interaction when the app is in the background via a
+    // Stream listener
+    FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
+      log(message.notification!.body!, name: 'App in background');
+      // if (message.data['type'] == 'chat') {
+      //   // Navigator.pushNamed(context, '/chat',
+      //   //     arguments: ChatArguments(message));
+      // }
+    });
+  }
+
   @override
   void initState() {
     super.initState();
     // log('home ran');
+    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+      log('i ran notification ');
+      RemoteNotification notification = message.notification!;
+      AndroidNotification android = message.notification!.android!;
+
+      // If `onMessage` is triggered with a notification, construct our own
+      // local notification to show to users using the created channel.
+      if (notification != null && android != null) {
+        flutterLocalNotificationsPlugin.show(
+            notification.hashCode,
+            notification.title,
+            notification.body,
+            NotificationDetails(
+              android: AndroidNotificationDetails(
+                channel.id,
+                channel.name,
+                channel.description,
+                icon: android.smallIcon,
+                // other properties...
+              ),
+            ));
+      }
+    });
+    messageInteraction();
     getIt.get<Store<AppState>>().dispatch(TipsAction());
   }
 

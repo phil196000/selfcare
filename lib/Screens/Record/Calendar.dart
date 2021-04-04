@@ -151,7 +151,7 @@ class Calendar extends StatelessWidget {
               }
               // Example: every 15th of month, we have a flight, we can place an icon in the container like that:
 
-              return null;
+              return Container();
             },
             weekFormat: false,
             // markedDatesMap: _markedDateMap,

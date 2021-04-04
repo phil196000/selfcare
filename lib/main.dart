@@ -1,9 +1,13 @@
-// @dart=2.9
+//@dart=2.9
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:get_it/get_it.dart';
 import 'package:redux/redux.dart';
+import 'package:rxdart/rxdart.dart';
 import 'package:selfcare/Data/BloodPressure.dart';
 import 'package:selfcare/Data/BodyWeight.dart';
 import 'package:selfcare/Data/Chats.dart';
@@ -15,6 +19,10 @@ import 'package:selfcare/redux/AppState.dart';
 import 'package:selfcare/redux/middleware.dart';
 import 'package:selfcare/redux/reducers.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:timezone/data/latest.dart' as tz;
+import 'package:timezone/timezone.dart' as tz;
+import 'Data/Notification.dart';
+
 //Global ServiceLocator
 GetIt getIt = GetIt.instance;
 const AndroidNotificationChannel channel = AndroidNotificationChannel(
@@ -24,16 +32,22 @@ const AndroidNotificationChannel channel = AndroidNotificationChannel(
   importance: Importance.max,
 );
 final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
-FlutterLocalNotificationsPlugin();
+    FlutterLocalNotificationsPlugin();
+
 /// Streams are created so that app can respond to notification-related events
 /// since the plugin is initialised in the `main` function
-// final BehaviorSubject<ReceivedNotification> didReceiveLocalNotificationSubject =
-// BehaviorSubject<ReceivedNotification>();
+/// Streams are created so that app can respond to notification-related events
+/// since the plugin is initialised in the `main` function
+final BehaviorSubject<ReceivedNotification> didReceiveLocalNotificationSubject =
+    BehaviorSubject<ReceivedNotification>();
 
-//
-// String? selectedNotificationPayload;
+final BehaviorSubject<String> selectNotificationSubject =
+    BehaviorSubject<String>();
 
-void main() {
+const MethodChannel platform = MethodChannel('high_importance_channel');
+String selectedNotificationPayload;
+
+Future<void> main() async {
   // FirebaseMessaging messaging = FirebaseMessaging.instance;
   final store = new Store(
     appStateReducer,
@@ -65,6 +79,36 @@ void main() {
   );
   getIt.registerSingleton<Store<AppState>>(store, signalsReady: true);
   WidgetsFlutterBinding.ensureInitialized();
+  // await _configureLocalTimeZone();
+  final NotificationAppLaunchDetails notificationAppLaunchDetails =
+      await flutterLocalNotificationsPlugin.getNotificationAppLaunchDetails();
+  // String initialRoute = HomePage.routeName;
+  if (notificationAppLaunchDetails?.didNotificationLaunchApp ?? false) {
+    // selectedNotificationPayload = notificationAppLaunchDetails!.payload;
+    // initialRoute = SecondPage.routeName;
+  }
+  const AndroidNotificationChannel channel = AndroidNotificationChannel(
+    'high_importance_channel', // id
+    'High Importance Notifications', // title
+    'This channel is used for important notifications.', // description
+    importance: Importance.max,
+  );
+  await flutterLocalNotificationsPlugin
+      .resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()
+      ?.createNotificationChannel(channel);
+  const AndroidInitializationSettings initializationSettingsAndroid =
+      AndroidInitializationSettings('@mipmap/launcher_icon');
+  final InitializationSettings initializationSettings = InitializationSettings(
+    android: initializationSettingsAndroid,
+  );
+  await flutterLocalNotificationsPlugin.initialize(initializationSettings,
+      onSelectNotification: (String payload) async {
+    if (payload != null) {
+      debugPrint('notification payload: $payload');
+    }
+    selectedNotificationPayload = payload;
+    selectNotificationSubject.add(payload);
+  });
   runApp(MyApp(
     store: store,
   ));
@@ -108,4 +152,12 @@ class MyApp extends StatelessWidget {
       store: store,
     );
   }
+}
+
+Future<void> _configureLocalTimeZone() async {
+  tz.initializeTimeZones();
+  final String timeZoneName =
+      await platform.invokeMethod<String>('getTimeZoneName');
+  log(timeZoneName);
+  tz.setLocalLocation(tz.getLocation(timeZoneName));
 }

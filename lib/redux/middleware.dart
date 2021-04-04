@@ -37,7 +37,7 @@ void fetchUser(Store<AppState> store, action, NextDispatcher next) {
         .where('email', isEqualTo: action.email)
         .get()
         .then((QuerySnapshot snapshot) {
-      log('successful');
+      // log('successful');
       if (snapshot.size > 0) {
         snapshot.docs.forEach((DocumentSnapshot documentSnapshot) {
           UserModel userModel = UserModel.fromJson(documentSnapshot.data()!);
@@ -48,7 +48,7 @@ void fetchUser(Store<AppState> store, action, NextDispatcher next) {
         });
       }
     });
-    log('user fetch done');
+    // log('user fetch done');
   } else if (action is GetUserEditAction) {
     store.dispatch(
         GetUserEditActionSuccess(userEditModel: action.userEditModel));
@@ -60,18 +60,18 @@ void fetchUser(Store<AppState> store, action, NextDispatcher next) {
             ? action.user_id
             : store.state.userModel!.user_id)
         .collection('bloodglucose');
-    log(action.user_id, name: 'user id');
+    // log(action.user_id, name: 'user id');
     // QuerySnapshot snapshot =
     List items = [];
     users
         .orderBy('date_for_timestamp_millis', descending: true)
         .get()
         .then((QuerySnapshot snapshot) {
-      log(snapshot.size.toString());
+      // log(snapshot.size.toString());
       log('successful glucose blood');
       if (snapshot.size > 0) {
         snapshot.docs.forEach((DocumentSnapshot documentSnapshot) {
-          log(documentSnapshot.id);
+          // log(documentSnapshot.id);
           items.add({
             'data': documentSnapshot.data(),
             'id': documentSnapshot.reference
@@ -91,9 +91,9 @@ void fetchUser(Store<AppState> store, action, NextDispatcher next) {
     // }
     // store.dispatch(SelectedDateAction(selected: store.state.selectedDate));
   } else if (action is SelectTimeValuesAction) {
-    log(action.screen, name: 'screen');
+    // log(action.screen, name: 'screen');
     if (action.screen == 'Blood Glucose') {
-      log('glucose section');
+      // log('glucose section');
       if (store.state.bloodglucose!.length > 0) {
         store.state.bloodglucose!.forEach((element) {
           MainGlucoseModelwithID initMainGlucoseModelwithID =
@@ -102,9 +102,9 @@ void fetchUser(Store<AppState> store, action, NextDispatcher next) {
               MainBloodGlucoseModel.fromJson(initMainGlucoseModelwithID.data);
           String initSelectedDate =
               '${store.state.selectedDate!.day}-${store.state.selectedDate!.month}-${store.state.selectedDate!.year}';
-          log(initSelectedDate);
+          // log(initSelectedDate);
           if (initMainBloodGlucoseModel.date_for == initSelectedDate) {
-            log('match');
+            // log('match');
             initMainBloodGlucoseModel.readings!.forEach((element) {
               BloodGlucoseModel bloodGlucoseModel =
                   BloodGlucoseModel.fromJson(element);
@@ -115,25 +115,25 @@ void fetchUser(Store<AppState> store, action, NextDispatcher next) {
               String timeofString =
                   '${timeOfDay.hour == 0 ? '12' : timeOfDay.hour > 12 ? timeOfDay.hour - 12 : timeOfDay.hour}:${timeOfDay.minute < 10 ? '0${timeOfDay.minute}' : timeOfDay.minute}:${dateTime.second < 10 ? '0${dateTime.second}' : dateTime.second} ${timeOfDay.hour > 11 ? 'PM' : 'AM'}';
               if (action.selected == timeofString) {
-                log('matches here too', name: 'SelectTimeValuesAction');
+                // log('matches here too', name: 'SelectTimeValuesAction');
                 store.dispatch(SelectTimeValuesActionSuccess(
                     selectedWeight: null,
                     selected: bloodGlucoseModel,
                     selectedPressure: null));
               }
-              log(action.selected!, name: timeofString);
+              // log(action.selected!, name: timeofString);
             });
-            log('found here');
+            // log('found here');
           } else {
             //   // selectedTimes = [];
-            log('nothing', name: 'finding date data');
+            // log('nothing', name: 'finding date data');
           }
         });
       } else {
-        log('else run');
+        // log('else run');
       }
     } else if (action.screen == 'Blood Pressure') {
-      log('pressure section');
+      // log('pressure section');
       if (store.state.bloodpressure!.length > 0) {
         store.state.bloodpressure!.forEach((element) {
           MainPressureModelwithID initMainPressureModelwithID =
@@ -142,9 +142,9 @@ void fetchUser(Store<AppState> store, action, NextDispatcher next) {
               MainBloodPressureModel.fromJson(initMainPressureModelwithID.data);
           String initSelectedDate =
               '${store.state.selectedDate!.day}-${store.state.selectedDate!.month}-${store.state.selectedDate!.year}';
-          log(initSelectedDate);
+          // log(initSelectedDate);
           if (initMainBloodPressureModel.date_for == initSelectedDate) {
-            log('match');
+            // log('match');
             initMainBloodPressureModel.readings!.forEach((element) {
               BloodPressureModel bloodPressureModel =
                   BloodPressureModel.fromJson(element);
@@ -154,27 +154,27 @@ void fetchUser(Store<AppState> store, action, NextDispatcher next) {
               // log(timeOfDay.hour.toString());
               String timeofString =
                   '${timeOfDay.hour == 0 ? '12' : timeOfDay.hour > 12 ? timeOfDay.hour - 12 : timeOfDay.hour}:${timeOfDay.minute < 10 ? '0${timeOfDay.minute}' : timeOfDay.minute}:${dateTime.second < 10 ? '0${dateTime.second}' : dateTime.second} ${timeOfDay.hour > 11 ? 'PM' : 'AM'}';
-              log(action.selected!, name: timeofString);
+              // log(action.selected!, name: timeofString);
 
               if (action.selected == timeofString) {
-                log('i ran when selected matched');
+                // log('i ran when selected matched');
                 store.dispatch(SelectTimeValuesActionSuccess(
                     selectedWeight: null,
                     selectedPressure: bloodPressureModel,
                     selected: null));
               }
             });
-            log('found here');
+            // log('found here');
           } else {
             //   // selectedTimes = [];
-            log('nothing', name: 'finding date data');
+            // log('nothing', name: 'finding date data');
           }
         });
       } else {
-        log('else run');
+        // log('else run');
       }
     } else {
-      log('body weight');
+      // log('body weight');
       if (store.state.bodyweight!.length > 0) {
         store.state.bodyweight!.forEach((element) {
           MainWeightModelwithID initMainWeightModelwithID =
@@ -183,9 +183,9 @@ void fetchUser(Store<AppState> store, action, NextDispatcher next) {
               MainBodyWeightModel.fromJson(initMainWeightModelwithID.data);
           String initSelectedDate =
               '${store.state.selectedDate!.day}-${store.state.selectedDate!.month}-${store.state.selectedDate!.year}';
-          log(initSelectedDate);
+          // log(initSelectedDate);
           if (initMainBodyWeightModel.date_for == initSelectedDate) {
-            log('match');
+            // log('match');
             initMainBodyWeightModel.readings!.forEach((element) {
               BodyWeightModel bodyWeightModel =
                   BodyWeightModel.fromJson(element);
@@ -195,24 +195,24 @@ void fetchUser(Store<AppState> store, action, NextDispatcher next) {
               // log(timeOfDay.hour.toString());
               String timeofString =
                   '${timeOfDay.hour == 0 ? '12' : timeOfDay.hour > 12 ? timeOfDay.hour - 12 : timeOfDay.hour}:${timeOfDay.minute < 10 ? '0${timeOfDay.minute}' : timeOfDay.minute}:${dateTime.second < 10 ? '0${dateTime.second}' : dateTime.second} ${timeOfDay.hour > 11 ? 'PM' : 'AM'}';
-              log(action.selected!, name: timeofString);
+              // log(action.selected!, name: timeofString);
 
               if (action.selected == timeofString) {
-                log('i ran when selected matched');
+                // log('i ran when selected matched');
                 store.dispatch(SelectTimeValuesActionSuccess(
                     selectedWeight: bodyWeightModel,
                     selectedPressure: null,
                     selected: null));
               }
             });
-            log('found here');
+            // log('found here');
           } else {
             //   // selectedTimes = [];
-            log('nothing', name: 'finding date data');
+            // log('nothing', name: 'finding date data');
           }
         });
       } else {
-        log('else run');
+        // log('else run');
       }
     }
   }
@@ -272,7 +272,7 @@ void fetchUserRecords(Store<AppState> store, action, NextDispatcher next) {
       });
       store.dispatch(GetWeightRecordsActionSuccess(weightRecords: initList));
     });
-    log('users fetch done');
+    // log('users fetch done');
   }
   next(action);
 }
@@ -287,7 +287,7 @@ void fetchChats(Store<AppState> store, action, NextDispatcher next) {
     snapshot.listen((element) {
       MainChatsModel chatsModel = MainChatsModel();
       element.docs.forEach((e) {
-        log('i ran');
+        // log('i ran');
         // UserModel userModel = UserModel.fromJson(e.data()!);
         // log(userModel.full_name, name: 'full name');
 
@@ -304,7 +304,7 @@ void fetchChats(Store<AppState> store, action, NextDispatcher next) {
     });
     // snapshot.single.then((value) => log(value.size.toString(),name: 'Streams'));
 
-    log('users fetch done');
+    // log('users fetch done');
   } else if (action is UnreadAction) {
     Query users = FirebaseFirestore.instance
         .collection('chats')
@@ -316,7 +316,7 @@ void fetchChats(Store<AppState> store, action, NextDispatcher next) {
       MainChatsModel chatsModel = MainChatsModel();
       List<UnreadModel> unreads = [];
       element.docs.forEach((e) {
-        log('i unread ran', name: element.size.toString());
+        // log('i unread ran', name: element.size.toString());
         // UserModel userModel = UserModel.fromJson(e.data()!);
         // log(userModel.full_name, name: 'full name');
 
@@ -326,7 +326,7 @@ void fetchChats(Store<AppState> store, action, NextDispatcher next) {
             rep_unread_count: chatsModel.rep_unread_count,
             user_ids: chatsModel.user_ids));
       });
-      log(unreads.length.toString(), name: 'unreads Length');
+      // log(unreads.length.toString(), name: 'unreads Length');
       store.dispatch(UnreadActionSuccess(unreads: unreads));
       // log('listener');
       // log(initialUsers.length.toString(), name: 'initial users');
@@ -354,7 +354,7 @@ void fetchTips(Store<AppState> store, action, NextDispatcher next) {
     });
     // snapshot.single.then((value) => log(value.size.toString(),name: 'Streams'));
 
-    log('users fetch done');
+    // log('users fetch done');
   }
   next(action);
 }
@@ -366,7 +366,7 @@ void fetchUsers(Store<AppState> store, action, NextDispatcher next) {
     snapshot.listen((element) {
       List<UserModel> initialUsers = [];
       element.docs.forEach((e) {
-        log('i ran');
+        // log('i ran');
         UserModel userModel = UserModel.fromJson(e.data()!);
         // log(userModel.full_name, name: 'full name');
 
@@ -374,11 +374,11 @@ void fetchUsers(Store<AppState> store, action, NextDispatcher next) {
       });
       store.dispatch(GetUsersActionSuccess(users: initialUsers));
       // log('listener');
-      log(initialUsers.length.toString(), name: 'initial users');
+      // log(initialUsers.length.toString(), name: 'initial users');
     });
     // snapshot.single.then((value) => log(value.size.toString(),name: 'Streams'));
 
-    log('users fetch done');
+    // log('users fetch done');
   }
   next(action);
 }
@@ -400,10 +400,10 @@ void fetchWeight(Store<AppState> store, action, NextDispatcher next) {
         .get()
         .then((QuerySnapshot snapshot) {
       // log(snapshot.size.toString());
-      log('successful pressure blood');
+      // log('successful pressure blood');
       if (snapshot.size > 0) {
         snapshot.docs.forEach((DocumentSnapshot documentSnapshot) {
-          log(documentSnapshot.id);
+          // log(documentSnapshot.id);
           items.add({
             'data': documentSnapshot.data(),
             'id': documentSnapshot.reference
@@ -444,11 +444,11 @@ void fetchPressure(Store<AppState> store, action, NextDispatcher next) {
         .get()
         .then((QuerySnapshot snapshot) {
       // log(snapshot.size.toString());
-      log('successful pressure blood');
+      // log('successful pressure blood');
       if (snapshot.size > 0) {
         MainBloodGlucoseModel mainBloodGlucoseModel;
         snapshot.docs.forEach((DocumentSnapshot documentSnapshot) {
-          log(documentSnapshot.id);
+          // log(documentSnapshot.id);
           items.add({
             'data': documentSnapshot.data(),
             'id': documentSnapshot.reference
@@ -490,7 +490,7 @@ void setDate(Store<AppState> store, action, NextDispatcher next) {
             BloodGlucoseModel forB = BloodGlucoseModel.fromJson(b);
             return forA.created_at - forB.created_at;
           });
-          log(initMainBloodGlucoseModel.readings!.length.toString());
+          // log(initMainBloodGlucoseModel.readings!.length.toString());
           initMainBloodGlucoseModel.readings!.forEach((element) {
             BloodGlucoseModel bloodGlucoseModel =
                 BloodGlucoseModel.fromJson(element);
@@ -519,7 +519,7 @@ void setDate(Store<AppState> store, action, NextDispatcher next) {
             BloodGlucoseModel forB = BloodGlucoseModel.fromJson(b);
             return forA.created_at - forB.created_at;
           });
-          log(initMainBloodPressureModel.readings!.length.toString());
+          // log(initMainBloodPressureModel.readings!.length.toString());
           initMainBloodPressureModel.readings!.forEach((element) {
             BloodPressureModel bloodPressureModel =
                 BloodPressureModel.fromJson(element);
@@ -547,7 +547,7 @@ void setDate(Store<AppState> store, action, NextDispatcher next) {
             BloodGlucoseModel forB = BloodGlucoseModel.fromJson(b);
             return forA.created_at - forB.created_at;
           });
-          log(initMainBodyWeightModel.readings!.length.toString());
+          // log(initMainBodyWeightModel.readings!.length.toString());
           initMainBodyWeightModel.readings!.forEach((element) {
             BodyWeightModel bodyWeightModel = BodyWeightModel.fromJson(element);
             DateTime dateTime =

@@ -3,7 +3,9 @@ import 'dart:developer';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:redux/redux.dart';
 import 'package:selfcare/CustomisedWidgets/Background.dart';
 import 'package:selfcare/CustomisedWidgets/RedText.dart';
@@ -99,7 +101,6 @@ class _SplashState extends State<Splash> with TickerProviderStateMixin {
                                       ),
                                       (route) => false);
                                 } else {
-
                                   Navigator.pushAndRemoveUntil(
                                       context,
                                       MaterialPageRoute(
@@ -236,6 +237,7 @@ class _SplashState extends State<Splash> with TickerProviderStateMixin {
   @override
   void initState() {
     super.initState();
+
     _controller.forward().then((value) {
       _prefs.then((SharedPreferences prefs) {
         var email = prefs.getString('email') ?? null;
