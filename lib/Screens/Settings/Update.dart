@@ -140,6 +140,7 @@ class _UpdateState extends State<Update> {
   void _requestDownload(_TaskInfo task) async {
     task.taskId = await FlutterDownloader.enqueue(
         url: task.link!,
+        fileName: updateInfo!.app_name,
         savedDir: _localPath,
         showNotification: true,
         openFileFromNotification: true);
