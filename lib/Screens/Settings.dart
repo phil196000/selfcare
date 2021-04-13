@@ -1,21 +1,30 @@
+import 'dart:developer';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:persistent_bottom_nav_bar/persistent-tab-view.dart';
+import 'package:rating_dialog/rating_dialog.dart';
 import 'package:redux/redux.dart';
 import 'package:selfcare/CustomisedWidgets/Background.dart';
 import 'package:selfcare/CustomisedWidgets/DarkGreenText.dart';
 import 'package:selfcare/CustomisedWidgets/DarkRedText.dart';
 import 'package:selfcare/CustomisedWidgets/RedText.dart';
+import 'package:selfcare/CustomisedWidgets/WhiteText.dart';
 import 'package:selfcare/Data/SettingCardModels.dart';
 import 'package:selfcare/Navigation/BottomNav.dart';
 import 'package:selfcare/Screens/Login.dart';
 import 'package:selfcare/Screens/Settings/Account.dart';
+import 'package:selfcare/Screens/Settings/Update.dart';
 import 'package:selfcare/Screens/Settings/Reminder.dart';
 import 'package:selfcare/Screens/Settings/SettingCard.dart';
 import 'package:selfcare/Theme/DefaultColors.dart';
+import 'package:selfcare/redux/Actions/GetUserAction.dart';
 import 'package:selfcare/redux/AppState.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+import '../main.dart';
 
 class Settings extends StatefulWidget {
   final Function hidenavbar;
@@ -166,10 +175,109 @@ class _SettingsState extends State<Settings> {
                             } else if (settingCardModel.title == 'Reminder') {
                               pushNewScreen(context, screen: Reminder());
                             } else if (settingCardModel.title == 'Account') {
+                              getIt.get<Store<AppState>>().dispatch(
+                                  GetUserEditAction(
+                                      userEditModel: state.userModel));
                               pushNewScreen(context,
                                   screen: Account(
                                     userModel: state.userModel,
                                   ));
+                            } else if (settingCardModel.title ==
+                                'Rate This App') {
+                              // show the dialog
+                              showDialog(
+                                context: context,
+                                builder: (context) => RatingDialog(
+                                  // your app's name?
+                                  title: 'Rate this App',
+                                  // encourage your user to leave a high rating?
+                                  message:
+                                      'Tap a star to set your rating. Add more description here if you want.',
+                                  // your app's logo?
+                                  image: Image.asset('lib/Assets/logo.png'),
+                                  submitButton: 'Submit',
+                                  initialRating: 1,
+
+                                  onCancelled: () => print('cancelled'),
+                                  onSubmitted: (response) {
+                                    print(
+                                        'rating: ${response.rating}, comment: ${response.comment}');
+                                    if (response.rating > 0) {
+                                      // log(response.rating.toString());
+                                      DocumentReference docRef =
+                                          FirebaseFirestore.instance
+                                              .collection('ratings')
+                                              .doc();
+                                      docRef.set({
+                                        'rating': response.rating,
+                                        'created_at': DateTime.now()
+                                            .millisecondsSinceEpoch,
+                                        'comment': response.comment,
+                                        'id': docRef.id,
+                                        'user': {
+                                          'id': state.userModel!.user_id,
+                                          'phone_number':
+                                              state.userModel!.phone_number,
+                                          'full_name':
+                                              state.userModel!.full_name,
+                                          'email': state.userModel!.email
+                                        },
+                                      }).then((value) => null);
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(SnackBar(
+                                        // onVisible: () => Timer(
+                                        //     Duration(seconds: 2),
+                                        //         () => Navigator.of(context).pop()),
+                                        backgroundColor: DefaultColors().green,
+                                        content: Container(
+                                          // color: Colors.yellow,
+                                          child: WhiteText(
+                                            text:
+                                                'Rating submitted successfully',
+                                          ),
+                                        ),
+                                        duration: Duration(milliseconds: 4000),
+                                      ));
+                                      // Navigator.pop(context);
+                                    } else {
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(SnackBar(
+                                        // onVisible: () => Timer(
+                                        //     Duration(seconds: 2),
+                                        //         () => Navigator.of(context).pop()),
+                                        backgroundColor:
+                                            DefaultColors().primary,
+                                        content: Container(
+                                          // color: Colors.yellow,
+                                          child: WhiteText(
+                                            text:
+                                                'Tap a star and /or leave a comment to submit a rating',
+                                          ),
+                                        ),
+                                        duration: Duration(milliseconds: 2000),
+                                      ));
+                                    }
+                                    // // TODO: add your own logic
+                                    // if (response.rating < 3.0) {
+                                    //   // send their comments to your email or anywhere you wish
+                                    //   // ask the user to contact you instead of leaving a bad review
+                                    // } else {
+                                    //
+                                    // }
+                                  },
+                                ),
+                              );
+                            } else if (settingCardModel.title ==
+                                'Check for Update') {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute<void>(
+                                  builder: (BuildContext context) => Update(
+                                    platform: Theme.of(context).platform,
+                                  ),
+                                  fullscreenDialog: true,
+                                ),
+                              );
                             }
                           },
                           title: settingCardModel.title,

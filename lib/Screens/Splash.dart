@@ -46,6 +46,13 @@ class _SplashState extends State<Splash> with TickerProviderStateMixin {
   bool passwordError = false;
   Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
 
+//Register To topic
+  void registerToTipsTopic() async {
+    await FirebaseMessaging.instance.subscribeToTopic('tips');
+    await FirebaseMessaging.instance.subscribeToTopic('chats');
+    log('tips topic register');
+  }
+
   void getUserData({required String email, required String password}) {
     CollectionReference users = FirebaseFirestore.instance.collection('users');
     // QuerySnapshot snapshot =
@@ -80,6 +87,7 @@ class _SplashState extends State<Splash> with TickerProviderStateMixin {
             getIt.get<Store<AppState>>().dispatch(GetUserAction(email: email));
 
             if (userModel.roles.length > 1) {
+              registerToTipsTopic();
               showDialog(
                 context: context,
                 barrierDismissible: false,

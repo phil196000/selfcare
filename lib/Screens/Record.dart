@@ -511,7 +511,7 @@ class _RecordState extends State<Record> {
                                                     .height *
                                                 0.002)),
                                 Visibility(
-                                  visible: dropdownValue != null,
+                                  visible: false,
                                   child: Row(
                                     children: [
                                       Container(
@@ -535,7 +535,7 @@ class _RecordState extends State<Record> {
                                                         'Blood Glucose'
                                                     ? "mmol/L"
                                                     : widget.title ==
-                                                            'Bood Pressure'
+                                                            'Blood Pressure'
                                                         ? 'mm/hg'
                                                         : 'kg',
                                                 size: 12,
@@ -590,7 +590,8 @@ class _RecordState extends State<Record> {
                                 Row(
                                   children: [
                                     ChoiceChip(
-                                      backgroundColor: defaultColors.lightdarkRed,
+                                      backgroundColor:
+                                          defaultColors.lightdarkRed,
                                       selectedColor: defaultColors.white,
                                       shape: RoundedRectangleBorder(
                                           borderRadius:
@@ -621,7 +622,8 @@ class _RecordState extends State<Record> {
                                               color: defaultColors.darkRed)),
                                       labelStyle: TextStyle(
                                           color: defaultColors.darkRed),
-                                      backgroundColor: defaultColors.lightdarkRed,
+                                      backgroundColor:
+                                          defaultColors.lightdarkRed,
                                       selectedColor: defaultColors.white,
                                       onSelected: (bool selected) {
                                         this.setState(() {

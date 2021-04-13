@@ -278,6 +278,10 @@ class _ChatDialogState extends State<ChatDialog> {
                                               'from': state.userModel!.user_id,
                                             }
                                           ]),
+                                          'user_ids': FieldValue.arrayUnion([
+                                            widget.userModel!.user_id,
+                                            state.userModel!.user_id
+                                          ]),
                                           'user_unread_count':
                                               FieldValue.increment(1),
                                         }).then((value) {

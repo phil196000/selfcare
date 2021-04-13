@@ -2,9 +2,11 @@ import 'package:selfcare/Data/BloodPressure.dart';
 import 'package:selfcare/Data/BodyWeight.dart';
 import 'package:selfcare/Data/Chats.dart';
 import 'package:selfcare/Data/HealthTip.dart';
+import 'package:selfcare/Data/RatingsModel.dart';
 import 'package:selfcare/Data/RecordsModel.dart';
 import 'package:selfcare/Data/UserModel.dart';
 import 'package:selfcare/Data/bloodglucosepost.dart';
+import 'package:selfcare/Screens/Admin/Rating.dart';
 
 class AppState {
   final List<UserModel>? users;
@@ -28,8 +30,10 @@ class AppState {
   final List<MainBodyWeightModel> weightRecords;
   final MainChatsModel? chatsModel;
   final List<UnreadModel> unreadList;
+  final List<RatingsModel> ratings;
 
   AppState({
+    this.ratings = const <RatingsModel>[],
     this.tips = const <TipModel>[],
     this.unreadList = const <UnreadModel>[],
     this.chatsModel,

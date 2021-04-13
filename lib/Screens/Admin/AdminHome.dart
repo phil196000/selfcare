@@ -3,8 +3,10 @@ import 'dart:developer';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
 import 'package:selfcare/CustomisedWidgets/Background.dart';
@@ -26,6 +28,7 @@ import 'package:selfcare/redux/Actions/ChatActions.dart';
 import 'package:selfcare/redux/Actions/GetRecordsAction.dart';
 import 'package:selfcare/redux/Actions/GetUserAction.dart';
 import 'package:selfcare/redux/Actions/GetUsersAction.dart';
+import 'package:selfcare/redux/Actions/RatingsAction.dart';
 import 'package:selfcare/redux/Actions/TipsAction.dart';
 import 'package:selfcare/redux/AppState.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -47,6 +50,32 @@ class _AdminHomeState extends State<AdminHome> {
   String? dropdownValue;
 
   // UserModel? userModelEdit;
+  void messageInteraction() async {
+    // Get any messages which caused the application to open from
+    // a terminated state.
+
+    FirebaseMessaging.instance.getInitialMessage().then((value) {
+      log('i ran', name: 'opened the app');
+      // log(value!.notification!.body!.toString(), name: 'opened the app');
+      // if (value!.data['type'] == 'chat') {
+      //   // Navigator.pushNamed(context, '/chat',
+      //   //     arguments: ChatArguments(initialMessage));
+      // }
+    });
+
+    // If the message also contains a data property with a "type" of "chat",
+    // navigate to a chat screen
+
+    // Also handle any interaction when the app is in the background via a
+    // Stream listener
+    FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
+      log(message.notification!.body!, name: 'App in background');
+      // if (message.data['type'] == 'chat') {
+      //   // Navigator.pushNamed(context, '/chat',
+      //   //     arguments: ChatArguments(message));
+      // }
+    });
+  }
 
   @override
   void initState() {
@@ -54,6 +83,31 @@ class _AdminHomeState extends State<AdminHome> {
     getIt.get<Store<AppState>>().dispatch(GetUsersAction());
     getIt.get<Store<AppState>>().dispatch(UnreadAction());
     getIt.get<Store<AppState>>().dispatch(TipsAction());
+    getIt.get<Store<AppState>>().dispatch(RatingsAction());
+    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+      log('i ran notification ');
+      RemoteNotification notification = message.notification!;
+      AndroidNotification android = message.notification!.android!;
+
+      // If `onMessage` is triggered with a notification, construct our own
+      // local notification to show to users using the created channel.
+      if (notification != null && android != null) {
+        flutterLocalNotificationsPlugin.show(
+            notification.hashCode,
+            notification.title,
+            notification.body,
+            NotificationDetails(
+              android: AndroidNotificationDetails(
+                channel.id,
+                channel.name,
+                channel.description,
+                icon: android.smallIcon,
+                // other properties...
+              ),
+            ));
+      }
+    });
+    messageInteraction();
   }
 
   void openChatDialog(

@@ -7,6 +7,7 @@ import 'package:persistent_bottom_nav_bar/persistent-tab-view.dart';
 import 'package:redux/redux.dart';
 import 'package:selfcare/Screens/Admin/AdminHome.dart';
 import 'package:selfcare/Screens/Admin/HealthTips.dart';
+import 'package:selfcare/Screens/Admin/Rating.dart';
 import 'package:selfcare/Screens/Blog.dart';
 import 'package:selfcare/Screens/Chat.dart';
 import 'package:selfcare/Screens/Home.dart';
@@ -62,7 +63,8 @@ class _AdminMainState extends State<AdminMain> {
             _hideNavBar = val;
           });
         },
-      )
+      ),
+      Rating()
 
       // Search(),
       // Community(),
@@ -88,6 +90,17 @@ class _AdminMainState extends State<AdminMain> {
             color: selected == 1 ? defaultColors.white : defaultColors.primary,
           ),
           title: "Health Tips",
+          // activeColorAlternate: defaultColors.white,
+          // activeColor: defaultColors.primary,
+          // inactiveColor: defaultColors.primary,
+          contentPadding: 0,
+          textStyle: TextStyle(fontWeight: FontWeight.bold)),
+      PersistentBottomNavBarItem(
+          icon: Icon(
+            Icons.star,
+            color: selected == 2 ? defaultColors.white : defaultColors.primary,
+          ),
+          title: "Ratings",
           // activeColorAlternate: defaultColors.white,
           // activeColor: defaultColors.primary,
           // inactiveColor: defaultColors.primary,
@@ -119,7 +132,7 @@ class _AdminMainState extends State<AdminMain> {
               curve: Curves.ease,
               duration: Duration(milliseconds: 200),
             ),
-            itemCount: 2,
+            itemCount: 3,
             customWidget: CustomNavBarWidget(
               items: _navBarsItems(),
               selectedIndex: selected,

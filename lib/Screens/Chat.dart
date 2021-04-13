@@ -5,6 +5,7 @@ import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:persistent_bottom_nav_bar/persistent-tab-view.dart';
 import 'package:redux/redux.dart';
+import 'package:selfcare/CustomisedWidgets/Background.dart';
 import 'package:selfcare/CustomisedWidgets/ChatAsset.dart';
 import 'package:selfcare/CustomisedWidgets/DarkRedText.dart';
 import 'package:selfcare/CustomisedWidgets/RedText.dart';
@@ -57,32 +58,39 @@ class _ChatState extends State<Chat> {
         return Scaffold(
           body: KeyboardVisibilityBuilder(
             builder: (context, isKeyboardVisible) {
-              return Center(
-                child: Visibility(
-                    child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Container(
-                      child: ChatImageAsset(),
-                    ),
-                    DarkRedText(text: 'Chat with our representative'),
-                    TextButton(
-                      onPressed: () {
-                        pushNewScreen(context,
-                            screen: Chats(
-                              user_id: state.userModel!.user_id,
-                            ),
-                            withNavBar: false);
-                      },
-                      child: RedText(
-                        text: 'Move to chat',
-                      ),
-                      style: ButtonStyle(
-                          backgroundColor: MaterialStateProperty.resolveWith(
-                              (states) => DefaultColors().shadowColorRed)),
-                    )
-                  ],
-                )),
+              return Stack(
+                children: [
+                  Background(),
+                  Positioned.fill(
+                      child: Center(
+                    child: Visibility(
+                        child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Container(
+                          child: ChatImageAsset(),
+                        ),
+                        DarkRedText(text: 'Chat with our representative'),
+                        TextButton(
+                          onPressed: () {
+                            pushNewScreen(context,
+                                screen: Chats(
+                                  user_id: state.userModel!.user_id,
+                                ),
+                                withNavBar: false);
+                          },
+                          child: RedText(
+                            text: 'Move to chat',
+                          ),
+                          style: ButtonStyle(
+                              backgroundColor:
+                                  MaterialStateProperty.resolveWith((states) =>
+                                      DefaultColors().shadowColorRed)),
+                        )
+                      ],
+                    )),
+                  ))
+                ],
               );
             },
           ),

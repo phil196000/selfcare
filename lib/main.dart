@@ -1,8 +1,10 @@
 //@dart=2.9
 import 'dart:developer';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:get_it/get_it.dart';
@@ -59,9 +61,11 @@ Future<void> main() async {
       fetchUsers,
       fetchUserRecords,
       fetchChats,
-      fetchTips
+      fetchTips,
+      fetchRatings
     ],
     initialState: new AppState(
+
         unreadList: <UnreadModel>[],
         users: <UserModel>[],
         chatsModel: MainChatsModel(),
@@ -79,36 +83,44 @@ Future<void> main() async {
   );
   getIt.registerSingleton<Store<AppState>>(store, signalsReady: true);
   WidgetsFlutterBinding.ensureInitialized();
+  await FlutterDownloader.initialize(
+      debug: true // optional: set false to disable printing logs to console
+  );
   // await _configureLocalTimeZone();
-  final NotificationAppLaunchDetails notificationAppLaunchDetails =
-      await flutterLocalNotificationsPlugin.getNotificationAppLaunchDetails();
-  // String initialRoute = HomePage.routeName;
-  if (notificationAppLaunchDetails?.didNotificationLaunchApp ?? false) {
-    // selectedNotificationPayload = notificationAppLaunchDetails!.payload;
-    // initialRoute = SecondPage.routeName;
-  }
-  const AndroidNotificationChannel channel = AndroidNotificationChannel(
-    'high_importance_channel', // id
-    'High Importance Notifications', // title
-    'This channel is used for important notifications.', // description
-    importance: Importance.max,
-  );
-  await flutterLocalNotificationsPlugin
-      .resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()
-      ?.createNotificationChannel(channel);
-  const AndroidInitializationSettings initializationSettingsAndroid =
-      AndroidInitializationSettings('@mipmap/launcher_icon');
-  final InitializationSettings initializationSettings = InitializationSettings(
-    android: initializationSettingsAndroid,
-  );
-  await flutterLocalNotificationsPlugin.initialize(initializationSettings,
-      onSelectNotification: (String payload) async {
-    if (payload != null) {
-      debugPrint('notification payload: $payload');
+  if (Platform.isAndroid || Platform.isIOS) {
+    final NotificationAppLaunchDetails notificationAppLaunchDetails =
+        await flutterLocalNotificationsPlugin.getNotificationAppLaunchDetails();
+    // String initialRoute = HomePage.routeName;
+    if (notificationAppLaunchDetails?.didNotificationLaunchApp ?? false) {
+      // selectedNotificationPayload = notificationAppLaunchDetails!.payload;
+      // initialRoute = SecondPage.routeName;
     }
-    selectedNotificationPayload = payload;
-    selectNotificationSubject.add(payload);
-  });
+    const AndroidNotificationChannel channel = AndroidNotificationChannel(
+      'high_importance_channel', // id
+      'High Importance Notifications', // title
+      'This channel is used for important notifications.', // description
+      importance: Importance.max,
+    );
+    await flutterLocalNotificationsPlugin
+        .resolvePlatformSpecificImplementation<
+            AndroidFlutterLocalNotificationsPlugin>()
+        ?.createNotificationChannel(channel);
+    const AndroidInitializationSettings initializationSettingsAndroid =
+        AndroidInitializationSettings('@mipmap/launcher_icon');
+    final InitializationSettings initializationSettings =
+        InitializationSettings(
+      android: initializationSettingsAndroid,
+    );
+    await flutterLocalNotificationsPlugin.initialize(initializationSettings,
+        onSelectNotification: (String payload) async {
+      if (payload != null) {
+        debugPrint('notification payload: $payload');
+      }
+      selectedNotificationPayload = payload;
+      selectNotificationSubject.add(payload);
+    });
+  }
+
   runApp(MyApp(
     store: store,
   ));

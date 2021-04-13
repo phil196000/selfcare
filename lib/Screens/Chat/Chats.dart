@@ -25,7 +25,7 @@ class Chats extends StatefulWidget {
 class _ChatsState extends State<Chats> {
   TextEditingController textEditingController = TextEditingController();
   DefaultColors defaultColors = DefaultColors();
-   ScrollController scrollController = ScrollController();
+  ScrollController scrollController = ScrollController();
 
   @override
   void initState() {
@@ -52,9 +52,9 @@ class _ChatsState extends State<Chats> {
         .update({'online': true}).then((value) => log('done and online'));
     // scrollController = ScrollController();
     // scrollController.animateTo(offset, duration: duration, curve: curve)
-    if(scrollController.hasClients)
-    scrollController.animateTo(scrollController.position.maxScrollExtent,
-        curve: Curves.easeOut, duration: const Duration(milliseconds: 300));
+    if (scrollController.hasClients)
+      scrollController.animateTo(scrollController.position.maxScrollExtent,
+          curve: Curves.easeOut, duration: const Duration(milliseconds: 300));
   }
 
   @override
@@ -99,7 +99,7 @@ class _ChatsState extends State<Chats> {
               direction: Axis.vertical,
               children: [
                 Expanded(
-                    flex: 14,
+                    flex: 21,
                     child: ListView(
                       controller: scrollController,
                       children: [
@@ -200,7 +200,7 @@ class _ChatsState extends State<Chats> {
                           Expanded(
                             flex: 8,
                             child: Container(
-                              margin: EdgeInsets.only(top: 5),
+                              margin: EdgeInsets.only(top: 0),
                               child: TextField(
                                 onTap: () {
                                   scrollController.animateTo(
@@ -268,6 +268,8 @@ class _ChatsState extends State<Chats> {
                                           'from': state.userModel!.user_id,
                                         }
                                       ]),
+                                      'user_ids': FieldValue.arrayUnion(
+                                          [state.userModel!.user_id]),
                                       'rep_unread_count':
                                           FieldValue.increment(1),
                                     }).then((value) {

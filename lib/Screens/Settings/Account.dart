@@ -61,11 +61,11 @@ class _AccountState extends State<Account> {
 
   void updatePassword({required UserModel userModel}) async {
     DocumentReference users =
-    FirebaseFirestore.instance.collection('users').doc(userModel.user_id);
+        FirebaseFirestore.instance.collection('users').doc(userModel.user_id);
     try {
       UserCredential userCredential = await FirebaseAuth.instance
           .signInWithEmailAndPassword(
-          email: userModel.email, password: userModel.password);
+              email: userModel.email, password: userModel.password);
       if (userCredential.user != null) {
         userCredential.user!.updatePassword(password.text.trim()).then((value) {
           // final password_crypt = Crypt.sha256(
@@ -111,16 +111,17 @@ class _AccountState extends State<Account> {
     }
   }
 
-  void updateUserProfile({bool updateEmail = false,
-    BuildContext? cont,
-    required UserModel userModel}) async {
+  void updateUserProfile(
+      {bool updateEmail = false,
+      BuildContext? cont,
+      required UserModel userModel}) async {
     // DocumentReference users =
     //     FirebaseFirestore.instance.collection('users').doc(userModel.user_id);
     log(userModel.user_id, name: 'inside update user profile');
     try {
       UserCredential userCredential = await FirebaseAuth.instance
           .signInWithEmailAndPassword(
-          email: userModel.email, password: userModel.password);
+              email: userModel.email, password: userModel.password);
       if (userCredential.user != null) {
         if (updateEmail) {
           userCredential.user!
@@ -149,11 +150,12 @@ class _AccountState extends State<Account> {
     }
   }
 
-  void postUserProfileUpdate({bool updateEmail = false,
-    BuildContext? cont,
-    required UserModel userModel}) {
+  void postUserProfileUpdate(
+      {bool updateEmail = false,
+      BuildContext? cont,
+      required UserModel userModel}) {
     DocumentReference users =
-    FirebaseFirestore.instance.collection('users').doc(userModel.user_id);
+        FirebaseFirestore.instance.collection('users').doc(userModel.user_id);
     // final password_crypt = Crypt.sha256(
     //   password.text.trim(),
     // ).toString();
@@ -170,30 +172,31 @@ class _AccountState extends State<Account> {
       'updated': FieldValue.arrayUnion([
         {
           'updated_by': userModel.user_id,
-          'updated_on': DateTime
-              .now()
-              .millisecondsSinceEpoch
+          'updated_on': DateTime.now().millisecondsSinceEpoch
         }
       ])
     }).then((value) {
+      getIt
+          .get<Store<AppState>>()
+          .dispatch(GetUserAction(email: email.text.trim().toLowerCase()));
       getIt.get<Store<AppState>>().dispatch(GetUserEditAction(
-          userEditModel: UserModel(
-              user_id: userModel.user_id,
-              created_at: userModel.created_at,
-              added_by: userModel.added_by,
-              updated: userModel.updated,
-              full_name: full_name.text.trim(),
-              email: updateEmail
-                  ? email.text.trim().toLowerCase()
-                  : userModel.email,
-              age: int.parse(age.text),
-              country: 'Ghana',
-              is_active: is_active,
-              phone_number: phone.text,
-              gender: gender!,
-              roles: checked,
-              password: userModel.password,
-              location: {
+              userEditModel: UserModel(
+                  user_id: userModel.user_id,
+                  created_at: userModel.created_at,
+                  added_by: userModel.added_by,
+                  updated: userModel.updated,
+                  full_name: full_name.text.trim(),
+                  email: updateEmail
+                      ? email.text.trim().toLowerCase()
+                      : userModel.email,
+                  age: int.parse(age.text),
+                  country: 'Ghana',
+                  is_active: is_active,
+                  phone_number: phone.text,
+                  gender: gender!,
+                  roles: checked,
+                  password: userModel.password,
+                  location: {
                 'name': area.text.toUpperCase().trim(),
                 'region': region
               })));
@@ -220,13 +223,14 @@ class _AccountState extends State<Account> {
     // QuerySnapshot snapshot =
     users
         .where('email', isEqualTo: email.text.toLowerCase().trim())
-    // .where('password', isEqualTo: _password.text)
+        // .where('password', isEqualTo: _password.text)
         .get()
         .then((QuerySnapshot snapshot) {
       if (snapshot.size > 0) {
         _showMyDialogError(message: 'User with similar email exist');
       } else {
-        if (create) {} else {
+        if (create) {
+        } else {
           updateUserProfile(
               userModel: userModel,
               updateEmail: userModel.email != email.text.trim().toLowerCase(),
@@ -334,93 +338,76 @@ class _AccountState extends State<Account> {
                             area.text.length > 0 &&
                             region != null &&
                             checked.length > 0) {
-                          if (widget.option == 'Edit') {
-                            // log(state.userModelEdit!.full_name,
-                            //     name: full_name.text);
-                            if (state.userModelEdit!.full_name !=
-                                full_name.text.trim() ||
-                                state.userModelEdit!.email !=
-                                    email.text.trim().toLowerCase() ||
-                                state.userModelEdit!.age.toString() !=
-                                    age.text ||
-                                state.userModelEdit!.phone_number !=
-                                    phone.text ||
-                                state.userModelEdit!.is_active != is_active ||
-                                state.userModelEdit!.roles.length !=
-                                    checked.length ||
-                                '${state.userModelEdit!.location['name']}'
-                                    .toUpperCase() !=
-                                    area.text.trim().toUpperCase() ||
-                                state.userModelEdit!.location['region'] !=
-                                    region) {
-                              if (state.userModelEdit!.email !=
-                                  email.text.trim().toLowerCase()) {
-                                log('email section ran');
-                                checkUser(
-                                    cont: context,
-                                    create: false,
-                                    userModel: state.userModelEdit!);
-                              } else {
-                                log('i am supposed to be the one running',
-                                    name: updateUserModelEdit.user_id +
-                                        'it seems so');
-
-                                updateUserProfile(
-                                    cont: context,
-                                    userModel: updateUserModelEdit);
-                              }
-
-                              log('change made');
+                          // log(state.userModelEdit!.full_name,
+                          //     name: full_name.text);
+                          if (state.userModelEdit!.full_name !=
+                                  full_name.text.trim() ||
+                              state.userModelEdit!.email !=
+                                  email.text.trim().toLowerCase() ||
+                              state.userModelEdit!.age.toString() != age.text ||
+                              state.userModelEdit!.phone_number != phone.text ||
+                              state.userModelEdit!.is_active != is_active ||
+                              state.userModelEdit!.roles.length !=
+                                  checked.length ||
+                              '${state.userModelEdit!.location['name']}'
+                                      .toUpperCase() !=
+                                  area.text.trim().toUpperCase() ||
+                              state.userModelEdit!.location['region'] !=
+                                  region) {
+                            if (state.userModelEdit!.email !=
+                                email.text.trim().toLowerCase()) {
+                              log('email section ran');
+                              checkUser(
+                                  cont: context,
+                                  create: false,
+                                  userModel: state.userModelEdit!);
                             } else {
-                              _showMyDialogError(message: 'No changes made');
+                              log('i am supposed to be the one running',
+                                  name: updateUserModelEdit.user_id +
+                                      'it seems so');
+
+                              updateUserProfile(
+                                  cont: context,
+                                  userModel: updateUserModelEdit);
                             }
+
+                            log('change made');
                           } else {
-                            if (password.text.length > 7 &&
-                                confirm.text.length > 7 &&
-                                password.text == confirm.text) {
-                              // createUser();
-                            } else {
-                              _showMyDialogError(
-                                  message: password.text.length < 8
-                                      ? 'Password must be 8 or more characters'
-                                      : confirm.text.length < 8
-                                      ? 'Confirm Password must be 8 or more characters'
-                                      : 'Password and Confirm password not equal');
-                            }
+                            _showMyDialogError(message: 'No changes made');
                           }
                         } else {
                           _showMyDialogError(
                               message: full_name.text.length < 3
                                   ? 'Full name should be 3 or more characters'
                                   : !email.text.contains('@')
-                                  ? 'Email must contain @'
-                                  : !email.text.contains('.')
-                                  ? 'Email must contain .'
-                                  : email.text.length < 7
-                                  ? "Email length must be 7 or more characters"
-                                  : phone.text.length < 10
-                                  ? 'Phone number must be 10 characters'
-                                  : int.parse(age.text.length ==
-                                  0
-                                  ? '0'
-                                  : age.text) <
-                                  1
-                                  ? 'Age must be greater than 1'
-                                  : gender == null
-                                  ? 'Gender not selected'
-                                  : area.text.length < 1
-                                  ? 'Area must be provided'
-                                  : region == null
-                                  ? 'Region must be provided'
-                                  : checked.length ==
-                                  0
-                                  ? 'Role must be assigned'
-                                  : password.text.length <
-                                  8
-                                  ? 'Password must be 8 or more characters'
-                                  : confirm.text.length < 8
-                                  ? 'Confirm Password must be 8 or more characters'
-                                  : 'Password and Confirm password not equal');
+                                      ? 'Email must contain @'
+                                      : !email.text.contains('.')
+                                          ? 'Email must contain .'
+                                          : email.text.length < 7
+                                              ? "Email length must be 7 or more characters"
+                                              : phone.text.length < 10
+                                                  ? 'Phone number must be 10 characters'
+                                                  : int.parse(age.text.length ==
+                                                                  0
+                                                              ? '0'
+                                                              : age.text) <
+                                                          1
+                                                      ? 'Age must be greater than 1'
+                                                      : gender == null
+                                                          ? 'Gender not selected'
+                                                          : area.text.length < 1
+                                                              ? 'Area must be provided'
+                                                              : region == null
+                                                                  ? 'Region must be provided'
+                                                                  : checked.length ==
+                                                                          0
+                                                                      ? 'Role must be assigned'
+                                                                      : password.text.length <
+                                                                              8
+                                                                          ? 'Password must be 8 or more characters'
+                                                                          : confirm.text.length < 8
+                                                                              ? 'Confirm Password must be 8 or more characters'
+                                                                              : 'Password and Confirm password not equal');
                         }
                       } else {
                         if (password.text.length > 7 &&
@@ -432,8 +419,8 @@ class _AccountState extends State<Account> {
                               message: password.text.length < 8
                                   ? 'Password must be 8 or more characters'
                                   : confirm.text.length < 8
-                                  ? 'Confirm Password must be 8 or more characters'
-                                  : 'Password and Confirm password not equal');
+                                      ? 'Confirm Password must be 8 or more characters'
+                                      : 'Password and Confirm password not equal');
                         }
                       }
                     })
@@ -452,20 +439,20 @@ class _AccountState extends State<Account> {
                         children: [
                           Expanded(
                               child: Container(
-                                color: page == 0
-                                    ? DefaultColors().shadowColorRed
-                                    : Colors.transparent,
-                                child: TextButton(
-                                    onPressed: () {
-                                      pageController.animateToPage(0,
-                                          duration: Duration(milliseconds: 500),
-                                          curve: Curves.easeInOut);
-                                      setState(() {
-                                        page = 0;
-                                      });
-                                    },
-                                    child: DarkRedText(text: 'Profile')),
-                              )),
+                            color: page == 0
+                                ? DefaultColors().shadowColorRed
+                                : Colors.transparent,
+                            child: TextButton(
+                                onPressed: () {
+                                  pageController.animateToPage(0,
+                                      duration: Duration(milliseconds: 500),
+                                      curve: Curves.easeInOut);
+                                  setState(() {
+                                    page = 0;
+                                  });
+                                },
+                                child: DarkRedText(text: 'Profile')),
+                          )),
                           Expanded(
                               child: Container(
                                   color: page == 1
@@ -475,7 +462,7 @@ class _AccountState extends State<Account> {
                                       onPressed: () {
                                         pageController.animateToPage(1,
                                             duration:
-                                            Duration(milliseconds: 500),
+                                                Duration(milliseconds: 500),
                                             curve: Curves.easeInOut);
                                         setState(() {
                                           page = 1;
@@ -488,405 +475,396 @@ class _AccountState extends State<Account> {
                     )),
                 Expanded(
                     child: PageView(
-                      controller: pageController,
-                      onPageChanged: (int p) {
-                        setState(() {
-                          page = p;
-                        });
-                      },
+                  controller: pageController,
+                  onPageChanged: (int p) {
+                    setState(() {
+                      page = p;
+                    });
+                  },
+                  children: [
+                    ListView(
+                      padding: EdgeInsets.only(
+                          left: 15, right: 15, top: 10, bottom: 60),
                       children: [
-                        ListView(
-                          padding:
-                          EdgeInsets.only(left: 15,right: 15, top: 10,bottom: 60),
+                        DefaultInput(
+                            keyboardType: TextInputType.name,
+                            controller: full_name,
+                            hint: 'Full Name',
+                            error: full_name_error),
+                        SizedBox(
+                          height: 10,
+                        ),
+                        DefaultInput(
+                            keyboardType: TextInputType.emailAddress,
+                            controller: email,
+                            hint: 'Email',
+                            error: full_name_error),
+                        SizedBox(
+                          height: 10,
+                        ),
+                        DefaultInput(
+                          inputFormatters: [
+                            LengthLimitingTextInputFormatter(10),
+                          ],
+                          controller: phone,
+                          hint: 'Phone Number',
+                          error: full_name_error,
+                          keyboardType: TextInputType.phone,
+                        ),
+                        SizedBox(
+                          height: 10,
+                        ),
+                        Flex(
+                          direction: Axis.horizontal,
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
-                            DefaultInput(
-                                keyboardType: TextInputType.name,
-                                controller: full_name,
-                                hint: 'Full Name',
-                                error: full_name_error),
-                            SizedBox(
-                              height: 10,
-                            ),
-                            DefaultInput(
-                                keyboardType: TextInputType.emailAddress,
-                                controller: email,
-                                hint: 'Email',
-                                error: full_name_error),
-                            SizedBox(
-                              height: 10,
-                            ),
-                            DefaultInput(
-                              inputFormatters: [
-                                LengthLimitingTextInputFormatter(10),
-                              ],
-                              controller: phone,
-                              hint: 'Phone Number',
-                              error: full_name_error,
-                              keyboardType: TextInputType.phone,
-                            ),
-                            SizedBox(
-                              height: 10,
-                            ),
-                            Flex(
-                              direction: Axis.horizontal,
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                Expanded(
-                                  flex: 4,
-                                  child: DefaultInput(
-                                    inputFormatters: [
-                                      LengthLimitingTextInputFormatter(2),
-                                    ],
-                                    controller: age,
-                                    hint: 'Age',
-                                    error: full_name_error,
-                                    keyboardType: TextInputType.number,
-                                  ),
-                                ),
-                                Spacer(
-                                  flex: 1,
-                                ),
-                                Expanded(
-                                    flex: 4,
-                                    child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment
-                                          .start,
-                                      mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        RedText(
-                                          text: 'Gender',
-                                        ),
-                                        Container(
-                                          alignment: Alignment.center,
-                                          height: 60,
-                                          decoration: BoxDecoration(
-                                              color: DefaultColors().white,
-                                              border: Border.all(
-                                                width: 2,
-                                                color: DefaultColors().primary,
-                                              ),
-                                              borderRadius:
-                                              BorderRadius.circular(0),
-                                              boxShadow: [
-                                                // BoxShadow(
-                                                //     color: DefaultColors().shadowColorGrey,
-                                                //     offset: Offset(0, 5),
-                                                //     blurRadius: 10)
-                                              ]),
-                                          margin: EdgeInsets.only(top: 5),
-                                          padding:
-                                          EdgeInsets.symmetric(horizontal: 10),
-                                          child: DropdownButton<String>(
-                                            value: gender,
-
-                                            icon: Icon(
-                                                Icons
-                                                    .keyboard_arrow_down_outlined),
-                                            iconSize: 24,
-                                            elevation: 16,
-                                            isExpanded: true,
-
-                                            hint: Text('Select a gender'),
-                                            style:
-                                            TextStyle(color: Colors.deepPurple),
-                                            // selectedItemBuilder: ,
-                                            underline: Container(
-                                              height: 0,
-                                              color: Colors.deepPurpleAccent,
-                                            ),
-                                            onChanged: (String? newValue) {
-                                              // getIt.get<Store<AppState>>().dispatch(
-                                              //     SelectTimeValuesAction(
-                                              //         screen: widget.title, selected: newValue));
-                                              setState(() {
-                                                gender = newValue!;
-                                              });
-                                            },
-                                            items: ['Male', 'Female']
-                                                .map<DropdownMenuItem<String>>(
-                                                    (String value) {
-                                                  return DropdownMenuItem<
-                                                      String>(
-                                                    value: value,
-                                                    child: Text(
-                                                      value,
-                                                      textAlign: TextAlign
-                                                          .center,
-                                                      style: TextStyle(
-                                                        color: DefaultColors()
-                                                            .darkblue,
-                                                      ),
-                                                    ),
-                                                  );
-                                                }).toList(),
-                                          ),
-                                        ),
-                                      ],
-                                    ))
-                              ],
-                            ),
-                            SizedBox(
-                              height: 10,
-                            ),
-                            Padding(
-                              padding: EdgeInsets.symmetric(vertical: 5),
-                              child: DarkBlueText(
-                                text: 'Location',
-                              ),
-                            ),
-                            Flex(
-                              direction: Axis.horizontal,
-                              children: [
-                                Expanded(
-                                  flex: 4,
-                                  child: DefaultInput(
-                                      controller: area,
-                                      hint: 'Area',
-                                      error: full_name_error),
-                                ),
-                                Spacer(
-                                  flex: 1,
-                                ),
-                                Expanded(
-                                  flex: 4,
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment
-                                        .start,
-                                    mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      RedText(
-                                        text: 'Region',
-                                      ),
-                                      Container(
-                                        alignment: Alignment.center,
-                                        height: 60,
-                                        decoration: BoxDecoration(
-                                            color: DefaultColors().white,
-                                            border: Border.all(
-                                              width: 2,
-                                              color: DefaultColors().primary,
-                                            ),
-                                            borderRadius: BorderRadius.circular(
-                                                0),
-                                            boxShadow: [
-                                              // BoxShadow(
-                                              //     color: DefaultColors().shadowColorGrey,
-                                              //     offset: Offset(0, 5),
-                                              //     blurRadius: 10)
-                                            ]),
-                                        margin: EdgeInsets.only(top: 5),
-                                        padding:
-                                        EdgeInsets.symmetric(horizontal: 10),
-                                        child: DropdownButton<String>(
-                                          value: region,
-
-                                          icon: Icon(
-                                              Icons
-                                                  .keyboard_arrow_down_outlined),
-                                          iconSize: 24,
-                                          elevation: 16,
-                                          isExpanded: true,
-
-                                          hint: Text('Select a Region'),
-                                          style:
-                                          TextStyle(color: Colors.deepPurple),
-                                          // selectedItemBuilder: ,
-                                          underline: Container(
-                                            height: 0,
-                                            color: Colors.deepPurpleAccent,
-                                          ),
-                                          onChanged: (String? newValue) {
-                                            // getIt.get<Store<AppState>>().dispatch(
-                                            //     SelectTimeValuesAction(
-                                            //         screen: widget.title, selected: newValue));
-                                            setState(() {
-                                              region = newValue!;
-                                            });
-                                          },
-                                          items: [
-                                            'Ashanti',
-                                            'Bono Region',
-                                            'Bono East',
-                                            'Ahafo',
-                                            'Central',
-                                            'Eastern',
-                                            'Greater Accra',
-                                            'Northern',
-                                            'Savannah',
-                                            'North East',
-                                            'Upper East',
-                                            'Upper West',
-                                            'Volta',
-                                            'Oti',
-                                            'Western',
-                                            'Western North'
-                                          ].map<DropdownMenuItem<String>>(
-                                                  (String value) {
-                                                return DropdownMenuItem<String>(
-                                                  value: value,
-                                                  child: Text(
-                                                    value,
-                                                    textAlign: TextAlign.center,
-                                                    style: TextStyle(
-                                                      color: DefaultColors()
-                                                          .darkblue,
-                                                    ),
-                                                  ),
-                                                );
-                                              }).toList(),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                )
-                              ],
-                            ),
-                            SizedBox(
-                              height: 10,
-                            ),
-                            Visibility(
-                              visible: widget.option != 'Edit',
-                              child: Flex(
-                                direction: Axis.horizontal,
-                                children: [
-                                  Expanded(
-                                    flex: 4,
-                                    child: DefaultInput(
-                                        controller: password,
-                                        hint: 'Password',
-                                        error: full_name_error),
-                                  ),
-                                  Spacer(
-                                    flex: 1,
-                                  ),
-                                  Expanded(
-                                    flex: 4,
-                                    child: DefaultInput(
-                                        controller: confirm,
-                                        hint: 'Confirm Password',
-                                        error: full_name_error),
-                                  )
+                            Expanded(
+                              flex: 4,
+                              child: DefaultInput(
+                                inputFormatters: [
+                                  LengthLimitingTextInputFormatter(2),
                                 ],
+                                controller: age,
+                                hint: 'Age',
+                                error: full_name_error,
+                                keyboardType: TextInputType.number,
                               ),
                             ),
-                            // Padding(
-                            //     padding: EdgeInsets.only(top: 10),
-                            //     child: RedText(
-                            //       text: 'User status',
-                            //     )),
-                            // Theme(
-                            //   data: ThemeData(
-                            //       focusColor: DefaultColors().green,
-                            //       unselectedWidgetColor: is_active
-                            //           ? DefaultColors().primary
-                            //           : DefaultColors().green,
-                            //       disabledColor: !is_active
-                            //           ? DefaultColors().primary
-                            //           : DefaultColors().green),
-                            //   child: Row(
-                            //     children: <Widget>[
-                            //       Container(
-                            //         child: Row(
-                            //           children: [
-                            //             Radio(
-                            //               value: true,
-                            //               groupValue: is_active,
-                            //               onChanged: is_active
-                            //                   ? null
-                            //                   : (bool? value) {
-                            //                 setState(() {
-                            //                   is_active = value!;
-                            //                 });
-                            //               },
-                            //             ),
-                            //             DarkGreenText(text: 'Active')
-                            //           ],
-                            //         ),
-                            //       ),
-                            //       Container(
-                            //         child: Row(
-                            //           children: [
-                            //             Radio(
-                            //               activeColor: DefaultColors().primary,
-                            //               value: false,
-                            //               groupValue: is_active,
-                            //               onChanged: !is_active
-                            //                   ? null
-                            //                   : (bool? value) {
-                            //                 setState(() {
-                            //                   is_active = value!;
-                            //                 });
-                            //               },
-                            //             ),
-                            //             RedText(text: 'Not Active')
-                            //           ],
-                            //         ),
-                            //       ),
-                            //     ],
-                            //   ),
-                            // ),
-                            // SizedBox(
-                            //   height: 10,
-                            // ),
-                            // RedText(
-                            //   text: 'User Roles',
-                            // ),
-                            // Row(
-                            //   // direction: Axis.horizontal,
-                            //     children: rolesList.map((e) {
-                            //       return Row(
-                            //         children: [
-                            //           Checkbox(
-                            //             onChanged: (bool? value) {
-                            //               setState(() {
-                            //                 if (value!) {
-                            //                   checked.add(e.toUpperCase());
-                            //                 } else {
-                            //                   checked.remove(e.toUpperCase());
-                            //                 }
-                            //
-                            //                 // checked[rolesList.indexOf(e)] = value!;
-                            //               });
-                            //             },
-                            //             // tristate: i == 1,
-                            //             value: checked.contains(
-                            //                 e.toUpperCase()),
-                            //           ),
-                            //           Text(
-                            //             e,
-                            //           ),
-                            //         ],
-                            //         mainAxisAlignment: MainAxisAlignment.center,
-                            //       );
-                            //     }).toList())
+                            Spacer(
+                              flex: 1,
+                            ),
+                            Expanded(
+                                flex: 4,
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    RedText(
+                                      text: 'Gender',
+                                    ),
+                                    Container(
+                                      alignment: Alignment.center,
+                                      height: 60,
+                                      decoration: BoxDecoration(
+                                          color: DefaultColors().white,
+                                          border: Border.all(
+                                            width: 2,
+                                            color: DefaultColors().primary,
+                                          ),
+                                          borderRadius:
+                                              BorderRadius.circular(0),
+                                          boxShadow: [
+                                            // BoxShadow(
+                                            //     color: DefaultColors().shadowColorGrey,
+                                            //     offset: Offset(0, 5),
+                                            //     blurRadius: 10)
+                                          ]),
+                                      margin: EdgeInsets.only(top: 5),
+                                      padding:
+                                          EdgeInsets.symmetric(horizontal: 10),
+                                      child: DropdownButton<String>(
+                                        value: gender,
+
+                                        icon: Icon(
+                                            Icons.keyboard_arrow_down_outlined),
+                                        iconSize: 24,
+                                        elevation: 16,
+                                        isExpanded: true,
+
+                                        hint: Text('Select a gender'),
+                                        style:
+                                            TextStyle(color: Colors.deepPurple),
+                                        // selectedItemBuilder: ,
+                                        underline: Container(
+                                          height: 0,
+                                          color: Colors.deepPurpleAccent,
+                                        ),
+                                        onChanged: (String? newValue) {
+                                          // getIt.get<Store<AppState>>().dispatch(
+                                          //     SelectTimeValuesAction(
+                                          //         screen: widget.title, selected: newValue));
+                                          setState(() {
+                                            gender = newValue!;
+                                          });
+                                        },
+                                        items: ['Male', 'Female']
+                                            .map<DropdownMenuItem<String>>(
+                                                (String value) {
+                                          return DropdownMenuItem<String>(
+                                            value: value,
+                                            child: Text(
+                                              value,
+                                              textAlign: TextAlign.center,
+                                              style: TextStyle(
+                                                color: DefaultColors().darkblue,
+                                              ),
+                                            ),
+                                          );
+                                        }).toList(),
+                                      ),
+                                    ),
+                                  ],
+                                ))
                           ],
                         ),
-                        if (widget.option == 'Edit' &&
-                            state.userModel!.user_id !=
-                                state.userModelEdit!.user_id)
-                          ListView(
-                            padding:
-                            EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                        SizedBox(
+                          height: 10,
+                        ),
+                        Padding(
+                          padding: EdgeInsets.symmetric(vertical: 5),
+                          child: DarkBlueText(
+                            text: 'Location',
+                          ),
+                        ),
+                        Flex(
+                          direction: Axis.horizontal,
+                          children: [
+                            Expanded(
+                              flex: 4,
+                              child: DefaultInput(
+                                  controller: area,
+                                  hint: 'Area',
+                                  error: full_name_error),
+                            ),
+                            Spacer(
+                              flex: 1,
+                            ),
+                            Expanded(
+                              flex: 4,
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  RedText(
+                                    text: 'Region',
+                                  ),
+                                  Container(
+                                    alignment: Alignment.center,
+                                    height: 60,
+                                    decoration: BoxDecoration(
+                                        color: DefaultColors().white,
+                                        border: Border.all(
+                                          width: 2,
+                                          color: DefaultColors().primary,
+                                        ),
+                                        borderRadius: BorderRadius.circular(0),
+                                        boxShadow: [
+                                          // BoxShadow(
+                                          //     color: DefaultColors().shadowColorGrey,
+                                          //     offset: Offset(0, 5),
+                                          //     blurRadius: 10)
+                                        ]),
+                                    margin: EdgeInsets.only(top: 5),
+                                    padding:
+                                        EdgeInsets.symmetric(horizontal: 10),
+                                    child: DropdownButton<String>(
+                                      value: region,
+
+                                      icon: Icon(
+                                          Icons.keyboard_arrow_down_outlined),
+                                      iconSize: 24,
+                                      elevation: 16,
+                                      isExpanded: true,
+
+                                      hint: Text('Select a Region'),
+                                      style:
+                                          TextStyle(color: Colors.deepPurple),
+                                      // selectedItemBuilder: ,
+                                      underline: Container(
+                                        height: 0,
+                                        color: Colors.deepPurpleAccent,
+                                      ),
+                                      onChanged: (String? newValue) {
+                                        // getIt.get<Store<AppState>>().dispatch(
+                                        //     SelectTimeValuesAction(
+                                        //         screen: widget.title, selected: newValue));
+                                        setState(() {
+                                          region = newValue!;
+                                        });
+                                      },
+                                      items: [
+                                        'Ashanti',
+                                        'Bono Region',
+                                        'Bono East',
+                                        'Ahafo',
+                                        'Central',
+                                        'Eastern',
+                                        'Greater Accra',
+                                        'Northern',
+                                        'Savannah',
+                                        'North East',
+                                        'Upper East',
+                                        'Upper West',
+                                        'Volta',
+                                        'Oti',
+                                        'Western',
+                                        'Western North'
+                                      ].map<DropdownMenuItem<String>>(
+                                          (String value) {
+                                        return DropdownMenuItem<String>(
+                                          value: value,
+                                          child: Text(
+                                            value,
+                                            textAlign: TextAlign.center,
+                                            style: TextStyle(
+                                              color: DefaultColors().darkblue,
+                                            ),
+                                          ),
+                                        );
+                                      }).toList(),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            )
+                          ],
+                        ),
+                        SizedBox(
+                          height: 10,
+                        ),
+                        Visibility(
+                          visible: widget.option != 'Edit',
+                          child: Flex(
+                            direction: Axis.horizontal,
                             children: [
-                              Container(
+                              Expanded(
+                                flex: 4,
                                 child: DefaultInput(
                                     controller: password,
                                     hint: 'Password',
                                     error: full_name_error),
                               ),
-                              Container(
+                              Spacer(
+                                flex: 1,
+                              ),
+                              Expanded(
+                                flex: 4,
                                 child: DefaultInput(
                                     controller: confirm,
                                     hint: 'Confirm Password',
                                     error: full_name_error),
                               )
                             ],
-                          )
+                          ),
+                        ),
+                        // Padding(
+                        //     padding: EdgeInsets.only(top: 10),
+                        //     child: RedText(
+                        //       text: 'User status',
+                        //     )),
+                        // Theme(
+                        //   data: ThemeData(
+                        //       focusColor: DefaultColors().green,
+                        //       unselectedWidgetColor: is_active
+                        //           ? DefaultColors().primary
+                        //           : DefaultColors().green,
+                        //       disabledColor: !is_active
+                        //           ? DefaultColors().primary
+                        //           : DefaultColors().green),
+                        //   child: Row(
+                        //     children: <Widget>[
+                        //       Container(
+                        //         child: Row(
+                        //           children: [
+                        //             Radio(
+                        //               value: true,
+                        //               groupValue: is_active,
+                        //               onChanged: is_active
+                        //                   ? null
+                        //                   : (bool? value) {
+                        //                 setState(() {
+                        //                   is_active = value!;
+                        //                 });
+                        //               },
+                        //             ),
+                        //             DarkGreenText(text: 'Active')
+                        //           ],
+                        //         ),
+                        //       ),
+                        //       Container(
+                        //         child: Row(
+                        //           children: [
+                        //             Radio(
+                        //               activeColor: DefaultColors().primary,
+                        //               value: false,
+                        //               groupValue: is_active,
+                        //               onChanged: !is_active
+                        //                   ? null
+                        //                   : (bool? value) {
+                        //                 setState(() {
+                        //                   is_active = value!;
+                        //                 });
+                        //               },
+                        //             ),
+                        //             RedText(text: 'Not Active')
+                        //           ],
+                        //         ),
+                        //       ),
+                        //     ],
+                        //   ),
+                        // ),
+                        // SizedBox(
+                        //   height: 10,
+                        // ),
+                        // RedText(
+                        //   text: 'User Roles',
+                        // ),
+                        // Row(
+                        //   // direction: Axis.horizontal,
+                        //     children: rolesList.map((e) {
+                        //       return Row(
+                        //         children: [
+                        //           Checkbox(
+                        //             onChanged: (bool? value) {
+                        //               setState(() {
+                        //                 if (value!) {
+                        //                   checked.add(e.toUpperCase());
+                        //                 } else {
+                        //                   checked.remove(e.toUpperCase());
+                        //                 }
+                        //
+                        //                 // checked[rolesList.indexOf(e)] = value!;
+                        //               });
+                        //             },
+                        //             // tristate: i == 1,
+                        //             value: checked.contains(
+                        //                 e.toUpperCase()),
+                        //           ),
+                        //           Text(
+                        //             e,
+                        //           ),
+                        //         ],
+                        //         mainAxisAlignment: MainAxisAlignment.center,
+                        //       );
+                        //     }).toList())
                       ],
-                    ))
+                    ),
+                    if (widget.option == 'Edit' &&
+                        state.userModel!.user_id !=
+                            state.userModelEdit!.user_id)
+                      ListView(
+                        padding:
+                            EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                        children: [
+                          Container(
+                            child: DefaultInput(
+                                controller: password,
+                                hint: 'Password',
+                                error: full_name_error),
+                          ),
+                          Container(
+                            child: DefaultInput(
+                                controller: confirm,
+                                hint: 'Confirm Password',
+                                error: full_name_error),
+                          )
+                        ],
+                      )
+                  ],
+                ))
               ],
             ));
       },

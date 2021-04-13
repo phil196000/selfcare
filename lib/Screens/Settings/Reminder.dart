@@ -30,6 +30,7 @@ class _ReminderState extends State<Reminder> {
       {TimeOfDay time = const TimeOfDay(hour: 9, minute: 0)}) {
     tz.initializeTimeZones();
     final tz.TZDateTime now = tz.TZDateTime.now(tz.local);
+    log(tz.local.toString(), name: 'tz local');
     tz.TZDateTime scheduledDate = tz.TZDateTime(
         tz.local, now.year, now.month, now.day, time.hour, time.minute);
     if (scheduledDate.isBefore(now)) {
@@ -64,6 +65,7 @@ class _ReminderState extends State<Reminder> {
   @override
   void initState() {
     super.initState();
+    _checkPendingNotificationRequests();
     setState(() {
       timeOfDay = TimeOfDay(hour: 9, minute: 0);
     });
@@ -96,7 +98,7 @@ class _ReminderState extends State<Reminder> {
       _checkPendingNotificationRequests() async {
     final List<PendingNotificationRequest> pendingNotificationRequests =
         await flutterLocalNotificationsPlugin.pendingNotificationRequests();
-
+    log((pendingNotificationRequests[0].payload!).toString());
     return pendingNotificationRequests;
   }
 
@@ -106,11 +108,11 @@ class _ReminderState extends State<Reminder> {
     await flutterLocalNotificationsPlugin.zonedSchedule(
         0,
         'Reminder',
-        'Have you uploaded your readings for the day yet?',
+        'Have you input your readings for the day yet?',
         _nextInstanceOfTenAM(time: time),
         const NotificationDetails(
           android: AndroidNotificationDetails(
-              'reminder_channerl_id',
+              'reminder_channel_id',
               'reminder channel',
               'This is the recurring reminder notification'),
         ),

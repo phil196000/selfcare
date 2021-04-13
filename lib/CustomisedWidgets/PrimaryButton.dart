@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:selfcare/CustomisedWidgets/WhiteText.dart';
 import 'package:selfcare/Theme/DefaultColors.dart';
 
 class PrimaryButton extends StatelessWidget {
@@ -18,8 +19,24 @@ class PrimaryButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    return ElevatedButton(
+        onPressed: () => this.onPressed!(),
+        style: ButtonStyle(
+            padding: MaterialStateProperty.resolveWith((states) =>
+                EdgeInsets.symmetric(
+                    vertical: verticalPadding,
+                    horizontal: this.horizontalPadding)),
+            backgroundColor: MaterialStateProperty.resolveWith(
+                (states) => defaultColors.primary),
+            side: MaterialStateProperty.resolveWith((states) => BorderSide(
+                width: 1,
+                color: defaultColors.white,
+                style: BorderStyle.solid))),
+        child: WhiteText(
+          text: this.text,
+        ));
     return RaisedButton(
-      onPressed: ()=>this.onPressed!(),
+      onPressed: () => this.onPressed!(),
       padding: EdgeInsets.all(0),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(5),

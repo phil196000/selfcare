@@ -4,6 +4,7 @@ import 'dart:developer';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:crypt/crypt.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
@@ -152,6 +153,12 @@ class _LoginState extends State<Login> {
     }
   }
 
+//Register To topic
+  void registerToTipsTopic() async {
+    await FirebaseMessaging.instance.subscribeToTopic('tips');
+    await FirebaseMessaging.instance.subscribeToTopic('chats');
+  }
+
   void getUserData() {
     CollectionReference users = FirebaseFirestore.instance.collection('users');
     // QuerySnapshot snapshot =
@@ -162,6 +169,8 @@ class _LoginState extends State<Login> {
         .then((QuerySnapshot snapshot) {
       log('successful');
       if (snapshot.size > 0) {
+        registerToTipsTopic();
+
         snapshot.docs.forEach((DocumentSnapshot documentSnapshot) {
           UserModel userModel = UserModel.fromJson(documentSnapshot.data()!);
 

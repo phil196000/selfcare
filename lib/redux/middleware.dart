@@ -1,11 +1,13 @@
 import 'dart:developer';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:redux/redux.dart';
 import 'package:selfcare/Data/BloodPressure.dart';
 import 'package:selfcare/Data/BodyWeight.dart';
 import 'package:selfcare/Data/Chats.dart';
 import 'package:selfcare/Data/HealthTip.dart';
+import 'package:selfcare/Data/RatingsModel.dart';
 import 'package:selfcare/Data/RecordsModel.dart';
 import 'package:selfcare/Data/UserModel.dart';
 import 'package:selfcare/Data/bloodglucosepost.dart';
@@ -15,6 +17,7 @@ import 'package:selfcare/redux/Actions/GetGlucoseAction.dart';
 import 'package:selfcare/redux/Actions/GetPressureAction.dart';
 import 'package:selfcare/redux/Actions/GetRecordsAction.dart';
 import 'package:selfcare/redux/Actions/GetUsersAction.dart';
+import 'package:selfcare/redux/Actions/RatingsAction.dart';
 import 'package:selfcare/redux/Actions/TipsAction.dart';
 
 import 'Actions/GetUserAction.dart';
@@ -28,6 +31,22 @@ import 'AppState.dart';
 //
 // Middleware do not return any values themselves. They simply forward
 // actions on to the Reducer or swallow actions in some special cases.
+Future<void> saveTokenToDatabase(String token, {String? userId}) async {
+  await FirebaseFirestore.instance.collection('users').doc(userId).update({
+    'tokens': FieldValue.arrayUnion([token]),
+  });
+}
+
+Future<void> listenToToken(String userId) async {
+  String token = (await FirebaseMessaging.instance.getToken())!;
+
+  // Save the initial token to the database
+  await saveTokenToDatabase(token, userId: userId);
+
+  // Any time the token refreshes, store this in the database too.
+  FirebaseMessaging.instance.onTokenRefresh.listen(saveTokenToDatabase);
+}
+
 void fetchUser(Store<AppState> store, action, NextDispatcher next) {
   // If our Middleware encounters a `FetchTodoAction`
   if (action is GetUserAction) {
@@ -41,6 +60,7 @@ void fetchUser(Store<AppState> store, action, NextDispatcher next) {
       if (snapshot.size > 0) {
         snapshot.docs.forEach((DocumentSnapshot documentSnapshot) {
           UserModel userModel = UserModel.fromJson(documentSnapshot.data()!);
+          listenToToken(userModel.user_id);
           store.dispatch(GetUserActionSuccess(userModelUser: userModel));
           store.dispatch(GetGlucoseAction(user_id: userModel.user_id));
           store.dispatch(GetPressureAction(user_id: userModel.user_id));
@@ -334,9 +354,39 @@ void fetchChats(Store<AppState> store, action, NextDispatcher next) {
   }
   next(action);
 }
+
+void fetchRatings(Store<AppState> store, action, NextDispatcher next) {
+  if (action is RatingsAction) {
+    Query tips = FirebaseFirestore.instance
+        .collection('ratings')
+        .orderBy('created_at', descending: true);
+    Stream<QuerySnapshot> snapshot = tips.snapshots();
+
+    snapshot.listen((element) {
+      List<RatingsModel> initialTips = [];
+      element.docs.forEach((e) {
+        // log('i ran');
+        RatingsModel ratingsModel = RatingsModel.fromJson(e.data()!);
+        // log(userModel.full_name, name: 'full name');
+
+        initialTips.add(ratingsModel);
+      });
+      store.dispatch(RatingsActionSuccess(ratings: initialTips));
+      // log('listener');
+      // log(initialTips.length.toString(), name: 'initial users');
+    });
+    // snapshot.single.then((value) => log(value.size.toString(),name: 'Streams'));
+
+    // log('users fetch done');
+  }
+  next(action);
+}
+
 void fetchTips(Store<AppState> store, action, NextDispatcher next) {
   if (action is TipsAction) {
-    Query tips = FirebaseFirestore.instance.collection('tips').orderBy('created_at',descending: true);
+    Query tips = FirebaseFirestore.instance
+        .collection('tips')
+        .orderBy('created_at', descending: true);
     Stream<QuerySnapshot> snapshot = tips.snapshots();
 
     snapshot.listen((element) {
@@ -358,6 +408,7 @@ void fetchTips(Store<AppState> store, action, NextDispatcher next) {
   }
   next(action);
 }
+
 void fetchUsers(Store<AppState> store, action, NextDispatcher next) {
   if (action is GetUsersAction) {
     CollectionReference users = FirebaseFirestore.instance.collection('users');
