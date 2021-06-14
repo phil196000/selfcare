@@ -109,7 +109,7 @@ class _UserFormDialogState extends State<UserFormDialog> {
       'gender': gender,
       'roles': checked,
       'location': {'name': area.text.toUpperCase().trim(), 'region': region},
-      'int created_at': DateTime.now().millisecondsSinceEpoch,
+      'created_at': DateTime.now().millisecondsSinceEpoch,
       'user_id': users.id,
       'updated': [],
       'online': false

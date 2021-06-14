@@ -14,6 +14,7 @@ import 'package:selfcare/Screens/Home.dart';
 import 'package:selfcare/Screens/Settings.dart';
 import 'package:selfcare/Theme/DefaultColors.dart';
 import 'package:selfcare/redux/AppState.dart';
+import 'package:selfcare/Screens/Admin/Hospitals.dart';
 
 class AdminMain extends StatefulWidget {
   @override
@@ -64,7 +65,8 @@ class _AdminMainState extends State<AdminMain> {
           });
         },
       ),
-      Rating()
+      Rating(),
+      Hospitals()
 
       // Search(),
       // Community(),
@@ -86,7 +88,7 @@ class _AdminMainState extends State<AdminMain> {
           textStyle: TextStyle(fontWeight: FontWeight.bold)),
       PersistentBottomNavBarItem(
           icon: Icon(
-            Icons.local_hospital,
+            Icons.article,
             color: selected == 1 ? defaultColors.white : defaultColors.primary,
           ),
           title: "Health Tips",
@@ -101,6 +103,17 @@ class _AdminMainState extends State<AdminMain> {
             color: selected == 2 ? defaultColors.white : defaultColors.primary,
           ),
           title: "Ratings",
+          // activeColorAlternate: defaultColors.white,
+          // activeColor: defaultColors.primary,
+          // inactiveColor: defaultColors.primary,
+          contentPadding: 0,
+          textStyle: TextStyle(fontWeight: FontWeight.bold)),
+      PersistentBottomNavBarItem(
+          icon: Icon(
+            Icons.local_hospital,
+            color: selected == 3 ? defaultColors.white : defaultColors.primary,
+          ),
+          title: "Hospital",
           // activeColorAlternate: defaultColors.white,
           // activeColor: defaultColors.primary,
           // inactiveColor: defaultColors.primary,
@@ -132,7 +145,7 @@ class _AdminMainState extends State<AdminMain> {
               curve: Curves.ease,
               duration: Duration(milliseconds: 200),
             ),
-            itemCount: 3,
+            itemCount: 4,
             customWidget: CustomNavBarWidget(
               items: _navBarsItems(),
               selectedIndex: selected,

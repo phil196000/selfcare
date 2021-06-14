@@ -511,7 +511,7 @@ class _RecordState extends State<Record> {
                                                     .height *
                                                 0.002)),
                                 Visibility(
-                                  visible: false,
+                                  visible: widget.title == 'Body Weight',
                                   child: Row(
                                     children: [
                                       Container(

@@ -357,6 +357,7 @@ void fetchChats(Store<AppState> store, action, NextDispatcher next) {
 
 void fetchRatings(Store<AppState> store, action, NextDispatcher next) {
   if (action is RatingsAction) {
+
     Query tips = FirebaseFirestore.instance
         .collection('ratings')
         .orderBy('created_at', descending: true);
